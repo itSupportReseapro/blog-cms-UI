@@ -2,10 +2,11 @@ import Link from "next/link";
 
 const links = [
   { href: "/blog/dashboard", label: "Dashboard" },
-  { href: "/blog/posts", label: "Posts" },
-  { href: "/blog/categories", label: "Categories" },
-  { href: "/blog/comments", label: "Comments" },
-  { href: "/blog/settings", label: "Settings" },
+  { href: "/blog/activity-log", label: "Activity Log" },
+  { href: "/blog/blogs", label: "Blogs" },
+  { href: "/blog/privacy-policy", label: "Privacy Policy" },
+  { href: "/blog/term-and-condition", label: "Term & Condition" },
+  { href: "/blog/user-and-role", label: "User & Role" },
 ];
 
 export default function BlogSidebar() {
