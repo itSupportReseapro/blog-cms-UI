@@ -1,0 +1,179 @@
+.pdp-textbox-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.pdp-textbox-label {
+  position: absolute;
+  top: 43%;
+  left: 10px;
+  color: #666;
+  transition: all 0.2s ease;
+  transform: translateY(-50%);
+  font-size: 16px;
+  font-weight: 400;
+  background-color: white;
+  padding: 1px 24px 3px 12px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.pdp-textbox-input,
+.pdp-textbox-dropdown {
+  width: 100%;
+  height: 40px;
+  padding: 8px 40px 8px 12px; /* space for icon on right */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  color: black;
+}
+
+.pdp-textbox-input:focus,
+.pdp-textbox-dropdown:focus {
+  border-color: #3f51b5;
+}
+
+.pdp-textbox-container.focused .pdp-textbox-label {
+  top: 4px;
+  font-size: 12px;
+  color: #3f51b5;
+}
+
+.indicator {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+}
+
+.indicator.valid {
+  color: green;
+}
+
+.indicator.invalid {
+  color: red;
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* ============================= */
+/* 📅 Date Input Styling          */
+/* ============================= */
+
+.pdp-date-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.pdp-date-wrapper .pdp-textbox-input {
+  padding-right: 40px; /* space for calendar icon */
+}
+
+/* Position calendar icon inside input */
+.pdp-date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.pdp-date-icon img {
+  width: 20px;
+  height: 20px;
+  pointer-events: none; /* make only the span clickable */
+}
+
+/* Hide the browser’s default date icon */
+.pdp-date-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* For Firefox */
+.pdp-date-wrapper input[type="date"]::-moz-focus-inner {
+  border: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .pdp-textbox-input,
+  .pdp-textbox-dropdown {
+    height: 40px;
+    padding: 10px 35px 10px 10px;
+    font-size: 14px;
+  }
+
+  .pdp-textbox-label {
+    font-size: 14px;
+  }
+
+  .pdp-textbox-container.focused .pdp-textbox-label {
+    font-size: 11px;
+  }
+}
+
+.pdp-textbox-input.invalid {
+  border-color: red;
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Textarea */
+.pdp-textarea {
+  min-height: 90px;
+  resize: vertical;
+  padding: 12px;
+  line-height: 1.4;
+}
+
+/* File upload */
+.pdp-file-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pdp-file-wrapper .pdp-textbox-input {
+  width: 100%;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.pdp-file-icon {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--Grey2);
+  transition: color 0.2s;
+  bottom: 6px;
+}
+
+.pdp-file-icon:hover {
+  color: var(--Primary);
+}

@@ -1,0 +1,249 @@
+/* ===== Auth Container ===== */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--White);
+  gap: 100px;
+  padding: 40px 30px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08);
+  min-height: 100vh;
+}
+
+/* ===== Left Form ===== */
+.auth-form-login {
+  background: var(--White);
+  padding: 20px 0;
+  width: 512px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-header {
+  margin-bottom: 15px;
+}
+
+.login-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--Primary);
+  margin-bottom: 10px;
+}
+
+.login-header p {
+  font-size: 14px;
+  color: var(--Text1);
+  margin-top: 6px;
+}
+
+/* ===== Inputs ===== */
+.auth-form input {
+  width: 100%;
+  border: 1px solid var(--Grey1);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-color: var(--Primary);
+  box-shadow: 0 0 0 2px rgba(26, 62, 207, 0.1);
+}
+
+/* ===== Forget ===== */
+.CheckNforgetBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.forget a {
+  text-decoration: none;
+  color: var(--Primary);
+  font-size: 14px;
+}
+.forget a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Buttons ===== */
+.btn-blue {
+  padding: 12px;
+  background: var(--Primary);
+  color: var(--White);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s ease;
+}
+
+.btn-blue:hover {
+  background: #0f2b91;
+}
+
+.btn-white {
+  padding: 12px;
+  background: var(--White);
+  border: 1px solid var(--Grey1);
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-white:hover {
+  background: var(--GreenPastel);
+}
+
+.btn-txt {
+  color: var(--Text1);
+  font-weight: 500;
+}
+
+/* ===== Extra text ===== */
+.auth-form p {
+  text-align: left;
+  font-size: 16px;
+  color: var(--Text1);
+}
+
+.auth-form p a {
+  color: var(--Primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.auth-form p a:hover {
+  text-decoration: underline;
+}
+
+.orSignup p {
+  text-align: center;
+}
+
+.link-signup {
+  text-decoration: none;
+  color: var(--Primary);
+  font-size: 14px;
+}
+
+.link-signup a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Grey lines ===== */
+.greylines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--Text2);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.left-line,
+.right-line {
+  border-top: 1px solid var(--Grey2);
+  width: 90px;
+}
+
+/* ===== Right Image ===== */
+.rightImgLogin img {
+  width: 400px;
+  height: auto;
+}
+
+/* ===== checkbox ===== */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--Text1);
+}
+
+.check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  background-color: var(--White);
+  border: 1px solid var(--Grey3);
+  border-radius: 4px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  position: relative;
+}
+
+.check input[type="checkbox"]:checked {
+  background-color: var(--White);
+  border-color: var(--Primary);
+}
+
+.check input[type="checkbox"]:checked::after {
+  content: "✔";
+  position: absolute;
+  top: -3px;
+  left: 3px;
+  font-size: 16px; /* smaller checkmark */
+  color: var(--Primary);
+}
+
+.check label {
+  cursor: pointer;
+}
+
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 16px;
+    min-height: 100vh;
+  }
+
+  .rightImgLogin {
+    display: none;
+  }
+
+  .auth-form-login {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .login-header h2 {
+    font-size: 20px;
+  }
+
+  .login-header p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-blue,
+  .btn-white {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .auth-form-login p {
+    font-size: 14px;
+  }
+
+  .auth-form p {
+    font-size: 14px;
+  }
+}
