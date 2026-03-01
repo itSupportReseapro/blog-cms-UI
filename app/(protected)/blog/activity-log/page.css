@@ -1,0 +1,66 @@
+.activity-log-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.activity-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.activity-log-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--Text1, #333);
+}
+
+.activity-log-header p {
+  margin: 8px 0 0 0;
+  color: var(--Text2, #666);
+  font-size: 14px;
+}
+
+.activity-log-table-wrapper {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .activity-log-section {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .activity-log-header {
+    flex-direction: column;
+  }
+
+  .activity-log-header h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .activity-log-section {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .activity-log-header h1 {
+    font-size: 20px;
+  }
+
+  .activity-log-header p {
+    font-size: 12px;
+  }
+}
