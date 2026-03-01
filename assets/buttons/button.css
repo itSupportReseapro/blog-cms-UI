@@ -1,0 +1,125 @@
+.pdp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 10px 20px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+/* ===== FULL WIDTH ===== */
+.pdp-btn-full {
+  width: 100%;
+}
+
+/* ===== DISABLED ===== */
+.pdp-btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ================= SIZE ================= */
+
+.pdp-btn-sm {
+  height: 36px;
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.pdp-btn-md {
+  height: 42px;
+}
+
+.pdp-btn-lg {
+  height: 50px;
+  font-size: 16px;
+  padding: 12px 24px;
+}
+
+/* ================= RADIUS ================= */
+
+.pdp-btn-radius-sm {
+  border-radius: 6px;
+}
+
+.pdp-btn-radius-md {
+  border-radius: 12px;
+}
+
+.pdp-btn-radius-lg {
+  border-radius: 18px;
+}
+
+.pdp-btn-radius-pill {
+  border-radius: 50px;
+}
+
+/* ================= VARIANTS ================= */
+
+/* Primary */
+.pdp-btn-primary {
+  background: var(--Primary);
+  color: var(--White);
+}
+
+.pdp-btn-primary:hover {
+  background: #0353a4;
+}
+
+/* Outline */
+.pdp-btn-outline {
+  background: transparent;
+  border: 2px solid var(--Primary);
+  color: var(--Primary);
+}
+
+.pdp-btn-outline:hover {
+  background: var(--PrimaryPastel);
+}
+
+/* Danger */
+.pdp-btn-danger {
+  background: var(--Red);
+  color: var(--White);
+}
+
+.pdp-btn-danger:hover {
+  background: #b02a37;
+}
+
+/* Success */
+.pdp-btn-success {
+  background: var(--Green);
+  color: var(--White);
+}
+
+.pdp-btn-success:hover {
+  background: #1e7e34;
+}
+
+/* Ghost */
+.pdp-btn-ghost {
+  background: transparent;
+  color: var(--Primary);
+}
+
+.pdp-btn-ghost:hover {
+  background: var(--PrimaryPastel);
+}
+
+/* ================= ICON ================= */
+
+.pdp-btn-icon {
+  display: flex;
+  align-items: center;
+}
+
+.pdp-btn-icon img {
+  width: 18px;
+  height: 18px;
+}
