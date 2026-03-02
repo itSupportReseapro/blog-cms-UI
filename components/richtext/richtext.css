@@ -1,0 +1,203 @@
+.rte-wrapper {
+  border: 1px solid var(--Grey1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--White);
+}
+
+.rte-toolbar {
+  padding: 10px;
+  border-bottom: 1px solid var(--Grey1);
+  display: flex;
+  gap: 10px;
+  background: var(--Background);
+}
+
+.rte-toolbar button {
+  padding: 6px 10px;
+  border: 1px solid var(--Grey1);
+  background: var(--White);
+  cursor: pointer;
+  border-radius: 6px;
+  color: var(--Text1);
+}
+
+.rte-editor {
+  padding: 15px;
+  min-height: 400px;
+}
+
+.rte-editor:focus {
+  outline: none;
+}
+
+.rte-wrapper {
+  border: 1px solid var(--Grey1);
+  border-radius: 12px;
+  background: var(--White);
+  overflow: hidden;
+}
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid var(--Grey1);
+  background: var(--Background);
+}
+
+.rte-toolbar button,
+.rte-toolbar select {
+  padding: 6px 8px;
+  border: 1px solid var(--Grey2);
+  background: var(--White);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--Text1);
+}
+
+.rte-toolbar button:hover {
+  background: var(--PrimaryPastel);
+}
+
+.rte-editor {
+  padding: 16px;
+  min-height: 450px;
+  outline: none;
+}
+
+.rte-editor table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.rte-editor th,
+.rte-editor td {
+  border: 1px solid var(--Grey2);
+  padding: 8px;
+}
+
+.rte-editor th {
+  background: var(--PrimaryPastel);
+}
+
+.rte-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--Grey1);
+  font-size: 12px;
+  color: var(--Text2);
+}
+
+.rte-toolbar button.active-tool {
+  background: var(--PrimaryPastel);
+  border-color: var(--Primary);
+}
+
+/* ================= LIST FIX ================= */
+
+.rte-editor ul,
+.rte-editor ol {
+  padding-left: 25px;
+  margin: 10px 0;
+}
+
+.rte-editor ul {
+  list-style-type: disc;
+}
+
+.rte-editor ol {
+  list-style-type: decimal;
+}
+
+.rte-editor li {
+  color: var(--Text1);
+}
+
+.rte-editor li::marker {
+  color: var(--Text1);
+  font-weight: 600;
+}
+
+/* ================= TABLE RESIZE ================= */
+
+.rte-editor table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.rte-editor td,
+.rte-editor th {
+  border: 1px solid var(--Grey2);
+  padding: 8px;
+  position: relative;
+}
+
+.rte-editor .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--Primary);
+  cursor: col-resize;
+  opacity: 0;
+}
+
+.rte-editor td:hover .column-resize-handle,
+.rte-editor th:hover .column-resize-handle {
+  opacity: 1;
+}
+
+/* ================= HEADINGS FIX ================= */
+
+.rte-editor h1,
+.rte-editor h2,
+.rte-editor h3,
+.rte-editor h4,
+.rte-editor h5,
+.rte-editor h6 {
+  color: var(--Text1); 
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.rte-editor h1 { font-size: 32px; }
+.rte-editor h2 { font-size: 28px; }
+.rte-editor h3 { font-size: 24px; }
+.rte-editor h4 { font-size: 20px; }
+.rte-editor h5 { font-size: 18px; }
+.rte-editor h6 { font-size: 16px; }
+
+/* ===== IMAGE CONTAINMENT FIX ===== */
+
+.rte-editor img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+  border-radius: 8px;
+  max-width: 100%;
+  width: auto;
+}
+
+/* Prevent overflow from any node */
+.rte-editor {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.rte-editor {
+  max-width: 100%;
+}
+
+/* =============== Table bubble ====================== */
+.table-bubble {
+  background: var(--White);
+  border: 1px solid var(--Grey1);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  gap: 6px;
+}

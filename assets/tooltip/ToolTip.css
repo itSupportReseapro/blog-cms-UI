@@ -10,13 +10,13 @@
     z-index: 1005; /* Ensure it's above other elements */
     white-space: nowrap;
     pointer-events: none; /* So it doesn't block mouse events */
+    transition: opacity 0.2s ease;
     opacity: 0;
-    transition: opacity 0.2s;
 }
 
-
-
-
+.tooltip-container.show {
+  opacity: 1;
+}
 
 .tooltip-arrow-top {
     bottom: -5px;
@@ -50,7 +50,4 @@
     border-color: transparent #555 transparent transparent;
 }
 
-/* Show tooltip when visible */
-.tooltip-container {
-    opacity: 1;
-}
+
