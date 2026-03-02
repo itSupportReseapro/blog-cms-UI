@@ -65,8 +65,8 @@
 }
 
 .data-table tbody .action-cell {
-  text-align: center;
-  padding: 12px 8px;
+  text-align: start;
+  padding: 12px 20px;
 }
 
 /* Empty State */

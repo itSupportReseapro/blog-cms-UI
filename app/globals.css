@@ -1,4 +1,5 @@
 :root {
+  /* Semantic Colors */
   --background: #F5F7FA;
   --foreground: #171717;
   --Primary: #0466C8;
@@ -11,16 +12,61 @@
   --RedPastel: #FAE1E3;
   --Green: #28A745;
   --GreenPastel: #DFF2E3;
+  
+  /* Text Colors */
   --Text1: #4D4D4D;
   --Text2: #A8A8A8;
+  --TextLight: #FFFFFF;
+  
+  /* Neutral/Grey Scale */
   --Grey1: #E1E1E1;
   --Grey2: #E6E6E6;
   --Grey3: #CDCDCD;
-  --Background: #F5F7FA;
   --White: #FFFFFF;
+  
+  /* UI Backgrounds */
+  --Background: #F5F7FA;
   --btnwhite: #F2F2F2;
   --TableHead: #fafafa;
   --BgInput: #F5F5F5;
+  
+  /* Spacing System */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Sidebar */
+  --sidebar-width: 296px;
+  --sidebar-width-mobile: 0;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.15);
+  
+  /* Typography */
+  --font-family: Arial, Helvetica, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,9 +89,10 @@ body {
 
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--Text1);
+  background: var(--Background);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -61,12 +108,27 @@ a {
   text-decoration: none;
 }
 
+h1 {
+  color: var(--Text1);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
 h2 {
-  color: #171717;
+  color: var(--Text1);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+h3 {
+  color: var(--Text1);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 p {
-  color: #171717;
+  color: var(--Text1);
+  line-height: 1.5;
 }
 
 @media (prefers-color-scheme: dark) {

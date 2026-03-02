@@ -1,8 +1,7 @@
 .activity-log-section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 24px;
+  gap: var(--spacing-lg);
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -11,34 +10,34 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 
 .activity-log-header h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--Text1, #333);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--Text1);
 }
 
 .activity-log-header p {
-  margin: 8px 0 0 0;
-  color: var(--Text2, #666);
-  font-size: 14px;
+  margin: var(--spacing-xs) 0 0 0;
+  color: var(--Text2);
+  font-size: var(--font-size-sm);
 }
 
 .activity-log-table-wrapper {
   width: 100%;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--Grey2);
 }
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
   .activity-log-section {
-    padding: 16px;
-    gap: 16px;
+    gap: var(--spacing-md);
   }
 
   .activity-log-header {
@@ -46,21 +45,20 @@
   }
 
   .activity-log-header h1 {
-    font-size: 24px;
+    font-size: var(--font-size-xl);
   }
 }
 
 @media (max-width: 640px) {
   .activity-log-section {
-    padding: 12px;
-    gap: 12px;
+    gap: var(--spacing-sm);
   }
 
   .activity-log-header h1 {
-    font-size: 20px;
+    font-size: var(--font-size-lg);
   }
 
   .activity-log-header p {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
   }
 }

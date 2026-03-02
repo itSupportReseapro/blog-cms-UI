@@ -1,0 +1,49 @@
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 100vh;
+  padding-top: 60px;
+  background: var(--Background);
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-lg);
+  margin-top: 20px;
+}
+
+/* Scrollbar Styling */
+.dashboard-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-content::-webkit-scrollbar-track {
+  background: var(--Background);
+}
+
+.dashboard-content::-webkit-scrollbar-thumb {
+  background: var(--Grey2);
+  border-radius: var(--radius-md);
+}
+
+.dashboard-content::-webkit-scrollbar-thumb:hover {
+  background: var(--Grey1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-main {
+    margin-top: 60px;
+  }
+}

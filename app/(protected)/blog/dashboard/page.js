@@ -2,8 +2,8 @@
 
 import "./page.css";
 import Image from "next/image";
-import { useState } from "react";
 import Table from "@/assets/ui/tables/Table";
+import StatsCard from "@/components/Dashboard/StatsCard";
 import PeopleIcon from "@/assets/Images/icon/peopleICON.svg";
 import WebsiteIcon from "@/assets/Images/icon/websiteICON.svg";
 import SettingsIcon from "@/assets/Images/icon/settingsICON.svg";
@@ -81,47 +81,11 @@ export default function BlogDashboardPage() {
   return (
     <section className="cms-dashboard">
       <div className="dashboard-top">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Website Management Portal overview</p>
-        </div>
         <button type="button" className="primary-action">
           Create Post
         </button>
       </div>
 
-      <div className="stats-grid">
-        {stats.map((item) => (
-          <article key={item.title} className="stat-card">
-            <div className="stat-head">
-              <Image src={item.icon} alt={item.title} width={16} height={16} />
-            </div>
-            <p className="stat-title">{item.title}</p>
-            <h3>{item.value}</h3>
-            <span className="stat-trend">{item.trend}</span>
-          </article>
-        ))}
-      </div>
-
-      <div className="dashboard-main-grid">
-        <article className="panel chart-panel">
-          <h3>Traffic & Engagement</h3>
-          <div className="chart-placeholder">Chart Preview</div>
-        </article>
-
-        <article className="panel quick-actions">
-          <h3>Quick Actions</h3>
-          <button type="button" onClick={() => window.addSnackbar?.("Opening post editor", "success")}>
-            Write New Blog
-          </button>
-          <button type="button" onClick={() => window.addSnackbar?.("Categories panel coming soon", "success")}>
-            Manage Categories
-          </button>
-          <button type="button" onClick={() => window.addSnackbar?.("Comments moderation coming soon", "success")}>
-            Review Comments
-          </button>
-        </article>
-      </div>
 
       <article className="panel table-panel">
         <h3>Recent Posts</h3>
