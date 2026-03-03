@@ -6,9 +6,8 @@ import StatusBadge from './StatusBadge';
 import ActionMenu from './ActionMenu';
 import './Table.css';
 
-const Table = ({ 
-  data = [], 
-  totalItems = 0,
+const Table = ({
+  data = [],
   onActionExecute = null,
   statusColumnKey = 'status',
   columns: columnsOverride = null
@@ -16,133 +15,105 @@ const Table = ({
   const contextConfig = useTable();
   const contextColumns = columnsOverride || contextConfig.columns;
   const { pageSize, rowsPerPageOptions } = contextConfig;
-  
-  // Use passed columns or context columns
+
   const columns = contextColumns;
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-  // Sort data
+  /* ================= SORT ================= */
+
   const sortedData = useMemo(() => {
     let sorted = [...data];
-    
+
     if (sortConfig.key) {
       sorted.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        
+
         if (aValue == null && bValue == null) return 0;
         if (aValue == null) return 1;
         if (bValue == null) return -1;
-        
+
         if (typeof aValue === 'string') {
           return sortConfig.direction === 'asc'
             ? aValue.localeCompare(bValue)
             : bValue.localeCompare(aValue);
         }
-        
+
         return sortConfig.direction === 'asc'
           ? aValue - bValue
           : bValue - aValue;
       });
     }
-    
+
     return sorted;
   }, [data, sortConfig]);
 
-  // Paginate data
+  /* ================= PAGINATION ================= */
+
   const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    return sortedData.slice(startIndex, startIndex + rowsPerPage);
+    const start = (currentPage - 1) * rowsPerPage;
+    return sortedData.slice(start, start + rowsPerPage);
   }, [sortedData, currentPage, rowsPerPage]);
 
-  // Calculate pagination info
   const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage + 1;
+  const startIndex = sortedData.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
   const endIndex = Math.min(currentPage * rowsPerPage, sortedData.length);
 
-  const handleSort = (columnKey) => {
+  const handleSort = (key) => {
     setSortConfig(prev => ({
-      key: columnKey,
-      direction: prev.key === columnKey && prev.direction === 'asc' ? 'desc' : 'asc'
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
-    setCurrentPage(1); // Reset to first page when sorting
+    setCurrentPage(1);
   };
 
   const handleRowsPerPageChange = (e) => {
     setRowsPerPage(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   };
 
-  const renderHeaderCell = (column) => {
-    if (!column.sortable) {
-      return <th key={column.key}>{column.label}</th>;
-    }
-
-    const isSorted = sortConfig.key === column.key;
-    const SortIcon = isSorted
-      ? sortConfig.direction === 'asc' ? ' ↑' : ' ↓'
-      : ' ⇅';
-
-    return (
-      <th
-        key={column.key}
-        onClick={() => handleSort(column.key)}
-        style={{ cursor: 'pointer', userSelect: 'none' }}
-        className="sortable-header"
-      >
-        {column.label}
-        <span className="sort-icon">{SortIcon}</span>
-      </th>
-    );
-  };
-
-  const renderCellValue = (row, column) => {
-    const value = row[column.key];
-
-    // Special handling for status column
-    if (column.key === statusColumnKey) {
-      return <StatusBadge status={value} />;
-    }
-
-    // Format dates
-    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
-      const date = new Date(value);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    return value ?? '-';
-  };
+  /* ================= RENDER ================= */
 
   return (
     <div className="table-wrapper">
       <table className="data-table">
         <thead>
           <tr>
-            {columns.map(column => renderHeaderCell(column))}
+            {columns.map(column => (
+              <th
+                key={column.key}
+                onClick={column.sortable ? () => handleSort(column.key) : undefined}
+                className={column.sortable ? 'sortable-header' : ''}
+              >
+                {column.label}
+              </th>
+            ))}
             {onActionExecute && <th>Action</th>}
           </tr>
         </thead>
+
         <tbody>
           {paginatedData.length > 0 ? (
-            paginatedData.map((row, rowIndex) => (
-              <tr key={row.id || rowIndex} className="table-body-row">
+            paginatedData.map((row, index) => (
+              <tr key={row.id || index}>
                 {columns.map(column => (
                   <td key={`${row.id}-${column.key}`}>
-                    {renderCellValue(row, column)}
+                    {column.key === statusColumnKey ? (
+                      <StatusBadge status={row[column.key]} />
+                    ) : (
+                      row[column.key] ?? '-'
+                    )}
                   </td>
                 ))}
                 {onActionExecute && (
-                  <td className="action-cell">
-                    <ActionMenu row={row} onActionExecute={onActionExecute} />
+                  <td>
+                    <ActionMenu
+                      row={row}
+                      onActionExecute={onActionExecute}
+                    />
                   </td>
                 )}
               </tr>
@@ -157,50 +128,51 @@ const Table = ({
         </tbody>
       </table>
 
+      {/* ================= CLEAN PAGINATION ================= */}
+
       {paginatedData.length > 0 && (
         <div className="table-footer">
-          <div className="pagination-info">
+
+          <div className="footer-left">
             Showing {startIndex} to {endIndex} of {sortedData.length} items
           </div>
 
-          <div className="pagination-controls">
-            <div className="rows-per-page">
-              <label htmlFor="rows-select">Rows per page:</label>
-              <select
-                id="rows-select"
-                value={rowsPerPage}
-                onChange={handleRowsPerPageChange}
-              >
-                {rowsPerPageOptions.map(option => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="footer-center">
+            <button
+              className="footer-nav-btn"
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+            >
+              &lt; Prev
+            </button>
 
-            <div className="page-navigation">
-              <button
-                className="nav-button"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-              >
-                ← Prev
-              </button>
+            <span className="footer-page-number">
+              {currentPage}
+            </span>
 
-              <span className="page-indicator">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                className="nav-button"
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next →
-              </button>
-            </div>
+            <button
+              className="footer-nav-btn"
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next &gt;
+            </button>
           </div>
+
+          <div className="footer-right">
+            <span>Items per Page</span>
+            <select
+              value={rowsPerPage}
+              onChange={handleRowsPerPageChange}
+            >
+              {rowsPerPageOptions.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
         </div>
       )}
     </div>

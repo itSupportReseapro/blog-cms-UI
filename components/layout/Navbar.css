@@ -1,275 +1,134 @@
+/* ================= NAVBAR ================= */
+
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--White);
-  border-bottom: 1px solid var(--Grey2);
-  height: 90px;
-  box-shadow: var(--shadow-sm);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1001;
+
+  height: 100px;
+  background: var(--White);
+  border-bottom: 1px solid var(--Grey2);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+  z-index: 1000;
 }
+
+/* LEFT */
 
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
-  flex: 1;
-}
-
-.navbar-hamburger {
-  display: none;
-  background: none;
-  border: none;
-  font-size: var(--font-size-lg);
-  cursor: pointer;
-  color: var(--Text1);
-  padding: var(--spacing-sm);
-  transition: all 0.2s ease;
-}
-
-.navbar-hamburger:hover {
-  color: var(--Primary);
-  transform: scale(1.1);
-}
-
-.navbar-title-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  flex: 1;
 }
 
 .navbar-title {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.navbar-title h3 {
-  margin: 0;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 100%;
   color: var(--Primary);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-}
-
-.navbar-title p {
   margin: 0;
-  color: var(--Text2);
-  font-size: var(--font-size-xs);
 }
 
-.navbar-dropdown {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--Grey2);
-  border-radius: var(--radius-md);
-  background: var(--White);
-  color: var(--Text1);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.navbar-dropdown:hover {
-  background: var(--PrimaryPastel);
-  color: var(--Primary);
-  border-color: var(--Primary);
-}
-
-.navbar-dropdown svg {
-  color: currentColor;
-  transition: transform 0.2s ease;
-}
+/* RIGHT */
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: 24px;
 }
 
-.navbar-icon-btn {
+/* ================= BELL ================= */
+
+.navbar-bell {
   background: none;
   border: none;
-  cursor: pointer;
-  color: var(--Text1);
-  padding: var(--spacing-sm);
+  padding: 8px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: var(--radius-md);
+
+  cursor: pointer;
 }
 
-.navbar-icon-btn:hover {
-  color: var(--Primary);
-  transform: scale(1.1);
+/* Control actual SVG size */
+.navbar-bell svg {
+  width: 26px;
+  height: 26px;
 }
+
+/* ================= AVATAR ================= */
+
+.navbar-avatar {
+  width: 62px;
+  height: 62px;
+
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--Primary);
+  background: var(--PrimaryPastel);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Control SVG inside avatar */
+.navbar-avatar svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* ================= DROPDOWN ================= */
 
 .navbar-user-menu {
   position: relative;
-}
-
-.navbar-user-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.navbar-user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--PrimaryPastel);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--Primary);
-  transition: all 0.2s ease;
-}
-
-.navbar-user-btn:hover .navbar-user-avatar {
-  background: var(--Primary);
-  color: var(--White);
-  transform: scale(1.1);
 }
 
 .navbar-user-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: var(--spacing-sm);
+  margin-top: 12px;
+
   background: var(--White);
   border: 1px solid var(--Grey2);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  min-width: 160px;
-  z-index: 2000;
-  overflow: hidden;
-  animation: dropdownSlideDown 0.2s ease;
-}
 
-@keyframes dropdownSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  min-width: 180px;
+  overflow: hidden;
 }
 
 .navbar-dropdown-item {
   width: 100%;
-  padding: var(--spacing-md);
+  padding: 14px 16px;
   background: none;
   border: none;
   text-align: left;
-  color: var(--Text1);
+
   font-size: var(--font-size-sm);
+  color: var(--Text1);
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
 }
 
 .navbar-dropdown-item:hover {
   background: var(--PrimaryPastel);
   color: var(--Primary);
-  padding-left: calc(var(--spacing-md) + var(--spacing-xs));
 }
 
 .navbar-logout-btn {
   color: var(--Red);
-  font-weight: var(--font-weight-medium);
 }
 
 .navbar-logout-btn:hover {
   background: var(--RedPastel);
   color: var(--Red);
-}
-
-.navbar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 999;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .navbar-hamburger {
-    display: flex;
-  }
-
-  .navbar-title-wrapper {
-    gap: var(--spacing-md);
-  }
-
-  .navbar-title h3 {
-    font-size: var(--font-size-base);
-  }
-
-  .navbar-title p {
-    display: none;
-  }
-
-  .navbar-dropdown {
-    display: none;
-  }
-
-  .navbar-icon-btn svg,
-  .navbar-user-avatar svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .navbar {
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .navbar-left {
-    gap: var(--spacing-md);
-  }
-
-  .navbar-right {
-    gap: var(--spacing-sm);
-  }
-
-  .navbar-title h3 {
-    font-size: var(--font-size-sm);
-  }
-
-  .navbar-user-avatar {
-    width: 28px;
-    height: 28px;
-  }
 }

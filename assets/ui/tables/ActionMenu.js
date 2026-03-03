@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { useTable } from '@/context/TableContext';
+import ThreeDotsIcon from '@/assets/Images/icon/3-dots.svg';
 import './ActionMenu.css';
 
 const ActionMenu = ({ row, onActionExecute }) => {
@@ -9,15 +11,13 @@ const ActionMenu = ({ row, onActionExecute }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Filter actions based on condition
-  const availableActions = actions.filter(action => {
+  const availableActions = actions.filter((action) => {
     if (action.condition && typeof action.condition === 'function') {
       return action.condition(row);
     }
     return true;
   });
 
-  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -40,16 +40,22 @@ const ActionMenu = ({ row, onActionExecute }) => {
     <div className="action-menu" ref={menuRef}>
       <button
         className="action-menu-trigger"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
         title="More actions"
+        aria-label="More actions"
       >
-        ⋯
+        <Image
+          src={ThreeDotsIcon}
+          alt="More"
+          width={18}
+          height={18}
+        />
       </button>
-      
+
       {isOpen && (
         <div className="action-menu-dropdown">
           {availableActions.length > 0 ? (
-            availableActions.map(action => (
+            availableActions.map((action) => (
               <button
                 key={action.key}
                 className="action-menu-item"
@@ -59,7 +65,9 @@ const ActionMenu = ({ row, onActionExecute }) => {
               </button>
             ))
           ) : (
-            <div className="action-menu-empty">No actions available</div>
+            <div className="action-menu-empty">
+              No actions available
+            </div>
           )}
         </div>
       )}

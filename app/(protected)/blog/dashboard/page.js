@@ -1,13 +1,17 @@
 "use client";
 
 import "./page.css";
+import Link from "next/link";
 import Image from "next/image";
+import { useState, useMemo } from "react";
 import Table from "@/assets/ui/tables/Table";
-import StatsCard from "@/components/Dashboard/StatsCard";
-import PeopleIcon from "@/assets/Images/icon/peopleICON.svg";
-import WebsiteIcon from "@/assets/Images/icon/websiteICON.svg";
-import SettingsIcon from "@/assets/Images/icon/settingsICON.svg";
-import PlusIcon from "@/assets/Images/icon/plusICON.svg";
+
+import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
+import SearchIcon from "@/assets/Images/icon/search-icon.svg";
+import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
+import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
+
+/* ================= DATA ================= */
 
 const postTitles = [
   "Getting Started with Next.js 14", "Advanced React Patterns", "CSS Tricks for Modern Layouts",
@@ -24,77 +28,165 @@ const postTitles = [
   "Service Workers Guide", "Browser APIs", "File Handling in Web Apps"
 ];
 
-const authors = ["John Doe", "Jane Smith", "Alice Brown", "Bob Wilson", "Carol Davis", "David Lee", "Emma Wilson", "Frank Johnson"];
-const statuses = ["published", "draft", "archived", "pending"];
+const authors = [
+  "John Doe", "Jane Smith", "Alice Brown",
+  "Bob Wilson", "Carol Davis", "David Lee",
+  "Emma Wilson", "Frank Johnson"
+];
+
+const statuses = [
+  "published",
+  "draft",
+  "created",
+  "unpublished",
+  "deleted"
+];
 
 const blogPostsData = Array.from({ length: 100 }, (_, i) => ({
   id: i + 1,
-  title: postTitles[i % postTitles.length] + (i > postTitles.length ? ` (${Math.floor(i / postTitles.length)})` : ""),
+  title:
+    postTitles[i % postTitles.length] +
+    (i >= postTitles.length ? ` (${Math.floor(i / postTitles.length)})` : ""),
   author: authors[Math.floor(Math.random() * authors.length)],
-  lastUpdated: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  lastUpdated: new Date(
+    Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000
+  ).toISOString().split("T")[0],
   status: statuses[Math.floor(Math.random() * statuses.length)],
 }));
 
-const blogPostsColumns = [
-  { key: 'id', label: 'ID', width: '60px', sortable: false },
-  { key: 'title', label: 'Title', width: '250px', sortable: true },
-  { key: 'author', label: 'Author', width: '150px', sortable: true },
-  { key: 'lastUpdated', label: 'Last Updated', width: '120px', sortable: true },
-  { key: 'status', label: 'Status', width: '100px', sortable: true },
-];
+/* ================= COMPONENT ================= */
 
 export default function BlogDashboardPage() {
-  const stats = [
-    { title: "Total Posts", value: "128", trend: "+12 this week", icon: WebsiteIcon },
-    { title: "Published", value: "96", trend: "+8 this week", icon: PeopleIcon },
-    { title: "Comments", value: "1,245", trend: "+21 today", icon: SettingsIcon },
-    { title: "Categories", value: "14", trend: "2 new", icon: PlusIcon },
-  ];
+  const [activeTab, setActiveTab] = useState("all");
 
   const handleTableAction = (actionKey, row) => {
     console.log(`Action: ${actionKey}`, row);
-    
-    switch (actionKey) {
-      case "edit":
-        window.addSnackbar?.(`Editing: ${row.title}`, "info");
-        break;
-      case "delete":
-        window.addSnackbar?.(`Deleted: ${row.title}`, "success");
-        break;
-      case "publish":
-        window.addSnackbar?.(`Published: ${row.title}`, "success");
-        break;
-      case "unpublish":
-        window.addSnackbar?.(`Unpublished: ${row.title}`, "info");
-        break;
-      case "details":
-        window.addSnackbar?.(`Viewing details: ${row.title}`, "info");
-        break;
-      case "rollback":
-        window.addSnackbar?.(`Restored: ${row.title}`, "success");
-        break;
-      default:
-        break;
-    }
   };
+
+  /* ✅ FILTER DATA BASED ON TAB */
+  const filteredData = useMemo(() => {
+    if (activeTab === "all") return blogPostsData;
+    return blogPostsData.filter((item) => item.status === activeTab);
+  }, [activeTab]);
+
+  const blogPostsColumns = [
+    { key: "id", label: "Sl. No.", width: "60px" },
+
+    {
+      key: "title",
+      label: (
+        <div className="sortable-head">
+          Blog Title
+          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
+        </div>
+      ),
+      width: "310px"
+    },
+
+    {
+      key: "author",
+      label: (
+        <div className="sortable-head">
+          Author
+          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
+        </div>
+      ),
+      width: "150px"
+    },
+
+    {
+      key: "lastUpdated",
+      label: (
+        <div className="sortable-head">
+          Last Updated
+          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
+        </div>
+      ),
+      width: "150px"
+    },
+
+    {
+      key: "status",
+      label: (
+        <div className="sortable-head">
+          Status
+          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
+        </div>
+      ),
+      width: "120px",
+      render: (row) => (
+        <span className={`status-pill ${row.status}`}>
+          {row.status}
+        </span>
+      )
+    }
+  ];
 
   return (
     <section className="cms-dashboard">
-      <div className="dashboard-top">
-        <button type="button" className="primary-action">
-          Create Post
-        </button>
+      <div className="main-card">
+
+        {/* ================= TOP CONTROLS ================= */}
+
+        <div className="top-controls">
+          <Link href="/create-blog">
+            <button className="create-btn">
+              Create Blog
+            </button>
+          </Link>
+
+          <div className="right-controls">
+            <div className="search-wrapper">
+              <Image src={SearchIcon} alt="Search" width={16} height={16} />
+              <input
+                type="text"
+                placeholder="Search"
+                className="search-input"
+              />
+            </div>
+
+            <button className="icon-btn">
+              <Image src={DownloadIcon} alt="Download" width={18} height={18} />
+            </button>
+
+            <button className="icon-btn">
+              <Image src={FilterIcon} alt="Filter" width={18} height={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* ================= TABS ================= */}
+
+        <div className="tabs-wrapper">
+          {[
+            { key: "all", label: "All Blogs" },
+            { key: "draft", label: "Draft" },
+            { key: "created", label: "Created" },
+            { key: "published", label: "Published" },
+            { key: "unpublished", label: "Unpublished" },
+            { key: "deleted", label: "Deleted" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`tab-btn ${activeTab === tab.key ? "active" : ""}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ================= TABLE ================= */}
+
+        <div className="table-wrapper">
+          <Table
+            data={filteredData}   /* ✅ NOW FILTERED */
+            columns={blogPostsColumns}
+            onActionExecute={handleTableAction}
+          />
+        </div>
+
       </div>
-
-
-      <article className="panel table-panel">
-        <h3>Recent Posts</h3>
-        <Table
-          data={blogPostsData}
-          columns={blogPostsColumns}
-          onActionExecute={handleTableAction}
-        />
-      </article>
     </section>
   );
 }
