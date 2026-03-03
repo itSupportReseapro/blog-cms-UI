@@ -10,6 +10,7 @@ import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
 import SearchIcon from "@/assets/Images/icon/search-icon.svg";
 import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
 import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
+import PlusIcon from "@/assets/Images/icon/plus-icon.svg";
 
 /* ================= DATA ================= */
 
@@ -63,7 +64,6 @@ export default function BlogDashboardPage() {
     console.log(`Action: ${actionKey}`, row);
   };
 
-  /* ✅ FILTER DATA BASED ON TAB */
   const filteredData = useMemo(() => {
     if (activeTab === "all") return blogPostsData;
     return blogPostsData.filter((item) => item.status === activeTab);
@@ -129,10 +129,11 @@ export default function BlogDashboardPage() {
         {/* ================= TOP CONTROLS ================= */}
 
         <div className="top-controls">
-          <Link href="/create-blog">
-            <button className="create-btn">
-              Create Blog
-            </button>
+
+          {/* ✅ FIXED CREATE BLOG BUTTON */}
+          <Link href="./create-blog" className="create-btn">
+            <Image src={PlusIcon} alt="Add" width={18} height={18} />
+            Create Blog
           </Link>
 
           <div className="right-controls">
@@ -180,7 +181,7 @@ export default function BlogDashboardPage() {
 
         <div className="table-wrapper">
           <Table
-            data={filteredData}   /* ✅ NOW FILTERED */
+            data={filteredData}
             columns={blogPostsColumns}
             onActionExecute={handleTableAction}
           />

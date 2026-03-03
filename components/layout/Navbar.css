@@ -132,3 +132,174 @@
   background: var(--RedPastel);
   color: var(--Red);
 }
+
+
+
+/* ================= OVERLAY ================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 120px;
+  padding-right: 40px;
+  z-index: 2000;
+}
+
+/* ================= PANEL ================= */
+
+.user-panel {
+  width: 490px;
+  background: var(--White);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.25s ease;
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ================= HEADER ================= */
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--Grey1);
+}
+
+.panel-header h3 {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.close-btn {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--Red);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--Red);
+  cursor: pointer;
+}
+
+/* ================= AVATAR ================= */
+
+.avatar-section {
+  padding: 30px 24px;
+  text-align: center;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.avatar-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-full);
+  border: 1.88px solid var(--Grey1);
+  background: var(--White);
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--Primary);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.user-name {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--Primary);
+}
+
+.info-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: var(--font-size-sm);
+}
+
+/* ================= FORM ================= */
+
+.form-section {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-field {
+  height: 56px;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1.5px solid var(--Grey1);
+  background: var(--White);
+  font-size: var(--font-size-sm);
+}
+
+/* ================= BUTTONS ================= */
+
+.panel-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.btn-outline {
+  width: 213px;
+  height: 40px;
+  border-radius: 6px;
+  border: 1.5px solid var(--Primary);
+  background: transparent;
+  color: var(--Primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  width: 213px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--Primary);
+  color: var(--TextLight);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}

@@ -1,0 +1,93 @@
+.contact-page {
+  padding: var(--spacing-xl);
+}
+
+.contact-card {
+  background: var(--White);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* HEADER */
+
+.contact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--Grey1);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+/* GRID */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+/* COLUMNS */
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.section-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--Primary);
+  margin-top: var(--spacing-md);
+}
+
+/* INPUTS */
+
+.input-field {
+  height: 56px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--Grey1);
+  padding: 0 var(--spacing-md);
+  font-size: var(--font-size-sm);
+  background: var(--White);
+}
+
+.textarea-field {
+  min-height: 120px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--Grey1);
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  resize: none;
+  background: var(--White);
+}
+
+/* BUTTONS */
+
+.btn-outline {
+  height: 40px;
+  padding: 0 var(--spacing-lg);
+  border-radius: 6px;
+  border: 1.5px solid var(--Primary);
+  background: transparent;
+  color: var(--Primary);
+  cursor: pointer;
+}
+
+.btn-primary {
+  height: 40px;
+  padding: 0 var(--spacing-lg);
+  border-radius: 6px;
+  background: var(--Primary);
+  color: var(--TextLight);
+  border: none;
+  cursor: pointer;
+}

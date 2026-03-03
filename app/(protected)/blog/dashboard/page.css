@@ -26,16 +26,21 @@
 .create-btn {
   width: 152px;
   height: 40px;
-  border-radius: 6px;
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
   background: var(--Primary);
   color: var(--TextLight);
-  border: none;
-  cursor: pointer;
+  border-radius: 6px;
+
+  padding: 10px 20px;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-}
 
+  text-decoration: none;
+  cursor: pointer;
+}
 .right-controls {
   display: flex;
   gap: 12px;
