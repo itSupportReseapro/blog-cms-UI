@@ -23,25 +23,6 @@
   align-items: center;
 }
 
-.create-btn {
-  width: 152px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  background: var(--Primary);
-  color: var(--TextLight);
-  border-radius: 6px;
-
-  padding: 10px 20px;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-
-  text-decoration: none;
-  cursor: pointer;
-}
-
 .right-controls {
   display: flex;
   gap: 12px;
@@ -66,8 +47,9 @@
   flex: 1;
   background: transparent;
   font-size: var(--font-size-sm);
-  color: var(--text1);
 }
+
+/* ================= ICON BUTTON ================= */
 
 .icon-btn {
   width: 40px;
@@ -81,42 +63,13 @@
   cursor: pointer;
 }
 
-/* ================= TABS ================= */
-
-.tabs-wrapper {
-  width: 100%;
-  height: 35px;
-  margin-top: 32px;
-  border-bottom: 2px solid var(--Grey2);
-  display: flex;
-  gap: 10px;
-}
-
-.tab-btn {
-  padding: 0 16px 16px 16px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  color: var(--Text1);
-}
-
-.tab-btn.active {
-  color: var(--Primary);
-  border-bottom: 2px solid var(--Primary);
-  font-weight: var(--font-weight-semibold);
-}
-
 /* ================= TABLE ================= */
 
 .table-wrapper {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 20px;
   border-radius: 10px;
   overflow: hidden;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 tbody tr {
@@ -126,6 +79,8 @@ tbody tr {
 tbody tr:last-child {
   border-bottom: none;
 }
+
+/* ================= SORTABLE HEAD ================= */
 
 .sortable-head {
   display: flex;

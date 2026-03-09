@@ -2,11 +2,13 @@
   padding: var(--spacing-xl);
 }
 
+/* CARD */
+
 .contact-card {
+  width: 1080px;
+  min-height: 860px;
   background: var(--White);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+  border-radius: 20px;
 }
 
 /* HEADER */
@@ -15,79 +17,120 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: var(--spacing-md);
+
+  padding: 16px 20px;
   border-bottom: 1px solid var(--Grey1);
+}
+
+.contact-header h2 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--Text1);
 }
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 12px;
 }
 
 /* GRID */
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-xl);
-  margin-top: var(--spacing-xl);
+  grid-template-columns: 470px 470px;
+  column-gap: 100px;
+  row-gap: 24px;
+
+  padding: 24px 20px;
 }
 
-/* COLUMNS */
-
-.left-column,
-.right-column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
-}
+/* CONTACT DETAILS TITLE */
 
 .section-title {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  grid-column: span 2;
+
+  font-size: 14px;
+  font-weight: 500;
+
   color: var(--Primary);
-  margin-top: var(--spacing-md);
+
+  border-bottom: 1px solid var(--Grey1);
+  padding-bottom: 10px;
 }
 
-/* INPUTS */
+/* INPUT GROUP */
 
-.input-field {
+.input-group {
+  position: relative;
+  width: 470px;
+}
+
+/* INPUT + TEXTAREA */
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
   height: 56px;
-  border-radius: var(--radius-md);
+
+  border-radius: 12px;
   border: 1.5px solid var(--Grey1);
-  padding: 0 var(--spacing-md);
+
+  padding: 16px;
   font-size: var(--font-size-sm);
+
   background: var(--White);
+  color: var(--Text1);
+
+  transition: border 0.2s ease;
 }
 
-.textarea-field {
-  min-height: 120px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--Grey1);
-  padding: var(--spacing-md);
-  font-size: var(--font-size-sm);
-  resize: none;
-  background: var(--White);
+/* TEXTAREA HEIGHT */
+
+.input-group.textarea textarea {
+  height: 129px;
 }
 
-/* BUTTONS */
+.input-group.large textarea {
+  height: 160px;
+}
 
-.btn-outline {
-  height: 40px;
-  padding: 0 var(--spacing-lg);
-  border-radius: 6px;
+/* REMOVE DEFAULT BROWSER OUTLINE */
+
+.input-group input:focus,
+.input-group textarea:focus {
+  outline: none;
+}
+
+/* ACTIVE BORDER */
+
+.input-group:focus-within input,
+.input-group:focus-within textarea {
   border: 1.5px solid var(--Primary);
-  background: transparent;
-  color: var(--Primary);
-  cursor: pointer;
 }
 
-.btn-primary {
-  height: 40px;
-  padding: 0 var(--spacing-lg);
-  border-radius: 6px;
-  background: var(--Primary);
-  color: var(--TextLight);
-  border: none;
-  cursor: pointer;
+/* FLOATING LABEL */
+
+.input-group label {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+
+  font-size: 14px;
+  color: var(--Text2);
+
+  background: var(--White);
+  padding: 0 4px;
+
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* LABEL ACTIVE */
+
+.input-group:focus-within label,
+.input-group input:not(:placeholder-shown) + label,
+.input-group textarea:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: var(--Primary);
 }

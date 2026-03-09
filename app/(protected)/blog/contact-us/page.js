@@ -2,31 +2,33 @@
 
 import "./page.css";
 import { useState } from "react";
+import FormField from "@/assets/ui/FormField/FormField";
+import PdpButton from "@/assets/buttons/button";
 
 export default function ContactUsPage() {
-  const [formData, setFormData] = useState({
+
+  const initialState = {
     title: "",
     description: "",
     phone: "",
     mapUrl: "",
     email: "",
     address: ""
-  });
+  };
+
+  const [formData, setFormData] = useState(initialState);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleClear = () => {
-    setFormData({
-      title: "",
-      description: "",
-      phone: "",
-      mapUrl: "",
-      email: "",
-      address: ""
-    });
+    setFormData(initialState);
   };
 
   const handleSave = () => {
@@ -35,89 +37,97 @@ export default function ContactUsPage() {
 
   return (
     <section className="contact-page">
+
       <div className="contact-card">
 
         {/* HEADER */}
+
         <div className="contact-header">
+
           <h2>Contact Us</h2>
 
           <div className="header-actions">
-            <button className="btn-outline" onClick={handleClear}>
-              Clear All
-            </button>
 
-            <button className="btn-primary" onClick={handleSave}>
+            <PdpButton
+              variant="outline"
+              size="md"
+              radius="sm"
+              onClick={handleClear}
+            >
+              Clear All
+            </PdpButton>
+
+            <PdpButton
+              variant="primary"
+              size="md"
+              radius="sm"
+              onClick={handleSave}
+            >
               Save
-            </button>
+            </PdpButton>
+
           </div>
+
         </div>
 
         {/* FORM GRID */}
+
         <div className="form-grid">
 
-          {/* LEFT COLUMN */}
-          <div className="left-column">
-            <input
-              type="text"
-              name="title"
-              placeholder="Title"
-              className="input-field"
-              value={formData.title}
-              onChange={handleChange}
-            />
+          <FormField
+            label="Title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+          />
 
-            <h4 className="section-title">Contact Details</h4>
+          <FormField
+            label="Description"
+            name="description"
+            textarea
+            value={formData.description}
+            onChange={handleChange}
+          />
 
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone"
-              className="input-field"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-
-            <input
-              type="text"
-              name="email"
-              placeholder="E-mail Address"
-              className="input-field"
-              value={formData.email}
-              onChange={handleChange}
-            />
+          <div className="section-title">
+            Contact Details
           </div>
 
-          {/* RIGHT COLUMN */}
-          <div className="right-column">
-            <textarea
-              name="description"
-              placeholder="Description"
-              className="textarea-field"
-              value={formData.description}
-              onChange={handleChange}
-            />
+          <FormField
+            label="Phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
 
-            <input
-              type="text"
-              name="mapUrl"
-              placeholder="Map URL"
-              className="input-field"
-              value={formData.mapUrl}
-              onChange={handleChange}
-            />
+          <FormField
+            label="Map URL"
+            name="mapUrl"
+            value={formData.mapUrl}
+            onChange={handleChange}
+          />
 
-            <textarea
-              name="address"
-              placeholder="Address"
-              className="textarea-field"
-              value={formData.address}
-              onChange={handleChange}
-            />
-          </div>
+          <FormField
+            label="E-mail Address"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+
+          <FormField
+            label="Address"
+            name="address"
+            textarea
+            large
+            value={formData.address}
+            onChange={handleChange}
+          />
 
         </div>
 
       </div>
+
     </section>
   );
 }

@@ -1,0 +1,60 @@
+.re-wrapper{
+position:relative;
+}
+
+.re-toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:10px;
+}
+
+.re-group{
+display:inline-flex;
+gap:8px;
+padding:6px;
+border:1px solid #eee;
+border-radius:12px;
+background:#fafafa;
+align-items:center;
+}
+
+.re-btn{
+padding:6px 10px;
+border:1px solid #ddd;
+background:#fff;
+border-radius:8px;
+cursor:pointer;
+font-size:13px;
+}
+
+.re-btn:hover{
+background:#f6f6f6;
+}
+
+.re-select{
+padding:6px 10px;
+border:1px solid #ddd;
+border-radius:8px;
+background:#fff;
+font-size:13px;
+}
+
+.re-editor{
+min-height:180px;
+border:1px solid #ddd;
+border-radius:12px;
+padding:12px;
+outline:none;
+background:white;
+white-space:pre-wrap;
+}
+
+.re-editor.disabled{
+background:#fafafa;
+}
+
+.re-editor:empty:before{
+content:attr(data-placeholder);
+color:#888;
+}

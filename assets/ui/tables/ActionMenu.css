@@ -20,7 +20,6 @@
   line-height: 0;
 }
 
-/* SVG inherits color automatically */
 .action-menu-trigger svg {
   width: 18px;
   height: 18px;

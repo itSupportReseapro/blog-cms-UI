@@ -4,13 +4,59 @@ import "./page.css";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useMemo } from "react";
+
+import { TableProvider } from "@/context/TableContext";
 import Table from "@/assets/ui/tables/Table";
+import PdpButton from "@/assets/buttons/button";
+
+import DeleteBlogModal from "@/assets/ui/modals/DeleteBlogModal";
 
 import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
 import SearchIcon from "@/assets/Images/icon/search-icon.svg";
 import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
 import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
 import PlusIcon from "@/assets/Images/icon/plus-icon.svg";
+
+/* ================= ACTION MENU LOGIC ================= */
+
+const tableActions = [
+  {
+    key: "publish",
+    label: "Publish",
+    condition: (row) => row.status === "unpublished"
+  },
+  {
+    key: "unpublish",
+    label: "Unpublish",
+    condition: (row) => row.status === "published"
+  },
+  {
+    key: "edit",
+    label: "Edit",
+    condition: (row) =>
+      row.status === "published" ||
+      row.status === "unpublished" ||
+      row.status === "draft"
+  },
+  {
+    key: "details",
+    label: "Details",
+    condition: () => true
+  },
+  {
+    key: "delete",
+    label: "Delete",
+    condition: (row) =>
+      row.status === "published" ||
+      row.status === "unpublished" ||
+      row.status === "draft"
+  },
+  {
+    key: "rollback",
+    label: "Roll Back",
+    condition: (row) => row.status === "deleted"
+  }
+];
 
 /* ================= DATA ================= */
 
@@ -58,24 +104,79 @@ const blogPostsData = Array.from({ length: 100 }, (_, i) => ({
 /* ================= COMPONENT ================= */
 
 export default function BlogDashboardPage() {
+
   const [activeTab, setActiveTab] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState(null);
+
+  const handleSort = (key) => {
+
+    if (sortKey === key) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDirection("asc");
+    }
+
+  };
 
   const handleTableAction = (actionKey, row) => {
+
+    if (actionKey === "delete") {
+      setSelectedBlog(row);
+      setDeleteModalOpen(true);
+      return;
+    }
+
     console.log(`Action: ${actionKey}`, row);
   };
 
   const filteredData = useMemo(() => {
-    if (activeTab === "all") return blogPostsData;
-    return blogPostsData.filter((item) => item.status === activeTab);
-  }, [activeTab]);
+
+    let data = blogPostsData;
+
+    if (activeTab !== "all") {
+      data = data.filter((item) => item.status === activeTab);
+    }
+
+    if (search.trim() !== "") {
+      data = data.filter((item) =>
+        item.title.toLowerCase().includes(search.toLowerCase()) ||
+        item.author.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (sortKey) {
+      data = [...data].sort((a, b) => {
+
+        if (a[sortKey] < b[sortKey])
+          return sortDirection === "asc" ? -1 : 1;
+
+        if (a[sortKey] > b[sortKey])
+          return sortDirection === "asc" ? 1 : -1;
+
+        return 0;
+
+      });
+    }
+
+    return data;
+
+  }, [activeTab, search, sortKey, sortDirection]);
 
   const blogPostsColumns = [
+
     { key: "id", label: "Sl. No.", width: "60px" },
 
     {
       key: "title",
       label: (
-        <div className="sortable-head">
+        <div className="sortable-head" onClick={() => handleSort("title")}>
           Blog Title
           <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
         </div>
@@ -86,7 +187,7 @@ export default function BlogDashboardPage() {
     {
       key: "author",
       label: (
-        <div className="sortable-head">
+        <div className="sortable-head" onClick={() => handleSort("author")}>
           Author
           <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
         </div>
@@ -97,7 +198,7 @@ export default function BlogDashboardPage() {
     {
       key: "lastUpdated",
       label: (
-        <div className="sortable-head">
+        <div className="sortable-head" onClick={() => handleSort("lastUpdated")}>
           Last Updated
           <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
         </div>
@@ -108,7 +209,7 @@ export default function BlogDashboardPage() {
     {
       key: "status",
       label: (
-        <div className="sortable-head">
+        <div className="sortable-head" onClick={() => handleSort("status")}>
           Status
           <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
         </div>
@@ -124,26 +225,39 @@ export default function BlogDashboardPage() {
 
   return (
     <section className="cms-dashboard">
+
       <div className="main-card">
 
         {/* ================= TOP CONTROLS ================= */}
 
         <div className="top-controls">
 
-          {/* ✅ FIXED CREATE BLOG BUTTON */}
-          <Link href="./create-blog" className="create-btn">
-            <Image src={PlusIcon} alt="Add" width={18} height={18} />
-            Create Blog
+          <Link href="./create-blog">
+            <PdpButton
+              variant="primary"
+              size="md"
+              radius="sm"
+              icon={PlusIcon}
+              iconPosition="left"
+            >
+              Create Blog
+            </PdpButton>
           </Link>
 
           <div className="right-controls">
+
             <div className="search-wrapper">
+
               <Image src={SearchIcon} alt="Search" width={16} height={16} />
+
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Search blogs..."
                 className="search-input"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
+
             </div>
 
             <button className="icon-btn">
@@ -153,12 +267,15 @@ export default function BlogDashboardPage() {
             <button className="icon-btn">
               <Image src={FilterIcon} alt="Filter" width={18} height={18} />
             </button>
+
           </div>
+
         </div>
 
         {/* ================= TABS ================= */}
 
         <div className="tabs-wrapper">
+
           {[
             { key: "all", label: "All Blogs" },
             { key: "draft", label: "Draft" },
@@ -167,6 +284,7 @@ export default function BlogDashboardPage() {
             { key: "unpublished", label: "Unpublished" },
             { key: "deleted", label: "Deleted" },
           ].map((tab) => (
+
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
@@ -174,20 +292,46 @@ export default function BlogDashboardPage() {
             >
               {tab.label}
             </button>
+
           ))}
+
         </div>
 
         {/* ================= TABLE ================= */}
 
         <div className="table-wrapper">
-          <Table
-            data={filteredData}
+
+          <TableProvider
             columns={blogPostsColumns}
-            onActionExecute={handleTableAction}
-          />
+            actions={tableActions}
+          >
+
+            <Table
+              data={filteredData}
+              onActionExecute={handleTableAction}
+            />
+
+          </TableProvider>
+
         </div>
 
       </div>
+
+      {/* ================= DELETE MODAL ================= */}
+
+      <DeleteBlogModal
+        isOpen={deleteModalOpen}
+        blogTitle={selectedBlog?.title}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => {
+
+          console.log("Delete confirmed:", selectedBlog);
+
+          setDeleteModalOpen(false);
+
+        }}
+      />
+
     </section>
   );
 }

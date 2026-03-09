@@ -3,32 +3,44 @@
 import React from 'react';
 
 const StatusBadge = ({ status }) => {
+
   const normalized = status?.toLowerCase();
 
   const statusStyles = {
     published: {
-      color: '#28A745',
-      bgColor: '#DFF2E3',
+      color: 'var(--Green)',
+      bgColor: 'var(--GreenPastel)',
+      width: '95px',
     },
-    deleted: {
-      color: '#DC3545',
-      bgColor: '#FAE1E3',
-    },
-    created: {
-      color: '#0466C8',
-      bgColor: '#D9E8F7',
-    },
+
     unpublished: {
-      color: '#F5A623',
-      bgColor: '#FDF2DE',
+      color: 'var(--Yellow)',
+      bgColor: 'var(--YellowPastel)',
+      width: '114px',
     },
+
+    deleted: {
+      color: 'var(--Red)',
+      bgColor: 'var(--RedPastel)',
+      width: '79px',
+    },
+
     draft: {
-      color: '#FF6B35',
-      bgColor: '#FFECE5',
+      color: 'var(--Orange)',
+      bgColor: 'var(--OrangePastel)',
+      width: '60px',
     },
+
+    created: {
+      color: 'var(--Primary)',
+      bgColor: 'var(--PrimaryPastel)',
+      width: '81px',
+    },
+
     default: {
-      color: '#4D4D4D',
-      bgColor: '#E6E6E6',
+      color: 'var(--Text1)',
+      bgColor: 'var(--Grey2)',
+      width: '80px',
     },
   };
 
@@ -38,19 +50,32 @@ const StatusBadge = ({ status }) => {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '4px 10px',
-    borderRadius: '6px', // 🔥 Not full pill
-    fontSize: '12px',
-    fontWeight: 500,     // 🔥 Medium weight like screenshot
+
+    height: '34px',
+    width: badgeConfig.width,
+
+    paddingTop: '6px',
+    paddingRight: '12px',
+    paddingBottom: '6px',
+    paddingLeft: '12px',
+
+    borderRadius: '6px',
+
+    fontSize: 'var(--font-size-sm)',
+    fontWeight: 'var(--font-weight-medium)',
+
     lineHeight: '16px',
-    height: '34px',      // 🔥 Fixed height like UI
-    width:'70px',
+
     color: badgeConfig.color,
     backgroundColor: badgeConfig.bgColor,
+
     whiteSpace: 'nowrap',
   };
 
-  return <span style={badgeStyle}>{status}</span>;
+  const formattedStatus =
+    status?.charAt(0).toUpperCase() + status?.slice(1);
+
+  return <span style={badgeStyle}>{formattedStatus}</span>;
 };
 
 export default StatusBadge;
