@@ -132,7 +132,7 @@ export function normalizeDoc(doc) {
   }
 
   for (const blk of d.content) {
-    if (!["p", "h", "li"].includes(blk.type)) blk.type = "p";
+    if (!["p", "h", "li", "table"].includes(blk.type)) blk.type = "p";
 
     blk.align = normalizeAlign(blk.align);
 
@@ -147,19 +147,46 @@ export function normalizeDoc(doc) {
       blk.indent = Number.isFinite(blk.indent) ? clamp(blk.indent, 0, 8) : 0;
     } else {
       delete blk.list;
-      blk.indent = Number.isFinite(blk.indent) ? clamp(blk.indent, 0, 8) : 0;
+      if (blk.type !== "table") {
+        blk.indent = Number.isFinite(blk.indent) ? clamp(blk.indent, 0, 8) : 0;
+      }
     }
 
-    if (!Array.isArray(blk.content) || blk.content.length === 0) blk.content = [{ text: "" }];
+    if (blk.type === "table") {
+      // Normalize table structure
+      blk.rows = Array.isArray(blk.rows) ? blk.rows : [];
+      if (blk.rows.length === 0) {
+        blk.rows = [
+          { cells: [{ content: [{ text: "" }] }, { content: [{ text: "" }] }] },
+          { cells: [{ content: [{ text: "" }] }, { content: [{ text: "" }] }] },
+        ];
+      }
+      for (const row of blk.rows) {
+        row.cells = Array.isArray(row.cells) ? row.cells : [];
+        for (const cell of row.cells) {
+          if (!Array.isArray(cell.content) || cell.content.length === 0) cell.content = [{ text: "" }];
+          cell.content = mergeAdjacentRuns(
+            cell.content.map((run) => ({
+              text: typeof run?.text === "string" ? run.text : "",
+              marks: Array.isArray(run?.marks) ? normalizeMarks(run.marks) : undefined,
+            }))
+          );
+          if (!cell.content.length) cell.content = [{ text: "" }];
+        }
+      }
+    } else {
+      delete blk.rows;
+      if (!Array.isArray(blk.content) || blk.content.length === 0) blk.content = [{ text: "" }];
 
-    blk.content = mergeAdjacentRuns(
-      blk.content.map((run) => ({
-        text: typeof run?.text === "string" ? run.text : "",
-        marks: Array.isArray(run?.marks) ? normalizeMarks(run.marks) : undefined,
-      }))
-    );
+      blk.content = mergeAdjacentRuns(
+        blk.content.map((run) => ({
+          text: typeof run?.text === "string" ? run.text : "",
+          marks: Array.isArray(run?.marks) ? normalizeMarks(run.marks) : undefined,
+        }))
+      );
 
-    if (!blk.content.length) blk.content = [{ text: "" }];
+      if (!blk.content.length) blk.content = [{ text: "" }];
+    }
   }
 
   return d;
@@ -167,7 +194,12 @@ export function normalizeDoc(doc) {
 
 export function docToPlainText(doc) {
   const d = normalizeDoc(doc);
-  return d.content.map((b) => b.content.map((r) => r.text).join("")).join("\n");
+  return d.content.map((b) => {
+    if (b.type === "table") {
+      return b.rows.map((row) => row.cells.map((cell) => cell.content.map((r) => r.text).join("")).join("\t")).join("\n");
+    }
+    return b.content.map((r) => r.text).join("");
+  }).join("\n");
 }
 
 /** ---------- HTML ---------- */
@@ -219,6 +251,20 @@ export function docToHTML(doc) {
 
   while (i < d.content.length) {
     const b = d.content[i];
+
+    // table
+    if (b.type === "table") {
+      const rows = (b.rows || []).map((row) => {
+        const cells = (row.cells || []).map((cell) => {
+          const inner = cell.content.map(wrapInline).join("") || "<br/>";
+          return `<td style="border: 1px solid #ccc; padding: 8px;">${inner}</td>`;
+        }).join("");
+        return `<tr>${cells}</tr>`;
+      }).join("");
+      blocks.push(`<table style="border-collapse: collapse; width: 100%; border: 1px solid #ccc;"><tbody>${rows}</tbody></table>`);
+      i++;
+      continue;
+    }
 
     // list group
     if (b.type === "li") {
@@ -274,7 +320,17 @@ export function docToTextIndexMap(doc) {
 
   for (let bi = 0; bi < d.content.length; bi++) {
     starts.push(idx);
-    const len = d.content[bi].content.reduce((a, r) => a + (r.text?.length || 0), 0);
+    const b = d.content[bi];
+    let len = 0;
+    if (b.type === "table") {
+      len = b.rows.reduce((acc, row) => {
+        return acc + row.cells.reduce((cellAcc, cell) => {
+          return cellAcc + cell.content.reduce((a, r) => a + (r.text?.length || 0), 0);
+        }, 0);
+      }, 0);
+    } else {
+      len = b.content.reduce((a, r) => a + (r.text?.length || 0), 0);
+    }
     idx += len;
     if (bi !== d.content.length - 1) idx += 1; // newline
   }

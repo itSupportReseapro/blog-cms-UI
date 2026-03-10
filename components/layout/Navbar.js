@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import bellIcon from "@/assets/Images/icon/bell-icon.svg";
-import profileIcon from "@/assets/Images/icon/profile-avatar.svg";
+import profileIcon from "@/assets/Images/icon/Profile-avatar.svg";
 
 import UserDetailsPanel from "./UserDetailsPanel";
 import EditUserPanel from "./EditUserPanel";

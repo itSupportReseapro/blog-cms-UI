@@ -1,112 +1,37 @@
+// components/pdp-rich-editor/RichEditor.js
 "use client";
-
-import React, { useEffect, useRef, useState } from "react";
 import "./RichEditor.css";
-
-import { defaultDoc, normalizeDoc, docToHTML } from "./core";
-
-import {
-  getSelectionOffsets,
-  setSelectionOffsets,
-} from "./selection-dom";
+import React, { useEffect } from "react";
+import { defaultDoc, docToHTML } from "./core";
+import { setSelectionOffsets, getRangeRectSafe } from "./selection-dom";
 
 import {
   indentBlock,
   toggleInlineMark,
   setBlockType,
   toggleList,
+  setLink,
+  unsetLink,
   setAlign,
   setColor,
+  insertTable,
 } from "./commands";
 
-/* ---------------- HTML helpers ---------------- */
+import { docToEditableHTML, htmlToDoc } from "./conversion";
+import { findContainingBlock, getLinkHrefInRange, logEvent } from "./helpers";
 
-function docToEditableHTML(doc) {
-  const d = normalizeDoc(doc);
+import useRichEditorState from "./useRichEditorState";
+import useRichEditorHistory from "./useRichEditorHistory";
+import useRichEditorUI from "./useRichEditorUI";
 
-  return d.content
-    .map((b) => {
-      const text = (b.content || []).map((r) => r.text || "").join("");
+import Toolbar from "./Toolbar";
+import LinkPopup from "./LinkPopup";
+import TablePopup from "./TablePopup";
+import Editor from "./Editor";
+import EditorFooter from "./EditorFooter";
 
-      if (b.type === "h") {
-        const lvl = b.level || 2;
-        return `<h${lvl}>${text}</h${lvl}>`;
-      }
 
-      return `<p>${text}</p>`;
-    })
-    .join("");
-}
-
-function htmlToDoc(html) {
-
-  const parser = new DOMParser();
-  const dom = parser.parseFromString(html, "text/html");
-  const blocks = [];
-
-  dom.body.childNodes.forEach((node) => {
-
-    const text = node.textContent || "";
-
-    if (node.nodeName === "H1")
-      blocks.push({ type: "h", level: 1, content: [{ text }] });
-
-    else if (node.nodeName === "H2")
-      blocks.push({ type: "h", level: 2, content: [{ text }] });
-
-    else if (node.nodeName === "H3")
-      blocks.push({ type: "h", level: 3, content: [{ text }] });
-
-    else
-      blocks.push({ type: "p", content: [{ text }] });
-
-  });
-
-  return normalizeDoc({
-    type: "doc",
-    content: blocks.length ? blocks : [{ type: "p", content: [{ text: "" }] }]
-  });
-}
-
-/* ---------------- Toolbar UI ---------------- */
-
-function Btn({ onClick, children, title }) {
-  return (
-    <button
-      type="button"
-      title={title}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
-      className="re-btn"
-    >
-      {children}
-    </button>
-  );
-}
-
-function Select({ value, onChange, options }) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="re-select"
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-function Group({ children }) {
-  return <div className="re-group">{children}</div>;
-}
-
-/* ---------------- Editor ---------------- */
+/** ---------- MAIN COMPONENT ---------- */
 
 export default function RichEditor({
   value,
@@ -117,182 +42,294 @@ export default function RichEditor({
   className,
   style,
 }) {
+  // State management
+  const editorState = useRichEditorState(value);
+  const history = useRichEditorHistory();
+  const ui = useRichEditorUI();
 
-  const rootRef = useRef(null);
+  const { rootRef, wrapRef, docRef, selectionRef, selectionSnapshotRef, debounceTimerRef, lastEmittedRef } = editorState;
+  const { historyRef, lastHistoryAtRef, pushHistory } = history;
+  const { linkInputRef, tableRowsInputRef, tableColsInputRef } = ui;
 
-  const [doc, setDoc] = useState(() =>
-    normalizeDoc(value || defaultDoc())
-  );
-
-  const docRef = useRef(doc);
-
+  // Initialize DOM
   useEffect(() => {
-    docRef.current = doc;
-  }, [doc]);
+    const el = rootRef.current;
+    if (!el) return;
+    el.innerHTML = docToEditableHTML(docRef.current);
+  }, []);
 
-  const historyRef = useRef({
-    undo: [],
-    redo: []
-  });
+  // Focus link input when popup opens
+  useEffect(() => {
+    if (ui.linkUI.open) {
+      setTimeout(() => linkInputRef.current?.focus(), 0);
+    }
+  }, [ui.linkUI.open, linkInputRef]);
 
-  const selectionRef = useRef({ from: 0, to: 0 });
+  // Focus table input when popup opens
+  useEffect(() => {
+    if (ui.tableUI.open) {
+      setTimeout(() => tableRowsInputRef.current?.focus(), 0);
+    }
+  }, [ui.tableUI.open, tableRowsInputRef]);
 
   const emitDoc = (nextDoc) => {
-
-    const normalized = normalizeDoc(nextDoc);
-
-    docRef.current = normalized;
-    setDoc(normalized);
-
-    if (onChange) onChange(normalized);
-    if (onHTMLChange) onHTMLChange(docToHTML(normalized));
+    return editorState.emitDoc(nextDoc, onChange, onHTMLChange);
   };
 
-  const pushHistory = (prev) => {
-
-    const h = historyRef.current;
-
-    h.undo.push(prev);
-
-    if (h.undo.length > 100)
-      h.undo.shift();
-
-    h.redo = [];
-  };
-
-  const applyTx = (tx) => {
-
+  const applyTx = (txFn, opts = {}) => {
     const el = rootRef.current;
     if (!el) return;
 
-    const sel = selectionRef.current;
+    const sel = editorState.getBestSelection();
+    selectionRef.current = sel;
+
     const prev = docRef.current;
+    const result = txFn(prev, sel);
+    const next = result?.doc ? result.doc : prev;
+    const nextSel = result?.selection || sel;
 
-    const result = tx(prev, sel);
-
-    const next = result?.doc || prev;
-
-    pushHistory(prev);
+    if (!opts.skipHistory) pushHistory(prev);
 
     el.innerHTML = docToEditableHTML(next);
+    setSelectionOffsets(el, nextSel.from, nextSel.to);
 
     emitDoc(next);
-  };
-
-  const scheduleSyncFromDOM = () => {
-
-    const el = rootRef.current;
-    if (!el) return;
-
-    const next = htmlToDoc(el.innerHTML);
-
-    pushHistory(docRef.current);
-
-    emitDoc(next);
+    el.focus();
   };
 
   const undo = () => {
-
-    const el = rootRef.current;
-    const h = historyRef.current;
-
-    const prev = h.undo.pop();
-
-    if (!prev) return;
-
-    h.redo.push(docRef.current);
-
-    el.innerHTML = docToEditableHTML(prev);
-
-    emitDoc(prev);
+    history.undo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
   };
 
   const redo = () => {
+    history.redo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
+  };
 
+  const refreshUIFromDOMSelection = () => {
     const el = rootRef.current;
-    const h = historyRef.current;
+    if (!el) return;
 
-    const next = h.redo.pop();
+    const selOff = editorState.getBestSelection();
+    const rect = getRangeRectSafe(el);
 
-    if (!next) return;
+    selectionRef.current = selOff;
 
-    h.undo.push(docRef.current);
+    if (selOff.from !== selOff.to) {
+      selectionSnapshotRef.current = { ...selOff, rect };
+    }
 
-    el.innerHTML = docToEditableHTML(next);
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
 
-    emitDoc(next);
+    const r = sel.getRangeAt(0);
+    const blockEl = findContainingBlock(el, r.startContainer);
+    if (!blockEl) return;
+
+    const tag = blockEl.tagName.toLowerCase();
+
+    if (tag === "h1") ui.setFormat("h1");
+    else if (tag === "h2") ui.setFormat("h2");
+    else if (tag === "h3") ui.setFormat("h3");
+    else if (tag === "li") {
+      const p = blockEl.parentElement?.tagName?.toLowerCase();
+      ui.setFormat(p === "ol" ? "ol" : "ul");
+    } else ui.setFormat("p");
+
+    const a = (blockEl.style?.textAlign || "left").toLowerCase();
+    ui.setAlignState(["left", "center", "right", "justify"].includes(a) ? a : "left");
+  };
+
+  const openLinkPopup = () => {
+    const el = rootRef.current;
+    const wrap = wrapRef.current;
+    if (!el || !wrap) return;
+
+    const selOff = editorState.getBestSelection();
+    if (selOff.from === selOff.to) return;
+
+    let rect = getRangeRectSafe(el);
+    if (!rect) rect = selectionSnapshotRef.current.rect;
+    if (!rect) return;
+
+    selectionRef.current = selOff;
+
+    const href = getLinkHrefInRange(docRef.current, selOff);
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const x = rect.left - wrapRect.left;
+    const y = rect.bottom - wrapRect.top + 8;
+
+    ui.setLinkUI({ open: true, href: String(href || ""), x, y });
+
+    setSelectionOffsets(el, selOff.from, selOff.to);
+    setTimeout(() => {
+      const el2 = rootRef.current;
+      if (el2) setSelectionOffsets(el2, selOff.from, selOff.to);
+    }, 0);
+  };
+
+  const applyLinkFromPopup = () => {
+    const href = String(ui.linkUI.href || "").trim();
+    if (!href) return;
+
+    const savedSel = selectionRef.current;
+    applyTx((d) => setLink(d, savedSel, href));
+    ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
+  };
+
+  const removeLinkFromPopup = () => {
+    const savedSel = selectionRef.current;
+    applyTx((d) => unsetLink(d, savedSel));
+    ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
+  };
+
+  const openTablePopup = () => {
+    const el = rootRef.current;
+    const wrap = wrapRef.current;
+    if (!el || !wrap) return;
+
+    let rect = getRangeRectSafe(el);
+    if (!rect) rect = selectionSnapshotRef.current?.rect;
+    if (!rect) return;
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const x = rect.left - wrapRect.left;
+    const y = rect.bottom - wrapRect.top + 8;
+
+    ui.setTableUI({ open: true, rows: 2, cols: 2, x, y });
+    el.focus();
+  };
+
+  const insertTableWithDimensions = () => {
+    const rows = Math.max(1, Math.min(20, ui.tableUI.rows || 2));
+    const cols = Math.max(1, Math.min(20, ui.tableUI.cols || 2));
+    applyTx((d, s) => insertTable(d, s, rows, cols));
+    ui.setTableUI({ open: false, rows: 2, cols: 2, x: 0, y: 0 });
   };
 
   const onKeyDown = (e) => {
+    if (disabled) return;
 
-    const mod = e.ctrlKey || e.metaKey;
+    const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
+    const mod = isMac ? e.metaKey : e.ctrlKey;
 
-    if (mod && e.key === "z") {
+    if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
       e.preventDefault();
       undo();
+      return;
     }
-
-    if (mod && e.key === "y") {
+    if ((mod && e.key.toLowerCase() === "y") || (mod && e.key.toLowerCase() === "z" && e.shiftKey)) {
       e.preventDefault();
       redo();
+      return;
     }
 
     if (e.key === "Tab") {
       e.preventDefault();
-      applyTx((d, s) => indentBlock(d, s, 1));
+      applyTx((d, s) => indentBlock(d, s, e.shiftKey ? -1 : 1));
     }
+  };
+
+  const handleFormatChange = (v) => {
+    ui.setFormat(v);
+    if (v === "p") applyTx((d, s) => setBlockType(d, s, "p"));
+    else if (v === "h1") applyTx((d, s) => setBlockType(d, s, "h", 1));
+    else if (v === "h2") applyTx((d, s) => setBlockType(d, s, "h", 2));
+    else if (v === "h3") applyTx((d, s) => setBlockType(d, s, "h", 3));
+    else if (v === "ul") applyTx((d, s) => toggleList(d, s, "ul"));
+    else if (v === "ol") applyTx((d, s) => toggleList(d, s, "ol"));
+  };
+
+  const handleAlignChange = (v) => {
+    ui.setAlignState(v);
+    applyTx((d, s) => setAlign(d, s, v));
+  };
+
+  const handleColorChange = (v) => {
+    ui.setColorState(v);
+    applyTx((d, s) => setColor(d, s, v));
+  };
+
+  const handleScheduleSyncFromDOM = () => {
+    editorState.scheduleSyncFromDOM(onChange, onHTMLChange);
+  };
+
+  const handleBlur = () => {
+    handleScheduleSyncFromDOM();
+    ui.setWordCount(editorState.calculateWordCount());
   };
 
   return (
     <div
-      className={`re-wrapper ${className || ""}`}
+      ref={wrapRef}
+      className={["re-wrap", className].filter(Boolean).join(" ")}
       style={style}
+      onClick={(e) => {
+        const a = e.target?.closest?.("a");
+        if (!a) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        const href = a.getAttribute("href") || "";
+        if (href) window.open(href, "_blank", "noopener,noreferrer");
+      }}
     >
-
-      <div className="re-toolbar">
-
-        <Group>
-          <Btn onClick={undo}>↶</Btn>
-          <Btn onClick={redo}>↷</Btn>
-        </Group>
-
-        <Group>
-          <Btn onClick={() => applyTx((d, s) => toggleInlineMark(d, s, "b"))}>B</Btn>
-          <Btn onClick={() => applyTx((d, s) => toggleInlineMark(d, s, "i"))}>I</Btn>
-          <Btn onClick={() => applyTx((d, s) => toggleInlineMark(d, s, "u"))}>U</Btn>
-        </Group>
-
-        <Group>
-          <Select
-            value="p"
-            onChange={(v) => {
-              if (v === "p") applyTx((d, s) => setBlockType(d, s, "p"));
-              if (v === "h1") applyTx((d, s) => setBlockType(d, s, "h", 1));
-              if (v === "h2") applyTx((d, s) => setBlockType(d, s, "h", 2));
-              if (v === "ul") applyTx((d, s) => toggleList(d, s, "ul"));
-            }}
-            options={[
-              { value: "p", label: "Paragraph" },
-              { value: "h1", label: "Heading 1" },
-              { value: "h2", label: "Heading 2" },
-              { value: "ul", label: "Bullets" },
-            ]}
-          />
-        </Group>
-
-      </div>
-
-      <div
-        ref={rootRef}
-        contentEditable={!disabled}
-        suppressContentEditableWarning
-        onInput={scheduleSyncFromDOM}
-        onBlur={scheduleSyncFromDOM}
-        onKeyDown={onKeyDown}
-        className={`re-editor ${disabled ? "disabled" : ""}`}
-        data-placeholder={placeholder}
+      <Toolbar
+        disabled={disabled}
+        format={ui.format}
+        align={ui.align}
+        color={ui.color}
+        onCaptureSelection={editorState.captureSelectionSnapshot}
+        onUndo={undo}
+        onRedo={redo}
+        onToggleMark={(mark) => applyTx((d, s) => toggleInlineMark(d, s, mark))}
+        onSetBlockType={(type, level) => applyTx((d, s) => setBlockType(d, s, type, level))}
+        onToggleList={(type) => applyTx((d, s) => toggleList(d, s, type))}
+        onSetAlign={(alignment) => applyTx((d, s) => setAlign(d, s, alignment))}
+        onIndent={(amount) => applyTx((d, s) => indentBlock(d, s, amount))}
+        onInsertTable={openTablePopup}
+        onSetColor={(col) => applyTx((d, s) => setColor(d, s, col))}
+        onOpenLink={openLinkPopup}
+        onFormatChange={handleFormatChange}
+        onAlignChange={handleAlignChange}
+        onColorChange={handleColorChange}
       />
 
+      <Editor
+        rootRef={rootRef}
+        placeholder={placeholder}
+        disabled={disabled}
+        onInput={handleScheduleSyncFromDOM}
+        onBlur={handleBlur}
+        onKeyDown={onKeyDown}
+        onKeyUp={refreshUIFromDOMSelection}
+        onMouseUp={refreshUIFromDOMSelection}
+        onPaste={() => {
+          if (disabled) return;
+          setTimeout(handleScheduleSyncFromDOM, 0);
+        }}
+      />
+
+      <EditorFooter wordCount={ui.wordCount} />
+
+      <LinkPopup
+        linkUI={ui.linkUI}
+        linkInputRef={linkInputRef}
+        onHrefChange={(href) => ui.setLinkUI((x) => ({ ...x, href }))}
+        onApply={applyLinkFromPopup}
+        onRemove={removeLinkFromPopup}
+        onClose={() => ui.setLinkUI({ open: false, href: "", x: 0, y: 0 })}
+      />
+
+      <TablePopup
+        tableUI={ui.tableUI}
+        tableRowsInputRef={tableRowsInputRef}
+        tableColsInputRef={tableColsInputRef}
+        onRowsChange={(rows) => ui.setTableUI((x) => ({ ...x, rows }))}
+        onColsChange={(cols) => ui.setTableUI((x) => ({ ...x, cols }))}
+        onInsert={insertTableWithDimensions}
+        onClose={() => ui.setTableUI({ open: false, rows: 2, cols: 2, x: 0, y: 0 })}
+      />
     </div>
   );
 }
