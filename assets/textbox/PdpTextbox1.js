@@ -13,7 +13,7 @@ const PdpTextbox1 = ({
   value,
   onChange = () => {},
   onFocus,
-  placeholder,
+  placeholder,  
   type = "text",
   name,
   id,

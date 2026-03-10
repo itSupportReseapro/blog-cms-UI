@@ -7,8 +7,8 @@ import Image from "next/image";
 import bellIcon from "@/assets/Images/icon/bell-icon.svg";
 import profileIcon from "@/assets/Images/icon/profile-avatar.svg";
 
-import UserDetailsPanel from "./UserDetailsPanel";
-import EditUserPanel from "./EditUserPanel";
+import UserDetailsPanel from "@/assets/ui/modals/UserDetailsPanel";
+import EditUserPanel from "@/assets/ui/modals/EditUserPanel";
 
 import "./Navbar.css";
 
@@ -19,7 +19,6 @@ export default function Navbar() {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showEditDetails, setShowEditDetails] = useState(false);
 
-  // Scroll lock
   useEffect(() => {
     if (showUserDetails || showEditDetails) {
       document.body.style.overflow = "hidden";
@@ -45,14 +44,14 @@ export default function Navbar() {
 
         <div className="navbar-right">
           <button className="navbar-bell">
-            <Image src={bellIcon} alt="Notifications" />
+            <Image src={bellIcon} alt="Notifications" width={36} height={40} />
           </button>
 
           <button
             className="navbar-avatar"
             onClick={() => setShowUserDetails(true)}
           >
-            <Image src={profileIcon} alt="Profile" />
+            <Image src={profileIcon} alt="Profile" width={52} height={52} />
           </button>
         </div>
       </nav>

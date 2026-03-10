@@ -14,7 +14,9 @@
 
 .delete-modal{
   width:498px;
+  height:329px ;
   padding:30px;
+  border-radius:20px ;
   border-radius:var(--radius-xl);
   border:1.5px solid var(--Grey1);
   background:var(--White);
@@ -42,10 +44,10 @@
 /* ================= CLOSE BUTTON ================= */
 
 .close-btn{
-  width:22px;
-  height:22px;
+  width:16px;
+  height:16px;
   border-radius:var(--radius-sm);
-  border:1.5px solid var(--Red);
+  border:none;    
   background:transparent;
   color:var(--Red);
   cursor:pointer;
@@ -113,6 +115,7 @@
 
 .cancel-btn{
   height:40px;
+  width: 89px;
   padding:10px 20px;
   border-radius:var(--radius-sm);
   border:1.5px solid var(--Primary);
@@ -132,6 +135,7 @@
 
 .delete-btn{
   height:40px;
+  width:187px;
   padding:10px 20px;
   border-radius:var(--radius-sm);
   background:var(--Red);
