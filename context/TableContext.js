@@ -7,11 +7,35 @@ const TableContext = createContext();
 export const TableProvider = ({
   columns = [],
   statusBadges = {},
-  actions = [],
+  actions = [
+    {
+      key: "edit",
+      label: "Edit"
+    },
+    {
+      key: "activate",
+      label: "Active User",
+      condition: (row) => row.role === "Editor"
+    },
+    {
+      key: "deactivate",
+      label: "Deactive User",
+      condition: (row) => row.role === "Admin"
+    },
+    {
+      key: "details",
+      label: "Details"
+    },
+    {
+      key: "remove",
+      label: "Remove"
+    }
+  ],
   pageSize = 10,
   rowsPerPageOptions = [10, 25, 50],
   children
 }) => {
+
   const value = {
     columns,
     statusBadges,

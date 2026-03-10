@@ -7,75 +7,82 @@ const StatusBadge = ({ status }) => {
   const normalized = status?.toLowerCase();
 
   const statusStyles = {
-    published: {
-      color: 'var(--Green)',
-      bgColor: 'var(--GreenPastel)',
-      width: '95px',
+
+    /* ROLE BADGES */
+
+    admin:{
+      color:'var( --White)',
+      bgColor:'var( --Primary)',
+      width:'80px'
     },
 
-    unpublished: {
-      color: 'var(--Yellow)',
-      bgColor: 'var(--YellowPastel)',
-      width: '114px',
+    editor:{
+      color:'var(--White)',
+      bgColor:'var(--Green)',
+      width:'80px'
     },
 
-    deleted: {
-      color: 'var(--Red)',
-      bgColor: 'var(--RedPastel)',
-      width: '79px',
+    viewer:{
+      color:'var(--Yellow)',
+      bgColor:'var(--YellowPastel)',
+      width:'80px'
     },
 
-    draft: {
-      color: 'var(--Orange)',
-      bgColor: 'var(--OrangePastel)',
-      width: '60px',
+    /* OTHER STATUSES */
+
+    published:{
+      color:'var(--Green)',
+      bgColor:'var(--GreenPastel)',
+      width:'95px'
     },
 
-    created: {
-      color: 'var(--Primary)',
-      bgColor: 'var(--PrimaryPastel)',
-      width: '81px',
+    draft:{
+      color:'var(--Orange)',
+      bgColor:'var(--OrangePastel)',
+      width:'80px'
     },
 
-    default: {
-      color: 'var(--Text1)',
-      bgColor: 'var(--Grey2)',
-      width: '80px',
+    deleted:{
+      color:'var(--Red)',
+      bgColor:'var(--RedPastel)',
+      width:'80px'
     },
+
+    created:{
+      color:'var(--Primary)',
+      bgColor:'var(--PrimaryPastel)',
+      width:'80px'
+    },
+
+    default:{
+      color:'var(--Text1)',
+      bgColor:'var(--Grey2)',
+      width:'80px'
+    }
+
   };
 
   const badgeConfig = statusStyles[normalized] || statusStyles.default;
 
   const badgeStyle = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    height: '34px',
-    width: badgeConfig.width,
-
-    paddingTop: '6px',
-    paddingRight: '12px',
-    paddingBottom: '6px',
-    paddingLeft: '12px',
-
-    borderRadius: '6px',
-
-    fontSize: 'var(--font-size-sm)',
-    fontWeight: 'var(--font-weight-medium)',
-
-    lineHeight: '16px',
-
-    color: badgeConfig.color,
-    backgroundColor: badgeConfig.bgColor,
-
-    whiteSpace: 'nowrap',
+    display:'inline-flex',
+    alignItems:'center',
+    justifyContent:'center',
+    height:'34px',
+    width:badgeConfig.width,
+    borderRadius:'6px',
+    fontSize:'var(--font-size-sm)',
+    fontWeight:'var(--font-weight-medium)',
+    color:badgeConfig.color,
+    backgroundColor:badgeConfig.bgColor,
+    whiteSpace:'nowrap'
   };
 
   const formattedStatus =
     status?.charAt(0).toUpperCase() + status?.slice(1);
 
   return <span style={badgeStyle}>{formattedStatus}</span>;
+
 };
 
 export default StatusBadge;

@@ -1,23 +1,47 @@
 "use client";
 
+import "./user-panel.css";
 import Image from "next/image";
+
 import editUserIcon from "@/assets/Images/icon/edit-user-icon.svg";
+import crossIcon from "@/assets/Images/icon/cross-icon.svg";
+
+/* avatar icon */
+import profileAvatar from "@/assets/Images/icon/profile-avatar.svg";
 
 export default function EditUserPanel({ onClose, onCancel }) {
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="user-panel edit-mode" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="user-panel edit-mode expand-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="panel-header">
           <h3>Edit User Details</h3>
-          <button className="close-btn" onClick={onClose}>✕</button>
+
+          <button className="close-btn" onClick={onClose}>
+            <Image src={crossIcon} alt="Close" width={14} height={14} />
+          </button>
         </div>
 
         <div className="avatar-section">
           <div className="avatar-wrapper">
-            <div className="avatar-circle"></div>
+
+            {/* BIG avatar */}
+            <div className="avatar-circle">
+              <Image
+                src={profileAvatar}
+                alt="Avatar"
+                width={70}
+                height={70}
+              />
+            </div>
+
+            {/* small edit icon */}
             <button className="edit-avatar-btn">
-              <Image src={editUserIcon} alt="Edit" />
+              <Image src={editUserIcon} alt="Edit" width={34} height={34} />
             </button>
+
           </div>
 
           <div className="form-section">

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import "./DeleteBlogModal.css";
+import Image from "next/image";
+import CrossIcon from "@/assets/Images/icon/cross-icon.svg"; // adjust path if needed
 
 export default function DeleteBlogModal({
   isOpen,
@@ -48,7 +50,12 @@ export default function DeleteBlogModal({
             className="close-btn"
             onClick={onClose}
           >
-            ✕
+            <Image
+              src={CrossIcon}
+              alt="close"
+              width={12}
+              height={12}
+            />
           </button>
 
         </div>
