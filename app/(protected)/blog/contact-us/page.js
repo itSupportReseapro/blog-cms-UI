@@ -1,11 +1,14 @@
 "use client";
 
 import "./page.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormField from "@/assets/ui/FormField/FormField";
 import PdpButton from "@/assets/buttons/button";
+import useContactUs from "@/hooks/contact-us/use-contact-us";
 
 export default function ContactUsPage() {
+
+  const { getContactUs, createContactUs, updateContactUs, loading } = useContactUs();
 
   const initialState = {
     title: "",
@@ -17,30 +20,102 @@ export default function ContactUsPage() {
   };
 
   const [formData, setFormData] = useState(initialState);
+  const [contactId, setContactId] = useState(null);
 
+  // ============================
+  // LOAD CONTACT ID FROM STORAGE
+  // ============================
+  useEffect(() => {
+
+    const storedId = localStorage.getItem("contactId");
+
+    if (!storedId) return; // do nothing if no id
+
+    setContactId(storedId);
+
+    loadContact(storedId);
+
+  }, []);
+
+  // ============================
+  // LOAD CONTACT DATA
+  // ============================
+  const loadContact = async (id) => {
+
+    const contact = await getContactUs(id);
+
+    if (!contact) return;
+
+    setFormData({
+      title: contact.heading || "",
+      description: contact.description || "",
+      phone: contact.phone_no || "",
+      mapUrl: contact.map_url || "",
+      email: contact.email || "",
+      address: contact.address || ""
+    });
+
+  };
+
+  // ============================
+  // HANDLE INPUT
+  // ============================
   const handleChange = (e) => {
+
     const { name, value } = e.target;
 
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
   };
 
+  // ============================
+  // CLEAR
+  // ============================
   const handleClear = () => {
+
     setFormData(initialState);
+
   };
 
-  const handleSave = () => {
-    console.log("Saved Data:", formData);
+  // ============================
+  // SAVE
+  // ============================
+  const handleSave = async () => {
+
+    let res;
+
+    if (contactId) {
+
+      res = await updateContactUs(contactId, formData);
+
+    } else {
+
+      res = await createContactUs(formData);
+
+      if (res?.data?.id) {
+
+        const newId = res.data.id;
+
+        setContactId(newId);
+
+        localStorage.setItem("contactId", newId);
+
+        // immediately load the saved contact
+        loadContact(newId);
+
+      }
+
+    }
+
   };
 
   return (
     <section className="contact-page">
 
       <div className="contact-card">
-
-        {/* HEADER */}
 
         <div className="contact-header">
 
@@ -62,15 +137,14 @@ export default function ContactUsPage() {
               size="md"
               radius="sm"
               onClick={handleSave}
+              disabled={loading}
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </PdpButton>
 
           </div>
 
         </div>
-
-        {/* FORM GRID */}
 
         <div className="form-grid">
 

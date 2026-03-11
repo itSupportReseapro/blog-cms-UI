@@ -8,6 +8,17 @@ export default function UserDetailsModal({ user, onClose }) {
 
   if (!user) return null;
 
+  /* detect profile image field safely */
+  const profileUrl =
+    user.profilePicture ||
+    user.profile ||
+    user.avatar ||
+    user.image ||
+    "";
+
+  /* extract filename */
+  const fileName = profileUrl ? profileUrl.split("/").pop() : "-";
+
   return (
     <div className="user-modal-overlay">
 
@@ -27,8 +38,8 @@ export default function UserDetailsModal({ user, onClose }) {
             <Image
               src={CrossIcon}
               alt="close"
-              width={16}
-              height={16}
+              width={18}
+              height={18}
             />
           </button>
 
@@ -38,44 +49,57 @@ export default function UserDetailsModal({ user, onClose }) {
 
         <div className="user-details-grid">
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Name</span>
-            <p className="value-link">{user.name}</p>
+            <a className="value-link">{user.name || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Email</span>
-            <p className="value-link">{user.email}</p>
+            <a className="value-link">{user.email || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Phone Number</span>
-            <p className="value-link">{user.phone}</p>
+            <a className="value-link">{user.phone || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Gender</span>
-            <p className="value-link">{user.gender}</p>
+            <a className="value-link">{user.gender || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Date of Birth</span>
-            <p className="value-link">{user.dob}</p>
+            <a className="value-link">{user.dob || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Role</span>
-            <p className="value-link">{user.role}</p>
+            <a className="value-link">{user.role || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Default Password</span>
-            <p className="value-link">{user.password}</p>
+            <a className="value-link">{user.password || "-"}</a>
           </div>
 
-          <div className="detail-item">
+          <div className="detail-row">
             <span>Profile Picture</span>
-            <p className="value-link">profilepicture.jpg</p>
+
+            {profileUrl ? (
+              <a
+                href={profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="value-link"
+              >
+                {fileName}
+              </a>
+            ) : (
+              <p>-</p>
+            )}
+
           </div>
 
         </div>
