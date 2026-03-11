@@ -5,12 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useMemo } from "react";
 
+import Table from "@/assets/ui/tables/Table";
 import PdpButton from "@/assets/buttons/button";
-import { PdpTable } from "@/components/pdp-table";
 
 import DeleteBlogModal from "@/assets/ui/modals/DeleteBlogModal";
 
-import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
 import SearchIcon from "@/assets/Images/icon/search-icon.svg";
 import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
 import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
@@ -106,23 +105,8 @@ export default function BlogDashboardPage() {
 
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
-
-  const [sortKey, setSortKey] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
-
-  const handleSort = (key) => {
-
-    if (sortKey === key) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDirection("asc");
-    }
-
-  };
 
   const handleTableAction = (actionKey, row) => {
 
@@ -150,70 +134,36 @@ export default function BlogDashboardPage() {
       );
     }
 
-    if (sortKey) {
-      data = [...data].sort((a, b) => {
-
-        if (a[sortKey] < b[sortKey])
-          return sortDirection === "asc" ? -1 : 1;
-
-        if (a[sortKey] > b[sortKey])
-          return sortDirection === "asc" ? 1 : -1;
-
-        return 0;
-
-      });
-    }
-
     return data;
 
-  }, [activeTab, search, sortKey, sortDirection]);
+  }, [activeTab, search]);
 
   const blogPostsColumns = [
 
-    { key: "id", label: "Sl. No.", width: "60px" },
+    { key: "id", label: "Sl. No.", sortable: false },
 
     {
       key: "title",
-      label: (
-        <div className="sortable-head" onClick={() => handleSort("title")}>
-          Blog Title
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
-        </div>
-      ),
-      width: "310px"
+      label: "Blog Title",
+      sortable: true
     },
 
     {
       key: "author",
-      label: (
-        <div className="sortable-head" onClick={() => handleSort("author")}>
-          Author
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
-        </div>
-      ),
-      width: "150px"
+      label: "Author",
+      sortable: true
     },
 
     {
       key: "lastUpdated",
-      label: (
-        <div className="sortable-head" onClick={() => handleSort("lastUpdated")}>
-          Last Updated
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
-        </div>
-      ),
-      width: "150px"
+      label: "Last Updated",
+      sortable: true
     },
 
     {
       key: "status",
-      label: (
-        <div className="sortable-head" onClick={() => handleSort("status")}>
-          Status
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14} />
-        </div>
-      ),
-      width: "120px",
+      label: "Status",
+      sortable: true,
       render: (row) => (
         <span className={`status-pill ${row.status}`}>
           {row.status}
@@ -298,50 +248,22 @@ export default function BlogDashboardPage() {
 
         {/* ================= TABLE ================= */}
 
-        <PdpTable
-          columns={[
-            { field: "id", label: "ID", width: "80px" },
-            { field: "title", label: "Blog Title" },
-            { field: "author", label: "Author", width: "150px" },
-            { field: "lastUpdated", label: "Last Updated", width: "150px" },
-            {
-              field: "status",
-              label: "Status",
-              width: "120px",
-              render: (row) => (
-                <span className={`status-pill ${row.status}`}>
-                  {row.status}
-                </span>
-              ),
-            },
-          ]}
-          data={filteredData}
-          rowKey="id"
-          // title="All Blogs"
-          searchEnabled={false}
-          pageSizeOptions={[5, 10, 15, 20, "All"]}
-          theme="light"
-          defaultPageSize={10}
-          enableFilters={true}
-          selectable={false}
-          showActions={true}
-          actions={[
-            { key: "edit", label: "Edit", icon: "✎" },
-            { key: "delete", label: "Delete", icon: "🗑️" },
-          ]}
-          onEdit={(row) => console.log("Edit:", row)}
-          onDelete={(row) => {
-            setSelectedBlog(row);
-            setDeleteModalOpen(true);
-          }}
-          showStatusDot={true}
-          highlightStatusCells={true}
-          statusField="status"
-          statusTrueValues={["published"]}
-          bodyHeight={520}
-          densityToggle={true}
-          exportFileBaseName="blogs"
-        />
+        <div className="table-wrapper">
+
+          <Table
+            data={filteredData}
+            columns={blogPostsColumns}
+            actions={tableActions}
+            onActionExecute={handleTableAction}
+            statusColumnKey="status"
+            rowKey="id"
+            defaultPageSize={10}
+            rowsPerPageOptions={[10, 25, 50]}
+            breakpoint={768}
+            showFooter={true}
+          />
+
+        </div>
 
       </div>
 

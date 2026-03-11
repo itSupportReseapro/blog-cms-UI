@@ -1,296 +1,133 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useTable } from '@/context/TableContext';
-import StatusBadge from './StatusBadge';
-import ActionMenu from './ActionMenu';
+import React, { useState, useEffect } from 'react';
+import useTableState from './useTableState';
+import TableDesktop from './TableDesktop';
+import TableMobileCards from './TableMobileCards';
+import PaginationFooter from './PaginationFooter';
+import EmptyState from './EmptyState';
+import SkeletonTable from './SkeletonTable';
 import './Table.css';
 
 const Table = ({
   data = [],
+  columns = [],
   onActionExecute = null,
+  actions = [],
   statusColumnKey = 'status',
-  columns: columnsOverride = null
+  rowKey = 'id',
+  defaultPageSize = 10,
+  rowsPerPageOptions = [10, 25, 50],
+  loading = false,
+  mobileMode = null,
+  breakpoint = 768,
+  showFooter = true,
 }) => {
-
-  const contextConfig = useTable();
-  const contextColumns = columnsOverride || contextConfig.columns;
-  const { pageSize, rowsPerPageOptions } = contextConfig;
-
-  const columns = contextColumns;
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(pageSize);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-
-  /* ================= SORT ================= */
-
-  const sortedData = useMemo(() => {
-
-    let sorted = [...data];
-
-    if (sortConfig.key) {
-
-      sorted.sort((a, b) => {
-
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-
-        if (aValue == null && bValue == null) return 0;
-        if (aValue == null) return 1;
-        if (bValue == null) return -1;
-
-        if (typeof aValue === 'string') {
-
-          return sortConfig.direction === 'asc'
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-
-        }
-
-        return sortConfig.direction === 'asc'
-          ? aValue - bValue
-          : bValue - aValue;
-
-      });
-
-    }
-
-    return sorted;
-
-  }, [data, sortConfig]);
-
-  /* ================= PAGINATION ================= */
-
-  const paginatedData = useMemo(() => {
-
-    const start = (currentPage - 1) * rowsPerPage;
-
-    return sortedData.slice(start, start + rowsPerPage);
-
-  }, [sortedData, currentPage, rowsPerPage]);
-
-  const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-
-  const startIndex =
-    sortedData.length === 0
-      ? 0
-      : (currentPage - 1) * rowsPerPage + 1;
-
-  const endIndex = Math.min(
-    currentPage * rowsPerPage,
-    sortedData.length
+  // Mobile responsiveness detection
+  const [isMobile, setIsMobile] = useState(
+    mobileMode !== null ? mobileMode : typeof window !== 'undefined' && window.innerWidth < breakpoint
   );
 
-  const handleSort = (key) => {
+  useEffect(() => {
+    if (mobileMode !== null) return;
 
-    setSortConfig(prev => ({
-      key,
-      direction:
-        prev.key === key && prev.direction === 'asc'
-          ? 'desc'
-          : 'asc'
-    }));
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < breakpoint);
+    };
 
-    setCurrentPage(1);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [mobileMode, breakpoint]);
 
-  };
+  // Use custom hook for state management
+  const {
+    sortedData,
+    paginatedData,
+    currentPage,
+    rowsPerPage,
+    totalPages,
+    sortConfig,
+    handleSort,
+    handlePageChange,
+    handleRowsPerPageChange,
+    startIndex,
+    endIndex,
+  } = useTableState({
+    data,
+    defaultPageSize,
+    rowKey,
+  });
 
-  const handleRowsPerPageChange = (e) => {
+  // Loading state
+  if (loading) {
+    return (
+      <div className="table-wrapper">
+        <SkeletonTable columns={columns} />
+      </div>
+    );
+  }
 
-    setRowsPerPage(Number(e.target.value));
-    setCurrentPage(1);
-
-  };
-
-  /* ================= RENDER ================= */
-
-  return (
-
-    <div className="table-wrapper">
-
-      <table className="data-table">
-
-        <thead>
-
-          <tr>
-
-            {columns.map(column => (
-
-              <th
-                key={column.key}
-                onClick={
-                  column.sortable
-                    ? () => handleSort(column.key)
-                    : undefined
-                }
-                className={
-                  column.sortable
-                    ? 'sortable-header'
-                    : ''
-                }
-              >
-                {column.label}
-              </th>
-
-            ))}
-
-            {onActionExecute && <th>Action</th>}
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {paginatedData.length > 0 ? (
-
-            paginatedData.map((row, index) => (
-
-              <tr key={row.id || index}>
-
-                {columns.map(column => (
-
-                  <td key={`${row.id}-${column.key}`}>
-
-                    {/* Custom Render Support */}
-
-                    {column.render ? (
-
-                      column.render(row)
-
-                    ) : column.key === statusColumnKey ? (
-
-                      <StatusBadge status={row[column.key]} />
-
-                    ) : (
-
-                      row[column.key] ?? "-"
-
-                    )}
-
-                  </td>
-
-                ))}
-
-                {onActionExecute && (
-
-                  <td>
-
-                    <ActionMenu
-                      row={row}
-                      onActionExecute={onActionExecute}
-                    />
-
-                  </td>
-
-                )}
-
-              </tr>
-
-            ))
-
-          ) : (
-
+  // Empty state
+  if (sortedData.length === 0) {
+    return (
+      <div className="table-wrapper">
+        <table className="data-table">
+          <thead>
             <tr>
-
-              <td
-                colSpan={
-                  columns.length +
-                  (onActionExecute ? 1 : 0)
-                }
-                className="empty-state"
-              >
-
-                No data available
-
-              </td>
-
-            </tr>
-
-          )}
-
-        </tbody>
-
-      </table>
-
-      {/* ================= PAGINATION ================= */}
-
-      {paginatedData.length > 0 && (
-
-        <div className="table-footer">
-
-          <div className="footer-left">
-
-            Showing {startIndex} to {endIndex} of {sortedData.length} items
-
-          </div>
-
-          <div className="footer-center">
-
-            <button
-              className="footer-nav-btn"
-              onClick={() =>
-                setCurrentPage(
-                  Math.max(1, currentPage - 1)
-                )
-              }
-              disabled={currentPage === 1}
-            >
-              &lt; Prev
-            </button>
-
-            <span className="footer-page-number">
-
-              {currentPage}
-
-            </span>
-
-            <button
-              className="footer-nav-btn"
-              onClick={() =>
-                setCurrentPage(
-                  Math.min(totalPages, currentPage + 1)
-                )
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next &gt;
-            </button>
-
-          </div>
-
-          <div className="footer-right">
-
-            <span>Items per Page</span>
-
-            <select
-              value={rowsPerPage}
-              onChange={handleRowsPerPageChange}
-            >
-
-              {rowsPerPageOptions.map(option => (
-
-                <option key={option} value={option}>
-
-                  {option}
-
-                </option>
-
+              {columns.map(column => (
+                <th key={column.key}>{column.label}</th>
               ))}
+              {onActionExecute && <th>Action</th>}
+            </tr>
+          </thead>
+          <tbody>
+            <EmptyState columns={columns} onActionExecute={onActionExecute} />
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
-            </select>
-
-          </div>
-
-        </div>
-
+  // Render table based on device type
+  return (
+    <div className="table-wrapper">
+      {isMobile ? (
+        <TableMobileCards
+          data={paginatedData}
+          columns={columns}
+          statusColumnKey={statusColumnKey}
+          onActionExecute={onActionExecute}
+          actions={actions}
+          rowKey={rowKey}
+        />
+      ) : (
+        <TableDesktop
+          data={paginatedData}
+          columns={columns}
+          statusColumnKey={statusColumnKey}
+          onActionExecute={onActionExecute}
+          actions={actions}
+          rowKey={rowKey}
+          sortConfig={sortConfig}
+          handleSort={handleSort}
+        />
       )}
 
+      {showFooter && (
+        <PaginationFooter
+          currentPage={currentPage}
+          totalPages={totalPages}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          totalItems={sortedData.length}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={rowsPerPageOptions}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      )}
     </div>
-
   );
-
 };
 
 export default Table;

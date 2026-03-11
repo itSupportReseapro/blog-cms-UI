@@ -2,12 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import { useTable } from '@/context/TableContext';
 import ThreeDotsIcon from '@/assets/Images/icon/3-dots.svg';
 import './ActionMenu.css';
 
-const ActionMenu = ({ row, onActionExecute }) => {
-  const { actions } = useTable();
+const ActionMenu = ({ row, onActionExecute, actions = [] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
