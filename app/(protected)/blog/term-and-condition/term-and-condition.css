@@ -1,6 +1,6 @@
 /* ================= Container ================= */
 
-.privacy-container {
+.terms-container {
   width: 100%;
   background: var(--White);
   border-radius: var(--radius-md);
@@ -13,19 +13,19 @@
 
 /* ================= Header ================= */
 
-.privacy-header {
+.terms-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.privacy-header h2 {
+.terms-header h2 {
   margin: 0;
 }
 
 /* ================= Header Buttons ================= */
 
-.privacy-actions {
+.terms-actions {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
@@ -33,20 +33,20 @@
 
 /* ================= Form Field ================= */
 
-.privacy-field {
+.terms-field {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
 }
 
-.privacy-field label {
+.terms-field label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
 }
 
 /* ================= Input ================= */
 
-.privacy-field input {
+.terms-field input {
   width: 100%;
   height: 44px;
   padding: 0 12px;
@@ -59,19 +59,17 @@
   color: var(--Text1);
 }
 
-.privacy-field input:focus {
+.terms-field input:focus {
   border-color: var(--Primary);
 }
 
 /* ================= Editor ================= */
 
-.privacy-editor {
+.terms-editor {
   width: 100%;
 }
 
-/* Fix spacing inside RichEditor */
-
-.privacy-editor > div {
+.terms-editor > div {
   width: 100%;
 }
 
@@ -79,13 +77,13 @@
 
 @media (max-width: 768px) {
 
-  .privacy-header {
+  .terms-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-sm);
   }
 
-  .privacy-actions {
+  .terms-actions {
     width: 100%;
   }
 

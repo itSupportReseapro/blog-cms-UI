@@ -5,9 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useMemo } from "react";
 
-import { TableProvider } from "@/context/TableContext";
-import Table from "@/assets/ui/tables/Table";
 import PdpButton from "@/assets/buttons/button";
+import { PdpTable } from "@/components/pdp-table";
 
 import DeleteBlogModal from "@/assets/ui/modals/DeleteBlogModal";
 
@@ -299,21 +298,50 @@ export default function BlogDashboardPage() {
 
         {/* ================= TABLE ================= */}
 
-        <div className="table-wrapper">
-
-          <TableProvider
-            columns={blogPostsColumns}
-            actions={tableActions}
-          >
-
-            <Table
-              data={filteredData}
-              onActionExecute={handleTableAction}
-            />
-
-          </TableProvider>
-
-        </div>
+        <PdpTable
+          columns={[
+            { field: "id", label: "ID", width: "80px" },
+            { field: "title", label: "Blog Title" },
+            { field: "author", label: "Author", width: "150px" },
+            { field: "lastUpdated", label: "Last Updated", width: "150px" },
+            {
+              field: "status",
+              label: "Status",
+              width: "120px",
+              render: (row) => (
+                <span className={`status-pill ${row.status}`}>
+                  {row.status}
+                </span>
+              ),
+            },
+          ]}
+          data={filteredData}
+          rowKey="id"
+          // title="All Blogs"
+          searchEnabled={false}
+          pageSizeOptions={[5, 10, 15, 20, "All"]}
+          theme="light"
+          defaultPageSize={10}
+          enableFilters={true}
+          selectable={false}
+          showActions={true}
+          actions={[
+            { key: "edit", label: "Edit", icon: "✎" },
+            { key: "delete", label: "Delete", icon: "🗑️" },
+          ]}
+          onEdit={(row) => console.log("Edit:", row)}
+          onDelete={(row) => {
+            setSelectedBlog(row);
+            setDeleteModalOpen(true);
+          }}
+          showStatusDot={true}
+          highlightStatusCells={true}
+          statusField="status"
+          statusTrueValues={["published"]}
+          bodyHeight={520}
+          densityToggle={true}
+          exportFileBaseName="blogs"
+        />
 
       </div>
 

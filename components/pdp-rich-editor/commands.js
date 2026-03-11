@@ -379,3 +379,30 @@ export function indentList(doc, selection, delta) {
 
   return { doc: next, selection: sel };
 }
+
+export function insertTable(doc, selection, rows = 2, cols = 2) {
+  const d = normalizeDoc(doc);
+  const sel = ensureSelection(selection);
+  const next = cloneDoc(d);
+
+  const start = splitDocAtTextOffset(next, sel.from);
+
+  // Create table block with empty cells
+  const tableBlock = {
+    type: "table",
+    rows: [],
+  };
+
+  for (let r = 0; r < rows; r++) {
+    const cells = [];
+    for (let c = 0; c < cols; c++) {
+      cells.push({ content: [{ text: "" }] });
+    }
+    tableBlock.rows.push({ cells });
+  }
+
+  // Insert table after current block
+  next.content.splice(start.blockIndex + 1, 0, tableBlock);
+
+  return { doc: next, selection: { from: sel.from, to: sel.from } };
+}

@@ -29,10 +29,13 @@
     "@tiptap/react": "^3.20.0",
     "@tiptap/starter-kit": "^3.20.0",
     "axios": "^1.13.5",
+    "jspdf": "^4.2.0",
+    "jspdf-autotable": "^5.0.7",
     "next": "16.1.6",
     "prop-types": "^15.8.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "babel-plugin-react-compiler": "1.0.0",
