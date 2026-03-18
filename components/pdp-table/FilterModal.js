@@ -96,9 +96,15 @@ export default function FilterModal({
         </div>
 
         <div className="pdp-modalButtons">
-          <button type="button" onClick={onClearAll}>Clear All Filters</button>
-          <button type="button" onClick={onClose}>Cancel</button>
-          <button type="button" onClick={onApply}>Apply</button>
+          <button type="button" className="pdp-modalBtn pdp-modalBtnGhost" onClick={onClearAll}>
+            Clear All Filters
+          </button>
+          <button type="button" className="pdp-modalBtn pdp-modalBtnOutline" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="pdp-modalBtn pdp-modalBtnPrimary" onClick={onApply}>
+            Apply
+          </button>
         </div>
       </div>
     </div>

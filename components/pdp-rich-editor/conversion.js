@@ -55,13 +55,23 @@ export function marksWrap(html, marks) {
 export function docToEditableHTML(doc) {
   const d = normalizeDoc(doc);
 
+  const renderRunText = (text) => {
+    const value = String(text ?? "");
+    if (value === "") return "\u200B";
+
+    return value
+      .split("\n")
+      .map((part) => escapeHtml(part === "" ? "\u200B" : part))
+      .join("<br/>");
+  };
+
   const inlineRuns = (runs) =>
     (runs || [])
       .map((r) => {
-        const text = escapeHtml(r.text ?? "");
+        const text = renderRunText(r.text);
         const marks = Array.isArray(r.marks) ? r.marks : [];
         // ZWSP keeps caret alive, selection-dom ignores it
-        return marksWrap(text === "" ? "\u200B" : text, marks);
+        return marksWrap(text, marks);
       })
       .join("");
 

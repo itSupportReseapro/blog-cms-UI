@@ -25,7 +25,7 @@ import useRichEditorHistory from "./useRichEditorHistory";
 import useRichEditorUI from "./useRichEditorUI";
 
 import Toolbar from "./Toolbar";
-import LinkPopup from "./LinkPopup";
+import LinkModal from "./LinkModal";
 import TablePopup from "./TablePopup";
 import Editor from "./Editor";
 import EditorFooter from "./EditorFooter";
@@ -39,9 +39,20 @@ export default function RichEditor({
   onHTMLChange,
   placeholder = "Write…",
   disabled = false,
+  showFooter = true,
   className,
   style,
 }) {
+  const emptyActiveMarks = {
+    b: false,
+    i: false,
+    u: false,
+    s: false,
+    sub: false,
+    sup: false,
+    a: false,
+  };
+
   // State management
   const editorState = useRichEditorState(value);
   const history = useRichEditorHistory();
@@ -58,7 +69,7 @@ export default function RichEditor({
     el.innerHTML = docToEditableHTML(docRef.current);
   }, []);
 
-  // Focus link input when popup opens
+  // Focus link input when modal opens
   useEffect(() => {
     if (ui.linkUI.open) {
       setTimeout(() => linkInputRef.current?.focus(), 0);
@@ -80,10 +91,15 @@ export default function RichEditor({
     const el = rootRef.current;
     if (!el) return;
 
+    // Always transact against the latest live DOM so recently typed content
+    // is not lost when a toolbar action runs before a delayed sync.
+    const liveDoc = htmlToDoc(el.innerHTML);
+    docRef.current = liveDoc;
+
     const sel = editorState.getBestSelection();
     selectionRef.current = sel;
 
-    const prev = docRef.current;
+    const prev = liveDoc;
     const result = txFn(prev, sel);
     const next = result?.doc ? result.doc : prev;
     const nextSel = result?.selection || sel;
@@ -95,17 +111,20 @@ export default function RichEditor({
 
     emitDoc(next);
     el.focus();
+    refreshUIFromDOMSelection();
   };
 
   const undo = () => {
     history.undo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
+    refreshUIFromDOMSelection();
   };
 
   const redo = () => {
     history.redo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
+    refreshUIFromDOMSelection();
   };
 
-  const refreshUIFromDOMSelection = () => {
+  function refreshUIFromDOMSelection() {
     const el = rootRef.current;
     if (!el) return;
 
@@ -119,11 +138,17 @@ export default function RichEditor({
     }
 
     const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
+    if (!sel || sel.rangeCount === 0) {
+      ui.setActiveMarks(emptyActiveMarks);
+      return;
+    }
 
     const r = sel.getRangeAt(0);
     const blockEl = findContainingBlock(el, r.startContainer);
-    if (!blockEl) return;
+    if (!blockEl) {
+      ui.setActiveMarks(emptyActiveMarks);
+      return;
+    }
 
     const tag = blockEl.tagName.toLowerCase();
 
@@ -137,29 +162,38 @@ export default function RichEditor({
 
     const a = (blockEl.style?.textAlign || "left").toLowerCase();
     ui.setAlignState(["left", "center", "right", "justify"].includes(a) ? a : "left");
-  };
 
-  const openLinkPopup = () => {
+    const startEl = r.startContainer.nodeType === Node.ELEMENT_NODE
+      ? r.startContainer
+      : r.startContainer.parentElement;
+
+    const hasAncestor = (selector) => {
+      const match = startEl?.closest?.(selector);
+      return !!(match && el.contains(match));
+    };
+
+    ui.setActiveMarks({
+      b: hasAncestor("strong,b"),
+      i: hasAncestor("em,i"),
+      u: hasAncestor("u"),
+      s: hasAncestor("s,strike"),
+      sub: hasAncestor("sub"),
+      sup: hasAncestor("sup"),
+      a: hasAncestor("a"),
+    });
+  }
+
+  const openLinkModal = () => {
     const el = rootRef.current;
-    const wrap = wrapRef.current;
-    if (!el || !wrap) return;
+    if (!el) return;
 
     const selOff = editorState.getBestSelection();
     if (selOff.from === selOff.to) return;
 
-    let rect = getRangeRectSafe(el);
-    if (!rect) rect = selectionSnapshotRef.current.rect;
-    if (!rect) return;
-
     selectionRef.current = selOff;
 
     const href = getLinkHrefInRange(docRef.current, selOff);
-
-    const wrapRect = wrap.getBoundingClientRect();
-    const x = rect.left - wrapRect.left;
-    const y = rect.bottom - wrapRect.top + 8;
-
-    ui.setLinkUI({ open: true, href: String(href || ""), x, y });
+    ui.setLinkUI({ open: true, href: String(href || ""), x: 0, y: 0 });
 
     setSelectionOffsets(el, selOff.from, selOff.to);
     setTimeout(() => {
@@ -168,7 +202,7 @@ export default function RichEditor({
     }, 0);
   };
 
-  const applyLinkFromPopup = () => {
+  const applyLinkFromModal = () => {
     const href = String(ui.linkUI.href || "").trim();
     if (!href) return;
 
@@ -177,7 +211,7 @@ export default function RichEditor({
     ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
   };
 
-  const removeLinkFromPopup = () => {
+  const removeLinkFromModal = () => {
     const savedSel = selectionRef.current;
     applyTx((d) => unsetLink(d, savedSel));
     ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
@@ -251,11 +285,11 @@ export default function RichEditor({
   };
 
   const handleScheduleSyncFromDOM = () => {
-    editorState.scheduleSyncFromDOM(onChange, onHTMLChange);
+    editorState.syncFromDOM(onChange, onHTMLChange);
   };
 
   const handleBlur = () => {
-    handleScheduleSyncFromDOM();
+    editorState.syncFromDOM(onChange, onHTMLChange);
     ui.setWordCount(editorState.calculateWordCount());
   };
 
@@ -279,6 +313,7 @@ export default function RichEditor({
         format={ui.format}
         align={ui.align}
         color={ui.color}
+        activeMarks={ui.activeMarks}
         onCaptureSelection={editorState.captureSelectionSnapshot}
         onUndo={undo}
         onRedo={redo}
@@ -289,7 +324,7 @@ export default function RichEditor({
         onIndent={(amount) => applyTx((d, s) => indentBlock(d, s, amount))}
         onInsertTable={openTablePopup}
         onSetColor={(col) => applyTx((d, s) => setColor(d, s, col))}
-        onOpenLink={openLinkPopup}
+        onOpenLink={openLinkModal}
         onFormatChange={handleFormatChange}
         onAlignChange={handleAlignChange}
         onColorChange={handleColorChange}
@@ -310,14 +345,14 @@ export default function RichEditor({
         }}
       />
 
-      <EditorFooter wordCount={ui.wordCount} />
+      {showFooter ? <EditorFooter wordCount={ui.wordCount} /> : null}
 
-      <LinkPopup
+      <LinkModal
         linkUI={ui.linkUI}
         linkInputRef={linkInputRef}
         onHrefChange={(href) => ui.setLinkUI((x) => ({ ...x, href }))}
-        onApply={applyLinkFromPopup}
-        onRemove={removeLinkFromPopup}
+        onApply={applyLinkFromModal}
+        onRemove={removeLinkFromModal}
         onClose={() => ui.setLinkUI({ open: false, href: "", x: 0, y: 0 })}
       />
 

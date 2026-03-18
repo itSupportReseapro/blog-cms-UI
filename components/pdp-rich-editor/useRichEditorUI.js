@@ -11,6 +11,15 @@ export default function useRichEditorUI() {
   const [format, setFormat] = useState("p");
   const [align, setAlignState] = useState("left");
   const [color, setColorState] = useState("#111111");
+  const [activeMarks, setActiveMarks] = useState({
+    b: false,
+    i: false,
+    u: false,
+    s: false,
+    sub: false,
+    sup: false,
+    a: false,
+  });
   const [wordCount, setWordCount] = useState(0);
 
   return {
@@ -34,6 +43,8 @@ export default function useRichEditorUI() {
     setAlignState,
     color,
     setColorState,
+    activeMarks,
+    setActiveMarks,
     wordCount,
     setWordCount,
   };

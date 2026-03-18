@@ -2,21 +2,29 @@
 
 import "./page.css";
 import { useState } from "react";
-import Table from "@/assets/ui/tables/Table";
-import StatusBadge from "@/assets/ui/tables/StatusBadge";
-import { TableProvider } from "@/context/TableContext";
 import PdpButton from "@/assets/buttons/button";
 import Image from "next/image";
+import { UniversalTable } from "@/components/universal-table";
 
 import PlusIcon from "@/assets/Images/icon/plus-icon.svg";
-import SearchIcon from "@/assets/Images/icon/search-icon.svg";
-import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
-import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
-import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
-import DefaultAvatar from "@/assets/Images/icon/profile-avatar.svg";
+import DefaultAvatar from "@/assets/Images/icon/Profile-avatar.svg";
 
 import AddUserForm from "@/components/AddUserForm/AddUserForm";
-import UserDetailsModal from "@/assets/ui/modals/UserDetailsModal";
+import UserDetailsModal from "@/assets/modals/UserDetailsModal/UserDetailsModal";
+import { uploadCmsAsset } from "@/services/cms.service";
+
+const tableActions = [
+  {
+    key: "details",
+    label: "Details",
+    condition: () => true
+  },
+  {
+    key: "remove",
+    label: "Remove",
+    condition: () => true
+  }
+];
 
 const initialUsers = [
   {
@@ -30,12 +38,17 @@ const initialUsers = [
   }
 ];
 
+const roleClassMap = {
+  admin: "role-badge role-badge-admin",
+  editor: "role-badge role-badge-editor",
+  user: "role-badge role-badge-user",
+};
+
 export default function UserRolePage() {
 
   const [users,setUsers]=useState(initialUsers);
   const [showAddUser,setShowAddUser]=useState(false);
   const [selectedUser,setSelectedUser]=useState(null);
-  const [search,setSearch]=useState("");
 
   const [formData,setFormData]=useState({
     name:"",
@@ -50,18 +63,13 @@ export default function UserRolePage() {
 
   const userColumns=[
 
-    {key:"id",label:"Sl. No."},
+    { field:"id", label:"Sl. No." },
 
     {
-      key:"name",
-      label:(
-        <div className="sortable-head">
-          Name
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14}/>
-        </div>
-      ),
+      field:"name",
+      label:"Name",
       sortable:true,
-      render:(row)=>(
+      render:(_, row)=>(
         <div className="user-cell">
 
           <Image
@@ -79,42 +87,45 @@ export default function UserRolePage() {
     },
 
     {
-      key:"email",
-      label:(
-        <div className="sortable-head">
-          Email
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14}/>
-        </div>
-      ),
+      field:"email",
+      label:"Email",
       sortable:true
     },
 
     {
-      key:"role",
-      label:(
-        <div className="sortable-head">
-          Role
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14}/>
-        </div>
-      ),
+      field:"role",
+      label:"Role",
       sortable:true,
-      render:(row)=>(
-        <StatusBadge status={row.role}/>
-      )
+      render:(value)=>{
+        const normalizedRole = String(value || "").toLowerCase();
+        const roleClass = roleClassMap[normalizedRole] || "role-badge";
+        return <span className={roleClass}>{value || "-"}</span>;
+      }
     },
 
     {
-      key:"lastActive",
-      label:(
-        <div className="sortable-head">
-          Last Active
-          <Image src={BothArrowIcon} alt="sort" width={14} height={14}/>
-        </div>
-      ),
+      field:"lastActive",
+      label:"Last Active",
       sortable:true
     }
 
   ];
+
+  const tableActionsForRows = tableActions.map((action) => ({
+    ...action,
+    onClick: (row) => handleTableAction(action.key, row),
+  }));
+
+  const toolbarLeft = (
+    <PdpButton
+      variant="primary"
+      icon={PlusIcon}
+      iconPosition="left"
+      onClick={() => setShowAddUser(true)}
+    >
+      Add User
+    </PdpButton>
+  );
 
   const handleInputChange=(e)=>{
     const {name,value}=e.target;
@@ -125,21 +136,28 @@ export default function UserRolePage() {
     }));
   };
 
-  const handleAvatarUpload=(e)=>{
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
 
-    const file=e.target.files?.[0];
-
-    if(file){
-
-      const url=URL.createObjectURL(file);
-
-      setFormData(prev=>({
-        ...prev,
-        avatar:url
-      }));
-
+    if (!file) {
+      return;
     }
 
+    try {
+      window.addSnackbar?.("Uploading avatar...", "info");
+
+      const { url } = await uploadCmsAsset(file);
+
+      setFormData((prev) => ({
+        ...prev,
+        avatar: url,
+      }));
+
+      window.addSnackbar?.("Avatar uploaded successfully", "success");
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+      window.addSnackbar?.("Avatar upload failed", "error");
+    }
   };
 
   const handleAddUser=()=>{
@@ -196,71 +214,33 @@ export default function UserRolePage() {
 
   }
 
-  const filteredUsers = users.filter(user=>{
-
-    if(!search) return true;
-
-    const term=search.toLowerCase();
-
-    return(
-      user.name.toLowerCase().includes(term) ||
-      user.email.toLowerCase().includes(term) ||
-      user.role.toLowerCase().includes(term)
-    );
-
-  });
-
   return(
 
-    <TableProvider>
-
-      <section className="cms-dashboard">
+    <section className="cms-dashboard">
 
         <div className="main-card">
 
-          <div className="top-controls">
+          <div className="table-wrapper">
 
-            <PdpButton
-              variant="primary"
-              icon={PlusIcon}
-              iconPosition="left"
-              onClick={()=>setShowAddUser(true)}
-            >
-              Add User
-            </PdpButton>
-
-            <div className="right-controls">
-
-              <div className="search-wrapper">
-
-                <Image src={SearchIcon} alt="search" width={16} height={16}/>
-
-                <input
-                  className="search-input"
-                  placeholder="Search"
-                  value={search}
-                  onChange={(e)=>setSearch(e.target.value)}
-                />
-
-              </div>
-
-              <button className="icon-btn">
-                <Image src={DownloadIcon} alt="download" width={18} height={18}/>
-              </button>
-
-              <button className="icon-btn">
-                <Image src={FilterIcon} alt="filter" width={18} height={18}/>
-              </button>
-
-            </div>
+            <UniversalTable
+              variant="data"
+              rows={users}
+              columns={userColumns}
+              toolbarLeft={toolbarLeft}
+              searchPlaceholder="Search users by name, email, or role"
+              actions={tableActionsForRows}
+              rowKey="id"
+              defaultPageSize={10}
+              pageSizeOptions={[10, 25, 50]}
+              breakpoint={768}
+              enableFilters={true}
+              showFilterButton={true}
+              showActions={true}
+              showFooter={true}
+              exportFileBaseName="users-and-roles"
+            />
 
           </div>
-
-          <Table
-            data={filteredUsers}
-            columns={userColumns}
-            onActionExecute={handleTableAction}
-          />
 
         </div>
 
@@ -270,8 +250,6 @@ export default function UserRolePage() {
         />
 
       </section>
-
-    </TableProvider>
 
   );
 

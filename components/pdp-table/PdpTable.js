@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import "./pdp-table.css";
 
 import usePdpTableState from "./usePdpTableState";
@@ -17,6 +18,9 @@ import SkeletonTable from "./SkeletonTable";
 
 import { exportRowsToExcel, exportRowsToPDF } from "./exporters";
 import TableSidebar from "./TableSidebar";
+import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
+import DownloadIcon from "@/assets/Images/icon/DownloadIcon.svg";
+import SearchIcon from "@/assets/Images/icon/search-icon.svg";
 
 export default function PdpTable({
   columns = [],
@@ -25,6 +29,7 @@ export default function PdpTable({
 
   title = "",
   searchEnabled = true,
+  searchPlaceholder = "Search...",
   toolbarLeft = null,
   toolbarRight = null,
 
@@ -32,6 +37,7 @@ export default function PdpTable({
   defaultPageSize,
   defaultSort,
   enableFilters = true,
+  showFilterButton = true,
 
   selectable = false,
   onSelectionChange,
@@ -45,6 +51,12 @@ export default function PdpTable({
   highlightStatusCells = false,
   statusField = "isActive",
   statusTrueValues = [1, "1", true, "true", "Active"],
+
+  expandableRows = false,
+  getExpandedRows,
+  renderExpandedContent,
+  headerRows = [],
+  summaryRows = [],
 
   mobileMode = "auto",
   breakpoint = 768,
@@ -129,6 +141,14 @@ const resize = useColumnResize({
     table.rowsPerPage === "All" ? 0 : (table.currentPage - 1) * Number(table.rowsPerPage);
 
   const activeFilterCount = Object.keys(table.appliedFilters || {}).length;
+  const hasVisibleDataColumns = useMemo(
+    () => columns.some((column) => table.visibleColumns?.[column.field]),
+    [columns, table.visibleColumns]
+  );
+  const firstFilterableColumn = useMemo(
+    () => columns.find((column) => column.filterable !== false) || columns[0],
+    [columns]
+  );
 
   // density
   const [density, setDensity] = useState(defaultDensity);
@@ -251,7 +271,7 @@ const resize = useColumnResize({
                   ref={searchRef}
                   className="pdp-search"
                   type="text"
-                  placeholder="Search..."
+                  placeholder={searchPlaceholder}
                   value={table.searchQuery}
                   onChange={(e) => table.setSearchQuery(e.target.value)}
                 />
@@ -262,7 +282,7 @@ const resize = useColumnResize({
                   title="Search"
                   aria-label="Search"
                 >
-                  {icons?.search ?? "🔎"}
+                  <Image src={SearchIcon} alt="Search" width={14} height={14} />
                 </button>
               </div>
             ) : null}
@@ -271,10 +291,22 @@ const resize = useColumnResize({
           <div className="pdp-toolbarRight">
             {toolbarRight}
 
+            {showFilterButton && enableFilters && firstFilterableColumn ? (
+              <button
+                type="button"
+                className="pdp-toolbarIconBtn"
+                onClick={() => table.openFilter(firstFilterableColumn.field)}
+                title="Open filters"
+                aria-label="Open filters"
+              >
+                <Image src={FilterIcon} alt="Filter" width={16} height={16} />
+              </button>
+            ) : null}
+
             {densityToggle && (
               <button
                 type="button"
-                className="pdp-btn"
+                className="pdp-tableBtn"
                 onClick={() => setDensity((d) => (d === "comfortable" ? "compact" : "comfortable"))}
                 title="Toggle row density"
               >
@@ -286,7 +318,7 @@ const resize = useColumnResize({
             {shouldUseSidebar ? (
               <button
                 type="button"
-                className="pdp-btn"
+                className="pdp-tableBtn"
                 onClick={() => setSidebarOpen(true)}
                 title="Table controls"
               >
@@ -299,13 +331,13 @@ const resize = useColumnResize({
                 <div className="pdp-cmWrap" ref={exportRef}>
                   <button
                     type="button"
-                    className="pdp-btn"
+                    className="pdp-toolbarIconBtn"
                     onClick={() => setExportOpen((s) => !s)}
                     disabled={loading}
                     title="Export"
+                    aria-label="Export"
                   >
-                    <span className="pdp-btnIcon">{icons?.export ?? "⤓"}</span>
-                    Export ▾
+                    <Image src={DownloadIcon} alt="Download" width={16} height={16} />
                   </button>
 
                   {exportOpen && (
@@ -343,7 +375,6 @@ const resize = useColumnResize({
                           setExportOpen(false);
                         }}
                       >
-                        <span className="pdp-dropdownIcon">{icons?.excel ?? "X"}</span>
                         Export Excel
                       </button>
 
@@ -356,7 +387,6 @@ const resize = useColumnResize({
                           setExportOpen(false);
                         }}
                       >
-                        <span className="pdp-dropdownIcon">{icons?.pdf ?? "PDF"}</span>
                         Export PDF
                       </button>
                     </div>
@@ -404,7 +434,7 @@ const resize = useColumnResize({
               showActions={showActions && resolvedActions.length > 0}
               rows={8}
             />
-          ) : table.filteredRows.length === 0 ? (
+          ) : table.filteredRows.length === 0 || !hasVisibleDataColumns ? (
             <EmptyState
               hasFilters={activeFilterCount > 0 || Boolean(table.searchQuery)}
               onClear={clearAllSearchAndFilters}
@@ -445,6 +475,11 @@ const resize = useColumnResize({
               highlightStatusCells={highlightStatusCells}
               statusField={statusField}
               statusTrueValues={statusTrueValues}
+              expandableRows={expandableRows}
+              getExpandedRows={getExpandedRows}
+              renderExpandedContent={renderExpandedContent}
+              headerRows={headerRows}
+              summaryRows={summaryRows}
               icons={icons}
             />
           )}
@@ -505,20 +540,20 @@ const resize = useColumnResize({
             <div className="pdp-sidebarButtons">
               <button
                 type="button"
-                className="pdp-btn"
+                className="pdp-tableBtn"
                 disabled={loading || getExportRows().length === 0}
                 onClick={async () => {
                   await doExportExcel();
                   setSidebarOpen(false);
                 }}
               >
-                <span className="pdp-btnIcon">{icons?.excel ?? "X"}</span>
-                Excel
+                <span className="pdp-btnIcon">{icons?.excel ?? "Excel"}</span>
+                
               </button>
 
               <button
                 type="button"
-                className="pdp-btn"
+                className="pdp-tableBtn"
                 disabled={loading || getExportRows().length === 0}
                 onClick={async () => {
                   await doExportPDF();
@@ -526,7 +561,7 @@ const resize = useColumnResize({
                 }}
               >
                 <span className="pdp-btnIcon">{icons?.pdf ?? "PDF"}</span>
-                PDF
+                
               </button>
             </div>
           </div>
@@ -561,7 +596,7 @@ const resize = useColumnResize({
 
           <div className="pdp-sidebarSection">
             <div className="pdp-sidebarTitle">Quick Actions</div>
-            <button type="button" className="pdp-btn" onClick={clearAllSearchAndFilters}>
+            <button type="button" className="pdp-tableBtn" onClick={clearAllSearchAndFilters}>
               Clear filters & search
             </button>
           </div>

@@ -1,7 +1,13 @@
 // components/pdp-table/TableDesktop.js
 "use client";
 
+import { Fragment, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import Image from "next/image";
 import { normalizeCellValue } from "./utils";
+import ThreeDotsIcon from "@/assets/Images/icon/3-dots.svg";
+import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
+import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
 
 export default function TableDesktop({
   columns,
@@ -32,34 +38,117 @@ export default function TableDesktop({
   statusField,
   statusTrueValues,
 
+  expandableRows,
+  getExpandedRows,
+  renderExpandedContent,
+  headerRows,
+  summaryRows,
+
   // icon pack
   icons,
 }) {
+  const [openRowKeys, setOpenRowKeys] = useState([]);
+  const [openActionMenuKey, setOpenActionMenuKey] = useState(null);
+  const [actionMenuPos, setActionMenuPos] = useState({ top: 0, left: 0 });
+  const tableRef = useRef(null);
+  const actionMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!openActionMenuKey) {
+        return;
+      }
+
+      const clickedInsideTable = tableRef.current?.contains(event.target);
+      const clickedInsideMenu = actionMenuRef.current?.contains(event.target);
+
+      if (!clickedInsideTable && !clickedInsideMenu) {
+        setOpenActionMenuKey(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [openActionMenuKey]);
+
+  useEffect(() => {
+    const closeMenu = () => setOpenActionMenuKey(null);
+    window.addEventListener("scroll", closeMenu, true);
+    window.addEventListener("resize", closeMenu);
+
+    return () => {
+      window.removeEventListener("scroll", closeMenu, true);
+      window.removeEventListener("resize", closeMenu);
+    };
+  }, []);
+
   const allPageSelected =
     selectable &&
     rows.length > 0 &&
     rows.every((r) => selectedKeys.includes(getRowKey(r)));
 
+  const hasActionsColumn = showActions && Boolean(actions?.length);
+  const visibleColumnCount = columns.filter((col) => visibleColumns?.[col.field]).length;
+  const hasVisibleDataColumns = visibleColumnCount > 0;
+  const showSerialColumn = hasVisibleDataColumns;
+  const showRowActionsColumn = hasActionsColumn && hasVisibleDataColumns;
+  const totalColumnCount =
+    visibleColumnCount +
+    (showSerialColumn ? 1 : 0) +
+    (expandableRows ? 1 : 0) +
+    (selectable ? 1 : 0) +
+    (showRowActionsColumn ? 1 : 0);
+
   const isStatusTrue = (v) => statusTrueValues.includes(v);
 
-  const sortNode = (colField) => {
-    const isSorted = sortConfig?.key === colField && Boolean(sortConfig?.direction);
-    if (!isSorted) return icons?.sortNone ?? "↕";
-    return sortConfig.direction === "asc"
-      ? (icons?.sortAsc ?? "▲")
-      : (icons?.sortDesc ?? "▼");
+  const isColumnSorted = (colField) =>
+    sortConfig?.key === colField && Boolean(sortConfig?.direction);
+
+  const isColumnFiltered = (colField) => Boolean(appliedFilters?.[colField]);
+
+  const toggleExpandedRow = (rowKey) => {
+    setOpenRowKeys((prev) =>
+      prev.includes(rowKey)
+        ? prev.filter((key) => key !== rowKey)
+        : [...prev, rowKey]
+    );
   };
 
-  const filterNode = (colField) => {
-    const isFiltered = Boolean(appliedFilters?.[colField]);
-    if (isFiltered) return icons?.filterActive ?? icons?.filter ?? "⛃";
-    return icons?.filter ?? "⛃";
-  };
+  const renderSpanCells = (cells, rowKeyPrefix, isHeader = false) =>
+    (cells || []).map((cell, index) => {
+      const key = `${rowKeyPrefix}-${index}`;
+      const Tag = isHeader ? "th" : "td";
+      const className = isHeader ? "pdp-th" : "pdp-td";
+
+      return (
+        <Tag
+          key={key}
+          className={className}
+          colSpan={cell?.colSpan || 1}
+          rowSpan={cell?.rowSpan || 1}
+          style={{ textAlign: cell?.align || "left" }}
+        >
+          {cell?.content}
+        </Tag>
+      );
+    });
 
   return (
-    <table className="pdp-table">
+    <table className="pdp-table" ref={tableRef}>
       <thead>
+        {(headerRows || []).map((headerRow, headerIndex) => (
+          <tr key={`header-row-${headerIndex}`}>
+            {renderSpanCells(headerRow, `header-${headerIndex}`, true)}
+          </tr>
+        ))}
+
         <tr>
+          {expandableRows ? (
+            <th className="pdp-th" style={{ width: 52, textAlign: "center" }}>
+              #
+            </th>
+          ) : null}
+
           {selectable && (
             <th className="pdp-th" style={{ width: 44, textAlign: "center" }}>
               <input
@@ -71,15 +160,17 @@ export default function TableDesktop({
             </th>
           )}
 
-          <th className="pdp-th" style={{ width: 74 }}>
-            Sl No.
-          </th>
+          {showSerialColumn ? (
+            <th className="pdp-th" style={{ width: 74 }}>
+              Sl No.
+            </th>
+          ) : null}
 
           {columns.map((col) => {
             if (!visibleColumns?.[col.field]) return null;
 
-            const isSorted = sortConfig?.key === col.field && Boolean(sortConfig?.direction);
-            const isFiltered = Boolean(appliedFilters?.[col.field]);
+            const isSorted = isColumnSorted(col.field);
+            const isFiltered = isColumnFiltered(col.field);
 
             return (
               <th
@@ -106,12 +197,12 @@ export default function TableDesktop({
                     {col.sortable !== false && (
                       <button
                         type="button"
-                        className="pdp-iconBtn"
+                        className="pdp-headerIconBtn pdp-sortBtn"
                         onClick={() => onSort(col.field)}
                         title="Sort"
                         aria-label={`Sort ${col.label}`}
                       >
-                        {sortNode(col.field)}
+                        <Image src={BothArrowIcon} alt="Sort" width={13} height={13} />
                       </button>
                     )}
 
@@ -119,12 +210,12 @@ export default function TableDesktop({
                     {enableFilters && col.filterable !== false && (
                       <button
                         type="button"
-                        className={`pdp-iconBtn ${isFiltered ? "pdp-filterActiveBtn" : ""}`}
+                        className={`pdp-headerIconBtn pdp-filterBtn ${isFiltered ? "pdp-filterActiveBtn" : ""}`}
                         onClick={() => onOpenFilter(col.field)}
                         title={isFiltered ? "Filter applied" : "Filter"}
                         aria-label={`Filter ${col.label}`}
                       >
-                        {filterNode(col.field)}
+                        <Image src={FilterIcon} alt="Filter" width={13} height={13} />
                         {isFiltered ? <span className="pdp-iconBadge" /> : null}
                       </button>
                     )}
@@ -143,7 +234,7 @@ export default function TableDesktop({
             );
           })}
 
-          {showActions && actions?.length ? (
+          {showRowActionsColumn ? (
             <th className="pdp-th" style={{ width: 100, textAlign: "center" }}>
               Actions
             </th>
@@ -155,89 +246,197 @@ export default function TableDesktop({
         {rows.length ? (
           rows.map((row, idx) => {
             const k = getRowKey(row) ?? idx;
+            const rowActions = (actions || []).filter((action) => {
+              if (typeof action.condition !== "function") {
+                return true;
+              }
+
+              return action.condition(row);
+            });
+
+            const isOpen = openRowKeys.includes(k);
+            const expandedRows = typeof getExpandedRows === "function" ? getExpandedRows(row) : [];
 
             return (
-              <tr key={k} className="pdp-tr">
-                {selectable && (
-                  <td className="pdp-td" style={{ textAlign: "center" }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedKeys.includes(k)}
-                      onChange={() => onSelectRow(row)}
-                      aria-label="Select row"
-                    />
-                  </td>
-                )}
-
-                <td className="pdp-td">
-                  {showStatusDot && (
-                    <span
-                      className={`pdp-statusDot ${
-                        isStatusTrue(row?.[statusField]) ? "pdp-active" : "pdp-inactive"
-                      }`}
-                    />
-                  )}
-                  {pageIndexOffset + idx + 1}
-                </td>
-
-                {columns.map((col) => {
-                  if (!visibleColumns?.[col.field]) return null;
-
-                  const raw = row?.[col.field];
-
-                  if (highlightStatusCells && (col.field === statusField || col.type === "status")) {
-                    const isOn = isStatusTrue(raw);
-                    return (
-                      <td
-                        key={col.field}
-                        className={`pdp-td ${isOn ? "pdp-activeCell" : "pdp-inactiveCell"}`}
-                        title={isOn ? "Active" : "Inactive"}
+              <Fragment key={k}>
+                <tr className="pdp-tr">
+                  {expandableRows ? (
+                    <td className="pdp-td" style={{ textAlign: "center" }}>
+                      <button
+                        type="button"
+                        className="pdp-expandBtn"
+                        onClick={() => toggleExpandedRow(k)}
+                        aria-label={isOpen ? "Collapse row" : "Expand row"}
                       >
-                        {isOn ? "Active" : "Inactive"}
+                        {isOpen ? (icons?.collapse ?? "-") : (icons?.expand ?? "+")}
+                      </button>
+                    </td>
+                  ) : null}
+
+                  {selectable && (
+                    <td className="pdp-td" style={{ textAlign: "center" }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedKeys.includes(k)}
+                        onChange={() => onSelectRow(row)}
+                        aria-label="Select row"
+                      />
+                    </td>
+                  )}
+
+                  {showSerialColumn ? (
+                    <td className="pdp-td">
+                      {showStatusDot && (
+                        <span
+                          className={`pdp-statusDot ${
+                            isStatusTrue(row?.[statusField]) ? "pdp-active" : "pdp-inactive"
+                          }`}
+                        />
+                      )}
+                      {pageIndexOffset + idx + 1}
+                    </td>
+                  ) : null}
+
+                  {columns.map((col) => {
+                    if (!visibleColumns?.[col.field]) return null;
+
+                    const raw = row?.[col.field];
+
+                    if (highlightStatusCells && (col.field === statusField || col.type === "status")) {
+                      const isOn = isStatusTrue(raw);
+                      return (
+                        <td
+                          key={col.field}
+                          className={`pdp-td ${isOn ? "pdp-activeCell" : "pdp-inactiveCell"}`}
+                          title={isOn ? "Active" : "Inactive"}
+                        >
+                          {isOn ? "Active" : "Inactive"}
+                        </td>
+                      );
+                    }
+
+                    const content = col.render
+                      ? col.render(raw, row)
+                      : normalizeCellValue(col, raw, { statusField, statusTrueValues });
+
+                    return (
+                      <td key={col.field} className="pdp-td" title={String(content ?? "")}>
+                        {content}
                       </td>
                     );
-                  }
+                  })}
 
-                  const content = col.render
-                    ? col.render(raw, row)
-                    : normalizeCellValue(col, raw, { statusField, statusTrueValues });
-
-                  return (
-                    <td key={col.field} className="pdp-td" title={String(content ?? "")}>
-                      {content}
-                    </td>
-                  );
-                })}
-
-                {showActions && actions?.length ? (
-                  <td className="pdp-td">
-                    <div className="pdp-actionRow">
-                      {actions.map((a) => (
+                  {showRowActionsColumn ? (
+                    <td className="pdp-td pdp-actionsCell" style={{ textAlign: "center" }}>
+                      <div className="pdp-actionMenuWrap">
                         <button
-                          key={a.key}
                           type="button"
-                          className="pdp-actionBtn"
-                          onClick={() => a.onClick(row)}
-                          title={a.label}
-                          aria-label={a.label}
+                          className="pdp-actionKebabBtn"
+                          onClick={(event) => {
+                            const buttonRect = event.currentTarget.getBoundingClientRect();
+                            const estimatedWidth = 170;
+                            const estimatedHeight = Math.max(56, rowActions.length * 44 + 8);
+                            const nextLeft = Math.max(
+                              12,
+                              Math.min(buttonRect.right - estimatedWidth, window.innerWidth - estimatedWidth - 12)
+                            );
+                            const fitsBelow = buttonRect.bottom + 6 + estimatedHeight <= window.innerHeight - 12;
+                            const nextTop = fitsBelow
+                              ? buttonRect.bottom + 6
+                              : Math.max(12, buttonRect.top - estimatedHeight - 6);
+
+                            setActionMenuPos({
+                              top: nextTop,
+                              left: nextLeft,
+                            });
+
+                            setOpenActionMenuKey((prev) => (prev === k ? null : k));
+                          }}
+                          aria-label="Row actions"
+                          title="Row actions"
                         >
-                          {/* icon if provided, else label */}
-                          {a.icon ? a.icon : a.label}
+                          <Image src={ThreeDotsIcon} alt="More" width={18} height={18} />
                         </button>
-                      ))}
-                    </div>
-                  </td>
+
+                        {openActionMenuKey === k && rowActions.length > 0 && typeof document !== "undefined"
+                          ? createPortal(
+                              <div
+                                ref={actionMenuRef}
+                                className="pdp-actionMenu pdp-actionMenuFixed"
+                                role="menu"
+                                style={{ top: actionMenuPos.top, left: actionMenuPos.left }}
+                              >
+                                {rowActions.map((action) => (
+                                  <button
+                                    key={action.key}
+                                    type="button"
+                                    className="pdp-actionMenuItem"
+                                    onClick={() => {
+                                      action.onClick(row);
+                                      setOpenActionMenuKey(null);
+                                    }}
+                                    role="menuitem"
+                                  >
+                                    {action.label}
+                                  </button>
+                                ))}
+                              </div>,
+                              document.body
+                            )
+                          : null}
+                      </div>
+                    </td>
+                  ) : null}
+                </tr>
+
+                {expandableRows && isOpen ? (
+                  <tr className="pdp-expandedRow">
+                    <td className="pdp-td" colSpan={totalColumnCount}>
+                      {typeof renderExpandedContent === "function" ? (
+                        renderExpandedContent(row)
+                      ) : expandedRows.length ? (
+                        <div className="pdp-subTableWrap">
+                          <table className="pdp-subTable">
+                            <thead>
+                              <tr>
+                                {Object.keys(expandedRows[0] || {}).map((cellKey) => (
+                                  <th key={cellKey}>{cellKey}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {expandedRows.map((expandedRow, expandedIndex) => (
+                                <tr key={`${k}-sub-${expandedIndex}`}>
+                                  {Object.keys(expandedRow).map((cellKey) => (
+                                    <td key={cellKey}>{expandedRow[cellKey]}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <div className="pdp-emptyExpanded">No additional details available.</div>
+                      )}
+                    </td>
+                  </tr>
                 ) : null}
-              </tr>
+              </Fragment>
             );
           })
         ) : (
           <tr>
-            <td className="pdp-td" colSpan={999}>
+            <td className="pdp-td" colSpan={totalColumnCount}>
               No matching records found.
             </td>
           </tr>
         )}
+
+        {(summaryRows || []).map((summaryRow, summaryIndex) => (
+          <tr key={`summary-row-${summaryIndex}`}>
+            {renderSpanCells(summaryRow, `summary-${summaryIndex}`)}
+          </tr>
+        ))}
       </tbody>
     </table>
   );

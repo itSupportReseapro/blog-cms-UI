@@ -1,22 +1,23 @@
 .dashboard-layout {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
-  min-height: 100vh;
-  padding-top: 60px;
+  height: var(--cms-shell-height);
+  padding-top: var(--navbar-height);
   background: var(--Background);
+  overflow: hidden;
 }
 
 .dashboard-main {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
 .dashboard-content {
   flex: 1;
   overflow: auto;
   padding: var(--spacing-lg);
-  margin-top: 20px;
 }
 
 /* Scrollbar Styling */
@@ -41,9 +42,5 @@
 @media (max-width: 768px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
-  }
-
-  .dashboard-main {
-    margin-top: 60px;
   }
 }

@@ -2,13 +2,14 @@
 
 .terms-container {
   width: 100%;
-  background: var(--White);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
+  min-height: 100%;
+  background: #fafafa;
+  border: 1px solid #e7e7e7;
+  border-radius: 16px;
+  padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
+  gap: 16px;
 }
 
 /* ================= Header ================= */
@@ -17,10 +18,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e7e7e7;
 }
 
 .terms-header h2 {
   margin: 0;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 /* ================= Header Buttons ================= */
@@ -28,7 +33,7 @@
 .terms-actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 10px;
 }
 
 /* ================= Form Field ================= */
@@ -36,31 +41,25 @@
 .terms-field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.terms-field label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
 }
 
 /* ================= Input ================= */
 
 .terms-field input {
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--Grey3);
-  border-radius: var(--radius-sm);
-  background: var(--BgInput);
+  height: 50px;
+  padding: 0 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #fff;
   font-size: var(--font-size-base);
   outline: none;
   transition: border 0.2s ease;
-  color: var(--Text1);
+  color: #232323;
 }
 
 .terms-field input:focus {
-  border-color: var(--Primary);
+  border-color: #c6c6c6;
 }
 
 /* ================= Editor ================= */
@@ -72,6 +71,62 @@
 .terms-editor > div {
   width: 100%;
 }
+
+.terms-editor .cms-rich-editor {
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.terms-editor .cms-rich-editor .re-toolbar {
+  margin: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e7e7e7;
+  background: #fdfdfd;
+  gap: 8px;
+}
+
+.terms-editor .cms-rich-editor .re-group {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  gap: 4px;
+}
+
+.terms-editor .cms-rich-editor .re-btn {
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+}
+
+.terms-editor .cms-rich-editor .re-btn:active {
+  background: #d6dbe3;
+  color: #111827;
+}
+
+.terms-editor .cms-rich-editor .re-select {
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  height: 22px;
+  min-width: 36px;
+  font-size: 12px;
+}
+
+.terms-editor .cms-rich-editor .re-editor {
+  border: 0;
+  border-radius: 0;
+  min-height: 420px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 14px 12px;
+}
+
+/* .re-footer is shown (word count) */
 
 /* ================= Responsive ================= */
 

@@ -37,20 +37,8 @@
   margin-top: 5px;
 }
 
-.auth-form button {
-  padding: 12px;
-  background: var(--Primary);
-  color: var(--White);
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s ease;
+.auth-submit-btn {
   margin-top: 20px;
-}
-
-.auth-form button:hover {
-  background: #0056b3;
 }
 
 .btn-white{
@@ -134,19 +122,6 @@
     cursor: pointer;
 }
 
-.check input[type="checkbox"] {
-  width: 5px;
-  height: 5px;
-  background-color: #fff;   /* ✅ White inner background */
-  border: 1px solid #ccc;
-  
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  outline: none;
-  position: relative;
-}
-
 .check input[type="checkbox"]:checked {
   background-color: #fff;   /* ✅ Keep white background even when checked */
   border-color: #1a3ecf;    /* Blue border on checked */
@@ -177,9 +152,14 @@
 .check input[type="checkbox"] {
   width: 20px;
   height: 20px;
+  background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  position: relative;
 }
 
 .leftImgSignup  img{
@@ -223,7 +203,7 @@
     padding: 24px 16px;
   }
 
-  .auth-form button,
+  .auth-submit-btn,
   .btn-white {
     font-size: 14px;
     padding: 10px;

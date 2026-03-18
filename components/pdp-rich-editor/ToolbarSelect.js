@@ -7,7 +7,7 @@ export default function ToolbarSelect({
 }) {
   return (
     <select
-      title={title}
+      aria-label={title}
       value={value}
       onMouseDownCapture={() => {
         if (typeof onBeforeOpen === "function") onBeforeOpen();

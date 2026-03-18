@@ -7,8 +7,8 @@ import Image from "next/image";
 import bellIcon from "@/assets/Images/icon/bell-icon.svg";
 import profileIcon from "@/assets/Images/icon/Profile-avatar.svg";
 
-import UserDetailsPanel from "@/assets/ui/modals/UserDetailsPanel";
-import EditUserPanel from "@/assets/ui/modals/EditUserPanel";
+import UserDetailsPanel from "@/assets/modals/UserDetailsPanel/UserDetailsPanel";
+import EditUserPanel from "@/assets/modals/EditUserPanel/EditUserPanel";
 
 import "./Navbar.css";
 

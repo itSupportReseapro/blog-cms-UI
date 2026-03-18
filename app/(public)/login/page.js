@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import PdpTextbox1 from "@/assets/textbox/PdpTextbox1";
+import PdpButton from "@/assets/buttons/button";
 import GoogleIcon from "@/assets/Images/icon/googleICON.svg";
 import LoginImg from "@/assets/Images/img/loginIMG.svg";
 import "./login.css";
@@ -151,9 +152,16 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button type="submit" className="btn-blue" disabled={submitting}>
+          <PdpButton
+            type="submit"
+            variant="primary"
+            size="md"
+            radius="sm"
+            fullWidth
+            disabled={submitting}
+          >
             {submitting ? "Logging in..." : "Login"}
-          </button>
+          </PdpButton>
 
           <div className="orSignup">
             <p>

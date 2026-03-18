@@ -1,15 +1,16 @@
 .cms-dashboard {
-  padding: 40px;
+  padding: var(--cms-page-padding);
   background: var(--Background);
+  min-height: 100%;
 }
 
 .main-card {
-  height: 860px;
-  width: 1080px;
+  width: 100%;
+  min-height: 100%;
   background: var(--White);
   border-radius: 20px;
   box-shadow: var(--shadow-lg);
-  padding: 20px;
+  padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
 }

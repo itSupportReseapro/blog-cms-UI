@@ -202,6 +202,7 @@ export function setLink(doc, selection, href) {
   const cleanHref = String(href || "").trim();
   if (!cleanHref) return { doc: next, selection: sel };
   if (sel.from === sel.to) return { doc: next, selection: sel };
+  const linkColor = "#2563eb";
 
   const start = splitDocAtTextOffset(next, sel.from);
   const end = splitDocAtTextOffset(next, sel.to);
@@ -212,11 +213,19 @@ export function setLink(doc, selection, href) {
     const fromInner = bi === start.blockIndex ? start.innerOffset : 0;
     const toInner = bi === end.blockIndex ? end.innerOffset : blockLen;
 
-    next.content[bi] = applyMarkRangeToBlock(
+    const withLink = applyMarkRangeToBlock(
       block,
       fromInner,
       toInner,
       { type: "a", href: cleanHref },
+      true
+    );
+
+    next.content[bi] = applyMarkRangeToBlock(
+      withLink,
+      fromInner,
+      toInner,
+      { type: "color", value: linkColor },
       true
     );
   }

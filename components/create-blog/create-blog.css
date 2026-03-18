@@ -1,9 +1,12 @@
 .create-blog-wrapper {
   background: var(--White);
   border-radius: var(--radius-xl);
-  padding: 30px;
-  max-width: 1100px;
-  margin: 40px auto;
+  padding: var(--cms-card-padding);
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  min-height: 100%;
+  box-shadow: var(--shadow-lg);
 }
 
 /* TOP HEADER */
@@ -21,6 +24,22 @@
   gap: 12px;
 }
 
+.back-button {
+  background: transparent;
+  border: none;
+  color: var(--Primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.back-button:hover {
+  opacity: 0.8;
+}
+
 .right-section {
   display: flex;
   gap: 12px;
@@ -35,6 +54,64 @@
 
 .step-two {
   margin-top: 25px;
+}
+
+.create-blog-wrapper .pdp-textbox-container {
+  margin-bottom: 0;
+}
+
+.create-blog-wrapper .pdp-textbox-input,
+.create-blog-wrapper .pdp-textbox-dropdown {
+  height: 46px;
+  border: 1px solid var(--Grey3);
+  border-radius: 12px;
+  padding: 10px 42px 10px 14px;
+  font-size: var(--font-size-sm);
+  color: var(--Text1);
+}
+
+.create-blog-wrapper .pdp-textbox-input:focus,
+.create-blog-wrapper .pdp-textbox-dropdown:focus {
+  border-color: var(--Primary);
+  box-shadow: 0 0 0 2px rgba(4, 102, 200, 0.1);
+}
+
+.create-blog-wrapper .pdp-textbox-label {
+  left: 12px;
+  top: 50%;
+  color: #7b7b7b;
+  font-size: var(--font-size-sm);
+  background: var(--White);
+  padding: 0 6px;
+}
+
+.create-blog-wrapper .pdp-textbox-container.focused .pdp-textbox-label {
+  top: -2px;
+  color: var(--Text2);
+  font-size: 11px;
+}
+
+.create-blog-wrapper .pdp-textbox-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #777 50%),
+    linear-gradient(135deg, #777 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.create-blog-wrapper .pdp-textbox-dropdown:disabled {
+  background-color: #f7f8fa;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.create-blog-wrapper .pdp-file-icon {
+  bottom: 12px;
+  right: 14px;
 }
 
 /* GRID */

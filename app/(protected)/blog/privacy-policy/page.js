@@ -1,15 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { RichEditor, defaultDoc } from "@/components/pdp-rich-editor"; // ✅ fixed import
+import { useEffect, useState } from "react";
+import { RichEditor, defaultDoc } from "@/components/pdp-rich-editor";
 import Button from "@/assets/buttons/button";
+import usePrivacyPolicy from "@/hooks/privacy-policy/use-privacy-policy";
 import "./page.css";
 
 export default function PrivacyPolicyPage() {
-
   const [title, setTitle] = useState("");
   const [doc, setDoc] = useState(defaultDoc());
-  const [loading, setLoading] = useState(false);
+  const { loadPrivacyPolicy, savePrivacyPolicy, loading, error } = usePrivacyPolicy();
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadPolicy() {
+      const nextState = await loadPrivacyPolicy();
+
+      if (!mounted || !nextState) {
+        return;
+      }
+
+      setTitle(nextState.title);
+      setDoc(nextState.doc);
+    }
+
+    loadPolicy();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleClear = () => {
     setTitle("");
@@ -17,51 +38,29 @@ export default function PrivacyPolicyPage() {
   };
 
   const handleSave = async () => {
-    try {
-      setLoading(true);
+    const result = await savePrivacyPolicy({ title, doc });
 
-      const payload = {
-        title,
-        doc,
-      };
-
-      console.log("SAVE PRIVACY POLICY ↓↓↓");
-      console.log(payload);
-
-      const res = await fetch("/api/privacy-policy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Save failed");
-        return;
-      }
-
-      alert("Privacy Policy saved successfully!");
-    } catch (err) {
-      console.error("SAVE ERROR:", err);
-      alert("Error saving policy");
-    } finally {
-      setLoading(false);
+    if (result) {
+      window.addSnackbar?.("Privacy Policy saved successfully!", "success");
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      window.addSnackbar?.(error, "error");
+    }
+  }, [error]);
 
   return (
     <div className="privacy-container">
 
-      {/* Header */}
       <div className="privacy-header">
         <h2>Privacy Policy</h2>
 
         <div className="privacy-actions">
           <Button
-            variant="secondary"
+            variant="outline"
+            radius="sm"
             onClick={handleClear}
             disabled={loading}
           >
@@ -70,6 +69,7 @@ export default function PrivacyPolicyPage() {
 
           <Button
             variant="primary"
+            radius="sm"
             onClick={handleSave}
             disabled={loading}
           >
@@ -78,23 +78,21 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* Title */}
       <div className="privacy-field">
-        <label>Title</label>
-
         <input
           type="text"
-          placeholder="Enter title"
+          placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
 
-      {/* Rich Editor */}
       <div className="privacy-editor">
         <RichEditor
           value={doc}
           onChange={setDoc}
+          className="cms-rich-editor"
+          showFooter
           placeholder="Your privacy policy content goes here..."
         />
       </div>

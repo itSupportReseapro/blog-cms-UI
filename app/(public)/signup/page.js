@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./signup.css";
 import PdpTextbox1 from "@/assets/textbox/PdpTextbox1";
+import PdpButton from "@/assets/buttons/button";
 import Image from "next/image";
 import GoogleIcon from "@/assets/Images/icon/googleICON.svg";
 import leftImg from "@/assets/Images/img/signupIMG.svg";
@@ -160,9 +161,17 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <button type="submit" disabled={loading}>
+          <PdpButton
+            type="submit"
+            variant="primary"
+            size="md"
+            radius="sm"
+            fullWidth
+            className="auth-submit-btn"
+            disabled={loading}
+          >
             {loading ? "Creating Account..." : "Create Account"}
-          </button>
+          </PdpButton>
 
           <p>
             Already have an account? <a href="/login">Login</a>

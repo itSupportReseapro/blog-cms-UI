@@ -1,0 +1,143 @@
+.blogs-table-wrapper {
+  padding: var(--cms-page-padding);
+  background: var(--Background);
+  min-height: 100%;
+}
+
+.main-card {
+  width: 100%;
+  min-height: 100%;
+  background: var(--White);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: var(--cms-card-padding);
+  display: flex;
+  flex-direction: column;
+}
+
+.blogs-toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.blogs-createLink {
+  text-decoration: none;
+}
+
+.blogs-createBtn {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-weight: var(--font-weight-medium);
+}
+
+.blogs-statusFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--Grey2);
+  border-radius: 10px;
+  background: var(--White);
+}
+
+.blogs-statusFilterLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--Text2);
+}
+
+.blogs-statusFilter select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--Text1);
+  padding-right: 12px;
+  cursor: pointer;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+tbody tr {
+  border-bottom: 1px dashed var(--Grey3);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+.sortable-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.sortable-head img {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.sortable-head:hover img {
+  opacity: 1;
+}
+
+/* ================= STATUS BADGES ================= */
+
+.status-pill {
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-pill.published {
+  background: var(--GreenPastel);
+  color: var(--Green);
+}
+
+.status-pill.unpublished {
+  background: var(--YellowPastel);
+  color: var(--Yellow);
+}
+
+.status-pill.deleted {
+  background: var(--RedPastel);
+  color: var(--Red);
+}
+
+.status-pill.draft {
+  background: var(--OrangePastel);
+  color: var(--Orange);
+}
+
+.status-pill.created {
+  background: var(--PrimaryPastel);
+  color: var(--Primary);
+}
+
+@media (max-width: 768px) {
+  .blogs-toolbarLeft {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .blogs-statusFilter {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

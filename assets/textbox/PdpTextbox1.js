@@ -125,6 +125,11 @@ const PdpTextbox1 = ({
   const handleBlur = () => {
     setIsFocused(false);
 
+    // File inputs dispatch their own onChange payload; avoid blur re-dispatches.
+    if (type === "file") {
+      return;
+    }
+
     if (dataValidation && localValue !== "") {
       const validationResult = validateInput(
         type === "number" ? localValue : localValue.toUpperCase()

@@ -8,6 +8,8 @@
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--Grey2);
+  height: calc(var(--cms-shell-height) - var(--navbar-height));
+  overflow: hidden;
 }
 
 /* ================= Nav ================= */
@@ -17,7 +19,8 @@
   flex-direction: column;
   gap: var(--spacing-xs);
   padding: var(--spacing-sm);
-  margin-top: 60px;
+  margin-top: 0;
+  overflow: auto;
 }
 
 /* ================= Default Item ================= */
@@ -52,25 +55,6 @@
   border-left: 4px solid var(--Primary);
   font-weight: var(--font-weight-medium);
 }
-
-/* ================= Icon Styling ================= */
-
-.sidebar-link img,
-.sidebar-link svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  transition: filter 0.2s ease;
-}
-
-/* Icon color change when active */
-.sidebar-link.active img,
-.sidebar-link.active svg {
-  filter: brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(1886%)
-    hue-rotate(195deg) brightness(94%) contrast(98%);
-}
-
-
 
 /* ================= Icon Styling ================= */
 

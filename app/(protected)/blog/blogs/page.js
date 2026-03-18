@@ -1,9 +1,5 @@
-import CreateBlog from "@/components/create-blog/create-blog";
+import BlogsTable from "@/components/blogs-table/BlogsTable";
 
-export default function CategoriesPage() {
-  return (
-    <section>
-      <CreateBlog />
-    </section>
-  );
+export default function BlogsPage() {
+  return <BlogsTable />;
 }

@@ -113,18 +113,27 @@ export default function useRichEditorState(value) {
     if (typeof onHTMLChange === "function") onHTMLChange(docToHTML(normalized));
   };
 
+  const syncFromDOM = (onChange, onHTMLChange) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    const el = rootRef.current;
+    if (!el) return null;
+
+    selectionRef.current = getSelectionOffsets(el);
+    const next = htmlToDoc(el.innerHTML);
+    emitDoc(next, onChange, onHTMLChange);
+    return next;
+  };
+
   const scheduleSyncFromDOM = (onChange, onHTMLChange) => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(() => {
-      const el = rootRef.current;
-      if (!el) return;
-
-      selectionRef.current = getSelectionOffsets(el);
-      const next = htmlToDoc(el.innerHTML);
-
-      emitDoc(next, onChange, onHTMLChange);
-    }, 200);
+      syncFromDOM(onChange, onHTMLChange);
+    }, 0);
   };
 
   const calculateWordCount = () => {
@@ -156,6 +165,7 @@ export default function useRichEditorState(value) {
     getBestSelection,
     captureSelectionSnapshot,
     emitDoc,
+    syncFromDOM,
     scheduleSyncFromDOM,
     calculateWordCount,
   };

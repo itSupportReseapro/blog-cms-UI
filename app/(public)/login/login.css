@@ -68,23 +68,6 @@
   text-decoration: underline;
 }
 
-/* ===== Buttons ===== */
-.btn-blue {
-  padding: 12px;
-  background: var(--Primary);
-  color: var(--White);
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: 0.3s ease;
-}
-
-.btn-blue:hover {
-  background: #0f2b91;
-}
-
 .btn-white {
   padding: 12px;
   background: var(--White);
@@ -233,7 +216,6 @@
 }
 
 @media (max-width: 480px) {
-  .btn-blue,
   .btn-white {
     font-size: 14px;
     padding: 10px;

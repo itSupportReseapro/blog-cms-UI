@@ -45,7 +45,7 @@ export async function exportRowsToPDF(opts) {
   );
 
   const jsPDFMod = await import("jspdf");
-  await import("jspdf-autotable");
+  const autoTableMod = await import("jspdf-autotable");
 
   const doc = new jsPDFMod.jsPDF({
     orientation: "landscape",
@@ -58,15 +58,31 @@ export async function exportRowsToPDF(opts) {
     doc.text(title, 40, 35);
   }
 
-  doc.autoTable({
-    head,
-    body,
-    startY: title ? 50 : 30,
-    styles: { fontSize: 9, cellPadding: 6 },
-    headStyles: { fillColor: [37, 99, 235] }, // matches primary
-    theme: "grid",
-    margin: { left: 40, right: 40 },
-  });
+  const autoTableExport = autoTableMod.default || autoTableMod.autoTable;
+
+  if (typeof autoTableExport === "function") {
+    autoTableExport(doc, {
+      head,
+      body,
+      startY: title ? 50 : 30,
+      styles: { fontSize: 9, cellPadding: 6 },
+      headStyles: { fillColor: [37, 99, 235] }, // matches primary
+      theme: "grid",
+      margin: { left: 40, right: 40 },
+    });
+  } else if (typeof doc.autoTable === "function") {
+    doc.autoTable({
+      head,
+      body,
+      startY: title ? 50 : 30,
+      styles: { fontSize: 9, cellPadding: 6 },
+      headStyles: { fillColor: [37, 99, 235] }, // matches primary
+      theme: "grid",
+      margin: { left: 40, right: 40 },
+    });
+  } else {
+    throw new Error("PDF export is unavailable because jspdf-autotable did not load correctly.");
+  }
 
   const fileName = `${fileBaseName}_${new Date().toISOString().replace(/[:.]/g, "-")}.pdf`;
   doc.save(fileName);

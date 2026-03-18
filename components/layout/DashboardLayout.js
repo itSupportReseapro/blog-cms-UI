@@ -18,6 +18,10 @@ export default function DashboardLayout({ children }) {
       setActiveSection("blogs");
     } else if (pathname.includes("/blog/activity-log")) {
       setActiveSection("activity-log");
+    } else if (pathname.includes("/blog/about-us")) {
+      setActiveSection("about-us");
+    } else if (pathname.includes("/blog/contact-us")) {
+      setActiveSection("contact-us");
     } else if (pathname.includes("/blog/user-and-role")) {
       setActiveSection("user-and-role");
     } else if (pathname.includes("/blog/privacy-policy")) {

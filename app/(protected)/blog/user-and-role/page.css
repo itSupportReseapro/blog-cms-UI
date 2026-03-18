@@ -1,3 +1,20 @@
+.cms-dashboard{
+  padding: var(--cms-page-padding);
+  background: var(--Background);
+  min-height: 100%;
+}
+
+.main-card{
+  width: 100%;
+  min-height: 100%;
+  background: var(--White);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: var(--cms-card-padding);
+  display: flex;
+  flex-direction: column;
+}
+
 .user-cell{
   display:flex;
   align-items:center;
@@ -7,6 +24,35 @@
 .user-avatar{
   border-radius:50%;
   object-fit:cover;
+}
+
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:72px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  text-transform:capitalize;
+  background:#f3f4f6;
+  color:#111827;
+}
+
+.role-badge-admin{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.role-badge-editor{
+  background:#dbeafe;
+  color:#1e3a8a;
+}
+
+.role-badge-user{
+  background:#dcfce7;
+  color:#166534;
 }
 
 .sortable-head{
@@ -60,4 +106,42 @@
   border-radius:10px;
   background:var(--White);
   cursor:pointer;
+}
+
+.table-wrapper{
+  width:100%;
+  margin-top:14px;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+@media (max-width: 992px){
+  .search-wrapper{
+    width:260px;
+  }
+}
+
+@media (max-width: 768px){
+  .main-card{
+    padding:16px;
+  }
+
+  .right-controls{
+    width:100%;
+  }
+
+  .search-wrapper{
+    width:100%;
+  }
+}
+
+@media (max-width: 640px){
+  .top-controls{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .icon-btn{
+    flex:0 0 40px;
+  }
 }

@@ -1,6 +1,9 @@
 // components/pdp-table/TableSidebar.js
 "use client";
 
+import Image from "next/image";
+import CrossIcon from "@/assets/Images/icon/cross-icon.svg";
+
 export default function TableSidebar({ open, onClose, title = "Controls", children }) {
   if (!open) return null;
 
@@ -15,8 +18,8 @@ export default function TableSidebar({ open, onClose, title = "Controls", childr
       >
         <div className="pdp-sidebarHeader">
           <div className="pdp-sidebarHeaderTitle">{title}</div>
-          <button className="pdp-iconBtn" type="button" onClick={onClose} aria-label="Close">
-            ✕
+          <button className="pdp-sidebarCloseBtn" type="button" onClick={onClose} aria-label="Close">
+            <Image src={CrossIcon} alt="Close" width={18} height={18} />
           </button>
         </div>
 

@@ -1,12 +1,56 @@
 import authClient from "@/lib/authAxios";
 
+const AUTH_APP_ID = process.env.NEXT_PUBLIC_AUTH_APP_ID || "20";
+
+async function postWithFallback(paths, payload) {
+  let lastError = null;
+
+  for (const path of paths) {
+    try {
+      return await authClient.post(path, payload);
+    } catch (error) {
+      const status = error?.response?.status;
+
+      if (status === 404 || status === 405) {
+        lastError = error;
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw lastError || new Error("Auth endpoint not found");
+}
+
+async function getWithFallback(paths) {
+  let lastError = null;
+
+  for (const path of paths) {
+    try {
+      return await authClient.get(path);
+    } catch (error) {
+      const status = error?.response?.status;
+
+      if (status === 404 || status === 405) {
+        lastError = error;
+        continue;
+      }
+
+      throw error;
+    }
+  }
+
+  throw lastError || new Error("Auth endpoint not found");
+}
+
 export async function loginUser({ email, password }) {
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
 
   try {
-    const response = await authClient.post("/auth/login", { email, password });
+    const response = await postWithFallback(["/login", "/auth/login"], { email, password });
     const payload = response.data ?? {};
 
     console.log("Login response:", payload);
@@ -43,7 +87,35 @@ export async function loginUser({ email, password }) {
 
 export async function registerUser(payload) {
   try {
-    const response = await authClient.post("/auth/register", payload);
+    const AUTH_DOMAIN = process.env.NEXT_PUBLIC_AUTH_DOMAIN || "pubmanu.com";
+    const registerPayload = {
+      domain: payload?.domain ?? AUTH_DOMAIN,
+      salutation: payload?.salutation ?? "",
+      first_name: payload?.first_name ?? "",
+      middle_name: payload?.middle_name ?? "",
+      last_name: payload?.last_name ?? "",
+      email: payload?.email ?? "",
+      official_email: payload?.official_email ?? "",
+      password: payload?.password ?? "",
+      phone: payload?.phone ?? "",
+      whatsapp_no: payload?.whatsapp_no ?? "",
+      gender: payload?.gender ?? "",
+      designation: payload?.designation ?? "",
+      company: payload?.company ?? "",
+      country: payload?.country ?? "",
+      gst: payload?.gst ?? "",
+      hear_about_us: payload?.hear_about_us ?? "",
+      description: payload?.description ?? "",
+      user_photo: payload?.user_photo ?? "",
+      address_1: payload?.address_1 ?? "",
+      address_2: payload?.address_2 ?? "",
+      aadhar_no: payload?.aadhar_no ?? "",
+      pan: payload?.pan ?? "",
+      app_id: payload?.app_id ?? String(AUTH_APP_ID),
+      appId: payload?.appId ?? String(AUTH_APP_ID),
+      ...payload,
+    };
+    const response = await postWithFallback(["/register", "/auth/register"], registerPayload);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -72,7 +144,7 @@ export async function refreshAuthToken(refreshToken) {
   }
 
   try {
-    const response = await authClient.post("/auth/refresh", {
+    const response = await postWithFallback(["/refresh", "/auth/refresh"], {
       refreshToken,
     });
     return response.data;
@@ -84,9 +156,73 @@ export async function refreshAuthToken(refreshToken) {
 
 export async function getProfile() {
   try {
-    const response = await authClient.get("/auth/me");
+    const response = await getWithFallback(["/me", "/auth/me"]);
     return response.data;
   } catch {
     return null;
+  }
+}
+
+export async function sendForgotPasswordEmail(email) {
+  try {
+    const response = await postWithFallback(["/forgot-password", "/auth/forgot-password"], {
+      app_id: String(AUTH_APP_ID),
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return {
+        error: true,
+        message: error.response.data?.message || "Invalid email",
+      };
+    }
+
+    return {
+      error: true,
+      message: "Network error. Try again.",
+    };
+  }
+}
+
+export async function verifyOtp(email, otp) {
+  try {
+    const response = await postWithFallback(["/verify-otp", "/auth/verify-otp"], {
+      app_id: String(AUTH_APP_ID),
+      email,
+      otp,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return {
+        error: true,
+        message: error.response.data?.message || "Invalid OTP",
+      };
+    }
+
+    return {
+      error: true,
+      message: "Network error. Try again.",
+    };
+  }
+}
+
+export async function resetPassword(email, otp, newPassword, confirmPassword) {
+  try {
+    const response = await postWithFallback(["/reset-password", "/auth/reset-password"], {
+      app_id: String(AUTH_APP_ID),
+      email,
+      otp,
+      newPassword,
+      confirmPassword,
+    });
+
+    return response.data;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.data?.message || "Failed to reset password",
+    };
   }
 }

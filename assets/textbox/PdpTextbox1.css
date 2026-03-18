@@ -156,6 +156,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .pdp-file-wrapper .pdp-textbox-input {

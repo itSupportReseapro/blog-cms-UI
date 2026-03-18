@@ -7,7 +7,7 @@ import PdpButton from "@/assets/buttons/button";
 
 import BackArrowIcon from "@/assets/Images/img/back-arrow.svg";
 import EditUserIcon from "@/assets/Images/icon/edit-user-icon.svg";
-import DefaultAvatar from "@/assets/Images/icon/profile-avatar.svg";
+import DefaultAvatar from "@/assets/Images/icon/Profile-avatar.svg";
 
 export default function AddUserForm({
   formData,

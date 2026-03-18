@@ -1,14 +1,16 @@
 .contact-page {
-  padding: var(--spacing-xl);
+  padding: var(--cms-page-padding);
+  min-height: 100%;
 }
 
 /* CARD */
 
 .contact-card {
-  width: 1080px;
-  min-height: 860px;
+  width: 100%;
+  min-height: 100%;
   background: var(--White);
   border-radius: 20px;
+  box-shadow: var(--shadow-lg);
 }
 
 /* HEADER */
@@ -37,8 +39,8 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: 470px 470px;
-  column-gap: 100px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--spacing-lg);
   row-gap: 24px;
 
   padding: 24px 20px;
@@ -62,7 +64,7 @@
 
 .input-group {
   position: relative;
-  width: 470px;
+  width: 100%;
 }
 
 /* INPUT + TEXTAREA */
@@ -133,4 +135,14 @@
   top: -8px;
   font-size: 12px;
   color: var(--Primary);
+}
+
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    grid-column: span 1;
+  }
 }
