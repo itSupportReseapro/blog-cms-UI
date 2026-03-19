@@ -2,6 +2,7 @@
 
 import "./UserDetailsPanel.css";
 import Image from "next/image";
+import PdpButton from "@/assets/buttons/button";
 
 import letterIcon from "@/assets/Images/icon/Letter.svg";
 import phoneIcon from "@/assets/Images/icon/Phone Calling.svg";
@@ -60,15 +61,19 @@ export default function UserDetailsPanel({ onClose, onEdit, onLogout }) {
 
           <div className="panel-buttons">
 
-            <button className="btn-outline">
-              <Image src={keyIcon} alt="" width={16} height={16} />
+            <PdpButton className="panel-button" variant="outline" icon={keyIcon} iconPosition="left">
               Reset Password
-            </button>
+            </PdpButton>
 
-            <button className="btn-primary" onClick={onLogout}>
-              <Image src={logoutIcon} alt="" width={16} height={16} />
+            <PdpButton
+              className="panel-button"
+              variant="primary"
+              onClick={onLogout}
+              icon={logoutIcon}
+              iconPosition="left"
+            >
               Logout
-            </button>
+            </PdpButton>
 
           </div>
         </div>

@@ -8,7 +8,7 @@ export default function usePdpTableState({
   columns,
   data,
   rowKey = "id",
-  pageSizeOptions = [5, 10, 15, 20, "All"],
+  pageSizeOptions = [5, 10, 15, 20],
   defaultPageSize,
   defaultSort,
   selectable = false,

@@ -17,7 +17,7 @@ export default function useColumnResize({
   maxColWidth = 260,     // ✅ cap so 1 col won't become huge
 
   checkboxColWidth = 44,
-  serialColWidth = 70,
+  serialColWidth = 64,
   actionsColWidth = 90,
   jitterPx = 1,
 }) {

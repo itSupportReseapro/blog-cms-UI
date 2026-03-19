@@ -1,18 +1,24 @@
 .cms-dashboard {
   padding: var(--cms-page-padding);
   background: var(--Background);
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-card {
   width: 100%;
-  min-height: 100%;
-  background: var(--White);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
   padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
+  gap: var(--cms-section-gap);
 }
 
 /* ================= TOP CONTROLS ================= */
@@ -51,10 +57,10 @@
 
 .search-wrapper {
   width: 324px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--Grey1);
-  background: var(--White);
+  height: var(--control-height-sm);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-base);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -67,15 +73,15 @@
   flex: 1;
   background: transparent;
   font-size: var(--font-size-sm);
-  color: var(--text1);
+  color: var(--Text1);
 }
 
 .icon-btn {
   width: 40px;
-  height: 40px;
-  background: var(--White);
-  border: 1px solid var(--Grey1);
-  border-radius: 8px;
+  height: var(--control-height-sm);
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,20 +92,29 @@
 
 .tabs-wrapper {
   width: 100%;
-  height: 35px;
-  margin-top: 32px;
-  border-bottom: 2px solid var(--Grey2);
+  min-height: 52px;
+  margin-top: 8px;
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .tab-btn {
-  padding: 0 16px 16px 16px;
+  min-height: 44px;
+  padding: 0 16px;
   background: transparent;
   border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 12px 12px 0 0;
   cursor: pointer;
   font-size: var(--font-size-sm);
   color: var(--Text1);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: var(--PrimaryPastel);
 }
 
 .tab-btn.active {
@@ -112,10 +127,11 @@
 
 .table-wrapper {
   width: 100%;
-  margin-top: 10px;
-  border-radius: 10px;
+  margin-top: 0;
+  border-radius: 16px;
   overflow: hidden;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }

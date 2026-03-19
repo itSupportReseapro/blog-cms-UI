@@ -1,16 +1,24 @@
 .contact-page {
   padding: var(--cms-page-padding);
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* CARD */
 
 .contact-card {
   width: 100%;
-  min-height: 100%;
-  background: var(--White);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -21,7 +29,7 @@
   align-items: center;
 
   padding: 16px 20px;
-  border-bottom: 1px solid var(--Grey1);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .contact-header h2 {
@@ -41,8 +49,10 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: var(--spacing-lg);
-  row-gap: 24px;
-
+  row-gap: var(--cms-section-gap);
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
   padding: 24px 20px;
 }
 
@@ -56,7 +66,7 @@
 
   color: var(--Primary);
 
-  border-bottom: 1px solid var(--Grey1);
+  border-bottom: 1px solid var(--border-soft);
   padding-bottom: 10px;
 }
 
@@ -72,18 +82,18 @@
 .input-group input,
 .input-group textarea {
   width: 100%;
-  height: 56px;
+  min-height: var(--field-height);
 
   border-radius: 12px;
-  border: 1.5px solid var(--Grey1);
+  border: 1.5px solid var(--border-soft);
 
   padding: 16px;
   font-size: var(--font-size-sm);
 
-  background: var(--White);
+  background: var(--surface-base);
   color: var(--Text1);
 
-  transition: border 0.2s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* TEXTAREA HEIGHT */
@@ -108,6 +118,7 @@
 .input-group:focus-within input,
 .input-group:focus-within textarea {
   border: 1.5px solid var(--Primary);
+  box-shadow: var(--focus-ring);
 }
 
 /* FLOATING LABEL */
@@ -120,7 +131,7 @@
   font-size: 14px;
   color: var(--Text2);
 
-  background: var(--White);
+  background: var(--surface-base);
   padding: 0 4px;
 
   pointer-events: none;

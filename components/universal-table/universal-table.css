@@ -12,7 +12,7 @@
 }
 
 .ut-expandedRow .pdp-td {
-  background: #f8faff;
+  background: var(--Background);
 }
 
 .ut-expandedTableWrap {

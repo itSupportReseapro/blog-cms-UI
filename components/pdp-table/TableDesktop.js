@@ -161,7 +161,7 @@ export default function TableDesktop({
           )}
 
           {showSerialColumn ? (
-            <th className="pdp-th" style={{ width: 74 }}>
+            <th className="pdp-th pdp-serialCol" style={{ width: 64, textAlign: "center" }}>
               Sl No.
             </th>
           ) : null}
@@ -285,7 +285,7 @@ export default function TableDesktop({
                   )}
 
                   {showSerialColumn ? (
-                    <td className="pdp-td">
+                    <td className="pdp-td pdp-serialCol" style={{ width: 64, textAlign: "center" }}>
                       {showStatusDot && (
                         <span
                           className={`pdp-statusDot ${

@@ -3,13 +3,17 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border: none;
+  min-height: var(--control-height-sm);
+  border: 1px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  padding: 10px 20px;
-  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease,
+    color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  padding: 0 18px;
+  font-size: var(--font-size-sm);
   white-space: nowrap;
+  line-height: 1;
 }
 
 /* ===== FULL WIDTH ===== */
@@ -19,40 +23,41 @@
 
 /* ===== DISABLED ===== */
 .pdp-btn-disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* ================= SIZE ================= */
 
 .pdp-btn-sm {
   height: 36px;
-  font-size: 14px;
-  padding: 8px 16px;
+  font-size: var(--font-size-sm);
+  padding: 0 14px;
 }
 
 .pdp-btn-md {
-  height: 42px;
+  height: var(--control-height-sm);
 }
 
 .pdp-btn-lg {
-  height: 50px;
-  font-size: 16px;
-  padding: 12px 24px;
+  height: var(--control-height-md);
+  font-size: var(--font-size-base);
+  padding: 0 24px;
 }
 
 /* ================= RADIUS ================= */
 
 .pdp-btn-radius-sm {
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .pdp-btn-radius-md {
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
 }
 
 .pdp-btn-radius-lg {
-  border-radius: 18px;
+  border-radius: var(--card-radius);
 }
 
 .pdp-btn-radius-pill {
@@ -65,16 +70,18 @@
 .pdp-btn-primary {
   background: var(--Primary);
   color: var(--White);
+  box-shadow: var(--shadow-sm);
 }
 
 .pdp-btn-primary:hover {
-  background: #0353a4;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Outline */
 .pdp-btn-outline {
-  background: transparent;
-  border: 2px solid var(--Primary);
+  background: var(--surface-base);
+  border-color: var(--Primary);
   color: var(--Primary);
 }
 
@@ -86,30 +93,44 @@
 .pdp-btn-danger {
   background: var(--Red);
   color: var(--White);
+  box-shadow: var(--shadow-sm);
 }
 
 .pdp-btn-danger:hover {
-  background: #b02a37;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Success */
 .pdp-btn-success {
   background: var(--Green);
   color: var(--White);
+  box-shadow: var(--shadow-sm);
 }
 
 .pdp-btn-success:hover {
-  background: #1e7e34;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Ghost */
 .pdp-btn-ghost {
   background: transparent;
+  border-color: transparent;
   color: var(--Primary);
 }
 
 .pdp-btn-ghost:hover {
   background: var(--PrimaryPastel);
+}
+
+.pdp-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.pdp-btn:not(.pdp-btn-disabled):active {
+  transform: translateY(0);
 }
 
 /* ================= ICON ================= */
@@ -122,4 +143,9 @@
 .pdp-btn-icon img {
   width: 18px;
   height: 18px;
+}
+
+.pdp-btn-text {
+  display: inline-flex;
+  align-items: center;
 }

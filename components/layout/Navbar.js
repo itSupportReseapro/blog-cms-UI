@@ -44,14 +44,14 @@ export default function Navbar() {
 
         <div className="navbar-right">
           <button className="navbar-bell">
-            <Image src={bellIcon} alt="Notifications" width={36} height={40} />
+            <Image src={bellIcon} alt="Notifications" width={28} height={28} />
           </button>
 
           <button
             className="navbar-avatar"
             onClick={() => setShowUserDetails(true)}
           >
-            <Image src={profileIcon} alt="Profile" width={52} height={52} />
+            <Image src={profileIcon} alt="Profile" width={44} height={44} />
           </button>
         </div>
       </nav>

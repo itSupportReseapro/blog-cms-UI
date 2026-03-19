@@ -1,18 +1,24 @@
 .cms-dashboard{
   padding: var(--cms-page-padding);
   background: var(--Background);
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-card{
   width: 100%;
-  min-height: 100%;
-  background: var(--White);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
   padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
+  gap: var(--cms-section-gap);
 }
 
 .user-cell{
@@ -34,25 +40,25 @@
   padding:4px 10px;
   border-radius:999px;
   font-size:12px;
-  font-weight:600;
+  font-weight:var(--font-weight-semibold);
   text-transform:capitalize;
-  background:#f3f4f6;
-  color:#111827;
+  background:var(--surface-soft);
+  color:var(--Text1);
 }
 
 .role-badge-admin{
-  background:#fee2e2;
-  color:#991b1b;
+  background:var(--RedPastel);
+  color:var(--Red);
 }
 
 .role-badge-editor{
-  background:#dbeafe;
-  color:#1e3a8a;
+  background:var(--PrimaryPastel);
+  color:var(--Primary);
 }
 
 .role-badge-user{
-  background:#dcfce7;
-  color:#166534;
+  background:var(--GreenPastel);
+  color:var(--Green);
 }
 
 .sortable-head{
@@ -81,10 +87,10 @@
   align-items:center;
   gap:8px;
   width:260px;
-  height:40px;
-  background:var(--White);
-  border:1px solid var(--Grey2);
-  border-radius:10px;
+  height:var(--control-height-sm);
+  background:var(--surface-base);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
   padding:0 12px;
 }
 
@@ -98,21 +104,25 @@
 
 .icon-btn{
   width:40px;
-  height:40px;
+  height:var(--control-height-sm);
   display:flex;
   align-items:center;
   justify-content:center;
-  border:1px solid var(--Grey2);
-  border-radius:10px;
-  background:var(--White);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  background:var(--surface-base);
   cursor:pointer;
 }
 
 .table-wrapper{
   width:100%;
-  margin-top:14px;
-  border-radius:12px;
+  margin-top:0;
+  border-radius:16px;
   overflow:hidden;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (max-width: 992px){

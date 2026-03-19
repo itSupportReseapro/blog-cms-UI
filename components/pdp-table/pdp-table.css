@@ -22,7 +22,7 @@
 
   --pdp-font: var(--font-family);
 
-  --pdp-focus: 0 0 0 2px var(--PrimaryPastel);
+    scrollbar-color: var(--Grey2) var(--Background);
 }
 
 .pdp-root {
@@ -30,6 +30,10 @@
   min-width: 0;
   font-family: var(--pdp-font);
   color: var(--pdp-text);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .pdp-title {
@@ -40,21 +44,22 @@
 }
 
 .pdp-toolbar {
-  min-width: 0;
+    color: var(--White);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 360px) auto;
   gap: 12px;
-  align-items: center;
+    filter: brightness(0.96);
+  position: relative;
+  z-index: 60;
   margin-bottom: 14px;
 }
 
 .pdp-toolbarLeft {
   display: flex;
-  gap: 10px;
+    color: var(--White);
   align-items: center;
   min-width: 0;
 }
-
 .pdp-toolbarCenter {
   display: flex;
   min-width: 0;
@@ -65,7 +70,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  align-items: center;
+  background: transparent;
   flex-wrap: wrap;
   min-width: 0;
 }
@@ -162,21 +167,21 @@
 .pdp-btnPrimary {
   border-color: transparent;
   background: var(--pdp-primary);
-  color: #fff;
+  color: var(--White);
 }
 
 .pdp-btnPrimary:hover {
-  background: #1d4ed8;
+  filter: brightness(0.96);
 }
 
 .pdp-btnDanger {
   border-color: transparent;
   background: var(--pdp-danger);
-  color: #fff;
+  color: var(--White);
 }
 
 .pdp-btnDanger:hover {
-  background: #dc2626;
+  filter: brightness(0.96);
 }
 
 .pdp-iconBtn {
@@ -206,25 +211,43 @@
 
 .pdp-cmWrap {
   position: relative;
+  z-index: 80;
 }
 
-.pdp-body {
+.pdp-tableCard {
   border: 1px solid var(--pdp-border);
   border-radius: var(--pdp-radius);
   background: var(--pdp-bg);
-  overflow: auto;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
   min-width: 0;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.pdp-body {
+  background: var(--pdp-bg);
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: flex;
 }
 
 .pdp-tableScroll {
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-height: 0;
+  flex: 1;
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #dbe5f2 #f8fbff;
+  scrollbar-color: var(--Grey2) var(--Background);
 }
 
 .pdp-tableScroll::-webkit-scrollbar {
@@ -233,18 +256,18 @@
 }
 
 .pdp-tableScroll::-webkit-scrollbar-track {
-  background: #f8fbff;
+  background: var(--Background);
   border-radius: 999px;
 }
 
 .pdp-tableScroll::-webkit-scrollbar-thumb {
-  background: #dbe5f2;
+  background: var(--Grey2);
   border-radius: 999px;
-  border: 2px solid #f8fbff;
+  border: 2px solid var(--Background);
 }
 
 .pdp-tableScroll::-webkit-scrollbar-thumb:hover {
-  background: #cdd9ea;
+  background: var(--Grey3);
 }
 
 .pdp-table {
@@ -287,6 +310,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pdp-serialCol {
+  font-variant-numeric: tabular-nums;
 }
 
 .pdp-tr:hover .pdp-td {
@@ -572,8 +599,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding: 10px 2px;
-  margin-top: 10px;
+  padding: 12px 14px;
+  margin-top: 0;
+  border-top: 1px solid var(--pdp-border);
+  background: var(--White);
   flex-wrap: wrap;
   color: var(--Text1);
   font-size: 13px;
@@ -648,7 +677,7 @@
   padding: 10px;
   min-width: 240px;
   box-shadow: var(--pdp-shadow-sm);
-  z-index: 20;
+  z-index: 2400;
   color: var(--Text1);
 }
 
@@ -1036,7 +1065,7 @@
   border-radius: 12px;
   box-shadow: var(--pdp-shadow-sm);
   padding: 10px;
-  z-index: 30;
+  z-index: 2400;
   color: var(--Text1);
 }
 

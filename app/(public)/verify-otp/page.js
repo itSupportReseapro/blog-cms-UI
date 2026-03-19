@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PdpTextbox1 from "@/assets/textbox/PdpTextbox1";
 import PdpButton from "@/assets/buttons/button";
 import { verifyOtp } from "@/services/auth.service";
 
-export default function VerifyOtpPage() {
+function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
@@ -63,5 +63,13 @@ export default function VerifyOtpPage() {
         </PdpButton>
       </form>
     </main>
+  );
+}
+
+export default function VerifyOtpPage() {
+  return (
+    <Suspense>
+      <VerifyOtpForm />
+    </Suspense>
   );
 }

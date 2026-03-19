@@ -2,6 +2,7 @@
 
 import "./EditUserPanel.css";
 import Image from "next/image";
+import PdpButton from "@/assets/buttons/button";
 
 import editUserIcon from "@/assets/Images/icon/edit-user-icon.svg";
 import crossIcon from "@/assets/Images/icon/cross-icon.svg";
@@ -51,13 +52,13 @@ export default function EditUserPanel({ onClose, onCancel }) {
           </div>
 
           <div className="panel-buttons">
-            <button className="btn-outline" onClick={onCancel}>
+            <PdpButton className="panel-button" variant="outline" onClick={onCancel}>
               Cancel
-            </button>
+            </PdpButton>
 
-            <button className="btn-primary">
+            <PdpButton className="panel-button" variant="primary">
               Update
-            </button>
+            </PdpButton>
           </div>
         </div>
       </div>

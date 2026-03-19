@@ -381,7 +381,7 @@ export default function BlogsTable() {
             actions={tableActionsForRows}
             rowKey="id"
             defaultPageSize={10}
-            pageSizeOptions={[10, 25, 50, "All"]}
+            pageSizeOptions={[10, 25, 50]}
             breakpoint={768}
             enableFilters={true}
             showFilterButton={true}

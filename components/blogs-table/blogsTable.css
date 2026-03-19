@@ -1,18 +1,24 @@
 .blogs-table-wrapper {
   padding: var(--cms-page-padding);
   background: var(--Background);
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-card {
   width: 100%;
-  min-height: 100%;
-  background: var(--White);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
   padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
+  gap: var(--cms-section-gap);
 }
 
 .blogs-toolbarLeft {
@@ -36,11 +42,11 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-height: 40px;
+  min-height: var(--control-height-sm);
   padding: 0 12px;
-  border: 1px solid var(--Grey2);
-  border-radius: 10px;
-  background: var(--White);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface-base);
 }
 
 .blogs-statusFilterLabel {
@@ -63,9 +69,10 @@
 
 .table-wrapper {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 16px;
   overflow: hidden;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -98,10 +105,13 @@ tbody tr:last-child {
 /* ================= STATUS BADGES ================= */
 
 .status-pill {
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
   padding: 6px 12px;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
   text-transform: capitalize;
 }
 

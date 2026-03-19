@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import "./DeleteBlogModal.css";
 import Image from "next/image";
+import PdpButton from "@/assets/buttons/button";
 import CrossIcon from "@/assets/Images/icon/cross-icon.svg"; // adjust path if needed
 
 export default function DeleteBlogModal({
@@ -87,20 +88,21 @@ export default function DeleteBlogModal({
         {/* BUTTONS */}
 
         <div className="modal-actions">
-
-          <button
-            className="cancel-btn"
+          <PdpButton
+            className="modal-action-btn"
+            variant="outline"
             onClick={onClose}
           >
             Cancel
-          </button>
+          </PdpButton>
 
-          <button
-            className="delete-btn"
+          <PdpButton
+            className="modal-action-btn modal-action-danger"
+            variant="danger"
             onClick={handleConfirm}
           >
             Yes, Delete this Blog
-          </button>
+          </PdpButton>
 
         </div>
 

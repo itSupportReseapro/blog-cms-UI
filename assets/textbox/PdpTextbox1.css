@@ -1,20 +1,20 @@
 .pdp-textbox-container {
   position: relative;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 0;
 }
 
 .pdp-textbox-label {
   position: absolute;
-  top: 43%;
-  left: 10px;
-  color: #666;
+  top: 50%;
+  left: 16px;
+  color: var(--text-muted);
   transition: all 0.2s ease;
   transform: translateY(-50%);
-  font-size: 16px;
-  font-weight: 400;
-  background-color: white;
-  padding: 1px 24px 3px 12px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  background-color: var(--surface-base);
+  padding: 0 8px;
   pointer-events: none;
   z-index: 1;
 }
@@ -22,27 +22,28 @@
 .pdp-textbox-input,
 .pdp-textbox-dropdown {
   width: 100%;
-  height: 40px;
-  padding: 8px 40px 8px 12px; /* space for icon on right */
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 15px;
+  min-height: var(--field-height);
+  padding: 18px 44px 10px 16px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 12px;
+  font-size: var(--font-size-sm);
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   box-sizing: border-box;
-  background-color: #FFFFFF;
-  color: black;
+  background-color: var(--surface-base);
+  color: var(--Text1);
 }
 
 .pdp-textbox-input:focus,
 .pdp-textbox-dropdown:focus {
-  border-color: #3f51b5;
+  border-color: var(--Primary);
+  box-shadow: var(--focus-ring);
 }
 
 .pdp-textbox-container.focused .pdp-textbox-label {
-  top: 4px;
+  top: 0;
   font-size: 12px;
-  color: #3f51b5;
+  color: var(--Primary);
 }
 
 .indicator {
@@ -54,16 +55,16 @@
 }
 
 .indicator.valid {
-  color: green;
+  color: var(--Green);
 }
 
 .indicator.invalid {
-  color: red;
+  color: var(--Red);
 }
 
 .toggle-visibility {
   position: absolute;
-  right: 15px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
@@ -80,13 +81,13 @@
 }
 
 .pdp-date-wrapper .pdp-textbox-input {
-  padding-right: 40px; /* space for calendar icon */
+  padding-right: 48px;
 }
 
 /* Position calendar icon inside input */
 .pdp-date-icon {
   position: absolute;
-  right: 12px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
@@ -119,8 +120,8 @@
 @media (max-width: 600px) {
   .pdp-textbox-input,
   .pdp-textbox-dropdown {
-    height: 40px;
-    padding: 10px 35px 10px 10px;
+    min-height: var(--field-height);
+    padding: 18px 40px 10px 14px;
     font-size: 14px;
   }
 
@@ -134,20 +135,20 @@
 }
 
 .pdp-textbox-input.invalid {
-  border-color: red;
+  border-color: var(--Red);
 }
 
 .error-text {
-  color: red;
+  color: var(--Red);
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 /* Textarea */
 .pdp-textarea {
   min-height: 90px;
   resize: vertical;
-  padding: 12px;
+  padding: 20px 16px 12px;
   line-height: 1.4;
 }
 
@@ -161,18 +162,20 @@
 
 .pdp-file-wrapper .pdp-textbox-input {
   width: 100%;
-  padding-right: 40px;
+  padding-right: 48px;
   cursor: pointer;
 }
 
 .pdp-file-icon {
   position: absolute;
-  right: 12px;
+  right: 16px;
   cursor: pointer;
   font-size: 18px;
-  color: var(--Grey2);
+  color: var(--Text2);
   transition: color 0.2s;
-  bottom: 6px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
 }
 
 .pdp-file-icon:hover {

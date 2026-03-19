@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_ENV=development next dev --webpack -p 4000",
-    "build": "cross-env NEXT_PUBLIC_ENV=production next build",
+    "build": "cross-env NEXT_PUBLIC_ENV=development next build",
     "build:test": "cross-env NEXT_PUBLIC_ENV=test next build",
     "build:prod": "cross-env NEXT_PUBLIC_ENV=production next build",
     "start": "cross-env NEXT_PUBLIC_ENV=production next start -p 3000",

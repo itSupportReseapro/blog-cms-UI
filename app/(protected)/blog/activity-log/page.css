@@ -3,9 +3,10 @@
   background: var(--Background);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--cms-section-gap);
   width: 100%;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 .activity-log-title {
@@ -17,13 +18,16 @@
 
 .activity-main-card {
   width: 100%;
-  min-height: 100%;
-  background: var(--White);
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
   padding: var(--cms-card-padding);
   display: flex;
   flex-direction: column;
+  gap: var(--cms-section-gap);
 }
 
 .activity-createLink {
@@ -53,10 +57,10 @@
 
 .activity-search-wrapper {
   width: 324px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid var(--Grey1);
-  background: var(--White);
+  height: var(--control-height-sm);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-base);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -74,10 +78,10 @@
 
 .activity-icon-btn {
   width: 40px;
-  height: 40px;
-  background: var(--White);
-  border: 1px solid var(--Grey1);
-  border-radius: 8px;
+  height: var(--control-height-sm);
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,10 +94,11 @@
 
 .activity-table-wrapper {
   width: 100%;
-  margin-top: 10px;
-  border-radius: 12px;
+  margin-top: 0;
+  border-radius: 16px;
   overflow: hidden;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }

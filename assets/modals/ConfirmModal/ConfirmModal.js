@@ -1,16 +1,17 @@
 import BaseModal from "../BaseModal/BaseModal";
+import PdpButton from "@/assets/buttons/button";
 
 export default function ConfirmModal({ title = "Confirm", message, onConfirm, onClose }) {
   return (
     <BaseModal title={title} onClose={onClose}>
-      <p>{message}</p>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button type="button" onClick={onClose}>
+      <p className="base-modal__message">{message}</p>
+      <div className="base-modal__actions">
+        <PdpButton type="button" variant="outline" onClick={onClose}>
           Cancel
-        </button>
-        <button type="button" onClick={onConfirm}>
+        </PdpButton>
+        <PdpButton type="button" variant="primary" onClick={onConfirm}>
           Confirm
-        </button>
+        </PdpButton>
       </div>
     </BaseModal>
   );

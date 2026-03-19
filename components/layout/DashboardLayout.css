@@ -16,31 +16,18 @@
 
 .dashboard-content {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   padding: var(--spacing-lg);
-}
-
-/* Scrollbar Styling */
-.dashboard-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dashboard-content::-webkit-scrollbar-track {
-  background: var(--Background);
-}
-
-.dashboard-content::-webkit-scrollbar-thumb {
-  background: var(--Grey2);
-  border-radius: var(--radius-md);
-}
-
-.dashboard-content::-webkit-scrollbar-thumb:hover {
-  background: var(--Grey1);
+  background: linear-gradient(180deg, rgba(4, 102, 200, 0.04) 0%, rgba(245, 247, 250, 0) 120px);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-content {
+    padding: var(--spacing-md);
   }
 }

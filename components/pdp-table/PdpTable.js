@@ -33,7 +33,7 @@ export default function PdpTable({
   toolbarLeft = null,
   toolbarRight = null,
 
-  pageSizeOptions = [5, 10, 15, 20, "All"],
+  pageSizeOptions = [5, 10, 15, 20],
   defaultPageSize,
   defaultSort,
   enableFilters = true,
@@ -213,6 +213,13 @@ const resize = useColumnResize({
   }, [shouldUseSidebar]);
 
   const fileBase = exportFileBaseName || title || "table";
+
+  const resolvedBodyMaxHeight =
+    typeof bodyHeight === "number" ? `${bodyHeight}px` : bodyHeight || undefined;
+
+  const tableScrollStyle = resolvedBodyMaxHeight
+    ? { height: "100%", maxHeight: resolvedBodyMaxHeight }
+    : { height: "100%" };
 
   const getExportRows = () => (exportScope === "allFiltered" ? table.sortedRows : table.pageRows);
 
@@ -423,83 +430,85 @@ const resize = useColumnResize({
         </div>
       )}
 
-      {/* BODY */}
-      <div className="pdp-body" ref={enableResize ? resize.containerRef : undefined}>
-<div className="pdp-tableScroll" style={{ height: bodyHeight }}>
-          {loading ? (
-            <SkeletonTable
-              columns={columns}
-              visibleColumns={table.visibleColumns}
-              selectable={selectable}
-              showActions={showActions && resolvedActions.length > 0}
-              rows={8}
-            />
-          ) : table.filteredRows.length === 0 || !hasVisibleDataColumns ? (
-            <EmptyState
-              hasFilters={activeFilterCount > 0 || Boolean(table.searchQuery)}
-              onClear={clearAllSearchAndFilters}
-            />
-          ) : isMobile ? (
-            <TableMobileCards
-              columns={columns}
-              rows={table.pageRows}
-              visibleColumns={table.visibleColumns}
-              getRowKey={table.getRowKey}
-              pageIndexOffset={pageIndexOffset}
-              showActions={showActions && resolvedActions.length > 0}
-              actions={resolvedActions}
-              statusField={statusField}
-              statusTrueValues={statusTrueValues}
-            />
-          ) : (
-            <TableDesktop
-              columns={columns}
-              rows={table.pageRows}
-              visibleColumns={table.visibleColumns}
-              columnWidths={enableResize ? resize.columnWidths : {}}
-              initResize={enableResize ? resize.initResize : null}
-              selectable={selectable}
-              selectedKeys={table.selectedKeys}
-              onSelectRow={table.selectRow}
-              onSelectPage={table.selectPage}
-              getRowKey={table.getRowKey}
-              pageIndexOffset={pageIndexOffset}
-              sortConfig={table.sortConfig}
-              onSort={table.cycleSort}
-              enableFilters={enableFilters}
-              appliedFilters={table.appliedFilters}
-              onOpenFilter={table.openFilter}
-              showActions={showActions && resolvedActions.length > 0}
-              actions={resolvedActions}
-              showStatusDot={showStatusDot}
-              highlightStatusCells={highlightStatusCells}
-              statusField={statusField}
-              statusTrueValues={statusTrueValues}
-              expandableRows={expandableRows}
-              getExpandedRows={getExpandedRows}
-              renderExpandedContent={renderExpandedContent}
-              headerRows={headerRows}
-              summaryRows={summaryRows}
-              icons={icons}
-            />
-          )}
+      <div className="pdp-tableCard" ref={enableResize ? resize.containerRef : undefined}>
+        {/* BODY */}
+        <div className="pdp-body">
+          <div className="pdp-tableScroll" style={tableScrollStyle}>
+            {loading ? (
+              <SkeletonTable
+                columns={columns}
+                visibleColumns={table.visibleColumns}
+                selectable={selectable}
+                showActions={showActions && resolvedActions.length > 0}
+                rows={8}
+              />
+            ) : table.filteredRows.length === 0 || !hasVisibleDataColumns ? (
+              <EmptyState
+                hasFilters={activeFilterCount > 0 || Boolean(table.searchQuery)}
+                onClear={clearAllSearchAndFilters}
+              />
+            ) : isMobile ? (
+              <TableMobileCards
+                columns={columns}
+                rows={table.pageRows}
+                visibleColumns={table.visibleColumns}
+                getRowKey={table.getRowKey}
+                pageIndexOffset={pageIndexOffset}
+                showActions={showActions && resolvedActions.length > 0}
+                actions={resolvedActions}
+                statusField={statusField}
+                statusTrueValues={statusTrueValues}
+              />
+            ) : (
+              <TableDesktop
+                columns={columns}
+                rows={table.pageRows}
+                visibleColumns={table.visibleColumns}
+                columnWidths={enableResize ? resize.columnWidths : {}}
+                initResize={enableResize ? resize.initResize : null}
+                selectable={selectable}
+                selectedKeys={table.selectedKeys}
+                onSelectRow={table.selectRow}
+                onSelectPage={table.selectPage}
+                getRowKey={table.getRowKey}
+                pageIndexOffset={pageIndexOffset}
+                sortConfig={table.sortConfig}
+                onSort={table.cycleSort}
+                enableFilters={enableFilters}
+                appliedFilters={table.appliedFilters}
+                onOpenFilter={table.openFilter}
+                showActions={showActions && resolvedActions.length > 0}
+                actions={resolvedActions}
+                showStatusDot={showStatusDot}
+                highlightStatusCells={highlightStatusCells}
+                statusField={statusField}
+                statusTrueValues={statusTrueValues}
+                expandableRows={expandableRows}
+                getExpandedRows={getExpandedRows}
+                renderExpandedContent={renderExpandedContent}
+                headerRows={headerRows}
+                summaryRows={summaryRows}
+                icons={icons}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* FOOTER (ONLY HERE, NEVER IN TableDesktop) */}
-      {showFooter && (
-        <PaginationFooter
-          pageSizeOptions={pageSizeOptions}
-          rowsPerPage={table.rowsPerPage}
-          onRowsPerPageChange={table.setRowsPerPage}
-          currentPage={table.currentPage}
-          totalPages={table.totalPages}
-          onPrev={() => table.setCurrentPage(Math.max(1, table.currentPage - 1))}
-          onNext={() => table.setCurrentPage(Math.min(table.totalPages, table.currentPage + 1))}
-          showingCount={table.pageRows.length}
-          totalCount={table.filteredRows.length}
-        />
-      )}
+        {/* FOOTER (ONLY HERE, NEVER IN TableDesktop) */}
+        {showFooter && (
+          <PaginationFooter
+            pageSizeOptions={pageSizeOptions}
+            rowsPerPage={table.rowsPerPage}
+            onRowsPerPageChange={table.setRowsPerPage}
+            currentPage={table.currentPage}
+            totalPages={table.totalPages}
+            onPrev={() => table.setCurrentPage(Math.max(1, table.currentPage - 1))}
+            onNext={() => table.setCurrentPage(Math.min(table.totalPages, table.currentPage + 1))}
+            showingCount={table.pageRows.length}
+            totalCount={table.filteredRows.length}
+          />
+        )}
+      </div>
 
       {/* FILTER MODAL */}
       <FilterModal

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PdpTextbox1 from "@/assets/textbox/PdpTextbox1";
 import PdpButton from "@/assets/buttons/button";
 import { resetPassword } from "@/services/auth.service";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
@@ -89,5 +89,13 @@ export default function ResetPasswordPage() {
         </PdpButton>
       </form>
     </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
