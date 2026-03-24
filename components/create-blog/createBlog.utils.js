@@ -12,14 +12,24 @@ export const getSelectedLabel = (dropdownState, field, value) => {
 
 export const resolveAuthorName = () => {
   if (typeof window === "undefined") {
-    return "admin";
+    return "Unknown user";
   }
 
   try {
-    const user = JSON.parse(window.localStorage.getItem("user") || "{}");
-    return user?.name || user?.full_name || user?.username || "admin";
+    const user = JSON.parse(window.sessionStorage.getItem("authUser") || "{}");
+    const fullName = [user?.first_name, user?.last_name, user?.firstName, user?.lastName]
+      .filter((value) => typeof value === "string" && value.trim())
+      .filter((value, index, values) => index < 2 || !values.slice(0, 2).some(Boolean))
+      .join(" ")
+      .trim();
+    const fallbackName = [user?.name, user?.full_name, user?.fullName, user?.username, user?.user_name]
+      .find((value) => typeof value === "string" && value.trim())
+      ?.replace(/\s+/g, " ")
+      .trim();
+
+    return fullName || fallbackName || "Unknown user";
   } catch {
-    return "admin";
+    return "Unknown user";
   }
 };
 

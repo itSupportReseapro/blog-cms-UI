@@ -165,6 +165,44 @@ function findContainingBlock(rootEl, node) {
   return null;
 }
 
+function getFirstBlockFromNode(node) {
+  if (!node || node.nodeType !== Node.ELEMENT_NODE) return null;
+
+  const tag = node.tagName?.toLowerCase();
+  if (tag === "p" || tag === "h1" || tag === "h2" || tag === "h3" || tag === "li") {
+    return node;
+  }
+
+  if (tag === "ul" || tag === "ol") {
+    return node.querySelector(":scope > li");
+  }
+
+  return node.querySelector("p, h1, h2, h3, li");
+}
+
+function resolveRootPointBlock(rootEl, container, offset) {
+  if (container !== rootEl || !Number.isFinite(offset)) return null;
+
+  const childNodes = Array.from(rootEl.childNodes || []);
+  if (!childNodes.length) return null;
+
+  const idx = Math.max(0, Math.min(offset, childNodes.length));
+
+  if (idx < childNodes.length) {
+    const fromNext = getFirstBlockFromNode(childNodes[idx]);
+    if (fromNext) return { blockEl: fromNext, innerOffset: 0 };
+  }
+
+  for (let i = idx - 1; i >= 0; i--) {
+    const fromPrev = getFirstBlockFromNode(childNodes[i]);
+    if (fromPrev) {
+      return { blockEl: fromPrev, innerOffset: getBlockTextLength(fromPrev) };
+    }
+  }
+
+  return null;
+}
+
 function getBlockTextLength(blockEl) {
   // Count block text by walking text nodes and ignoring ZWSP/NBSP
   const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null);
@@ -196,6 +234,26 @@ function getOffsetWithinElementClean(el, node, nodeOffset) {
   return offset;
 }
 
+function getOffsetWithinPointClean(blockEl, container, nodeOffset) {
+  if (container.nodeType === Node.TEXT_NODE) {
+    return getOffsetWithinElementClean(blockEl, container, nodeOffset);
+  }
+
+  if (container.nodeType === Node.ELEMENT_NODE) {
+    try {
+      const endOffset = Math.max(0, Math.min(nodeOffset, container.childNodes.length));
+      const range = document.createRange();
+      range.setStart(blockEl, 0);
+      range.setEnd(container, endOffset);
+      return cleanLen(range.toString());
+    } catch {
+      return getOffsetWithinElementClean(blockEl, container, 0);
+    }
+  }
+
+  return 0;
+}
+
 function pointToAbs(rootEl, container, offset) {
   const blocks = getBlockElements(rootEl);
   if (!blocks.length) return 0;
@@ -210,16 +268,22 @@ function pointToAbs(rootEl, container, offset) {
     if (i !== lengths.length - 1) sum += 1; // newline
   }
 
-  const bEl = findContainingBlock(rootEl, container);
-  if (!bEl) return 0;
+  let bEl = findContainingBlock(rootEl, container);
+  let inner = 0;
+
+  if (!bEl) {
+    const rootPoint = resolveRootPointBlock(rootEl, container, offset);
+    if (!rootPoint) return 0;
+    bEl = rootPoint.blockEl;
+    inner = rootPoint.innerOffset;
+  }
 
   const bi = blocks.indexOf(bEl);
   if (bi < 0) return 0;
 
-  const inner =
-    container.nodeType === Node.TEXT_NODE
-      ? getOffsetWithinElementClean(bEl, container, offset)
-      : getOffsetWithinElementClean(bEl, container, 0);
+  if (container !== rootEl) {
+    inner = getOffsetWithinPointClean(bEl, container, offset);
+  }
 
   return starts[bi] + inner;
 }

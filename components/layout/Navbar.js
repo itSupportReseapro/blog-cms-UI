@@ -14,7 +14,7 @@ import "./Navbar.css";
 
 export default function Navbar() {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [showEditDetails, setShowEditDetails] = useState(false);
@@ -58,6 +58,7 @@ export default function Navbar() {
 
       {showUserDetails && (
         <UserDetailsPanel
+          user={user}
           onClose={() => setShowUserDetails(false)}
           onEdit={() => {
             setShowUserDetails(false);
@@ -69,6 +70,7 @@ export default function Navbar() {
 
       {showEditDetails && (
         <EditUserPanel
+          user={user}
           onClose={() => setShowEditDetails(false)}
           onCancel={() => {
             setShowEditDetails(false);

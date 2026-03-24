@@ -66,11 +66,28 @@ export default function SignupPage() {
     try {
       setLoading(true);
       const res = await registerUser({
+        domain: "pubmanu.com",
+        salutation: "",
         name: `${form.first_name} ${form.last_name}`.trim(),
         first_name: form.first_name,
+        middle_name: "",
         last_name: form.last_name,
         email: form.email,
+        official_email: "",
         phone: form.phone,
+        whatsapp_no: "",
+        gender: "",
+        job_description: "",
+        company: "",
+        country: "",
+        gst: "",
+        hear_about_us: "",
+        about: "",
+        user_photo: "",
+        address_1: "",
+        address_2: "",
+        aadhar_no: "",
+        pan: "",
         password: form.password,
       });
 

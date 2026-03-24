@@ -249,30 +249,34 @@ export default function CreateBlog({ blogId = null }) {
   };
 
 
-  const buildBlogPayload = (statusOverride) => ({
-    app_id: 12,
-    user_id: null,
-    cluster_id: formData.group ? Number(formData.group) : null,
-    category_id: formData.category ? Number(formData.category) : null,
-    sub_category_id: formData.subcategory ? Number(formData.subcategory) : null,
-    blog_title: formData.title?.trim(),
-    author_name: resolveAuthorName(),
-    description: formData.content || "",
-    time_to_read: estimateReadTime(formData.content || formData.subtitle),
-    blog_status: statusOverride || formData.blogStatus || "created",
-    carousel_status: 1,
-    view_count: 0,
-    img_1: formData.cover || "",
-    img_2: "",
-    slug: toSlug(formData.title),
-    obj_1: formData.subtitle || "",
-    obj_2: getDropdownLabel("country", formData.country),
-    obj_3: getDropdownLabel("state", formData.state),
-    obj_4: getDropdownLabel("district", formData.district),
-    obj_5: getDropdownLabel("city", formData.city),
-    status: 1,
-    created_by: "admin",
-  });
+  const buildBlogPayload = (statusOverride) => {
+    const authorName = resolveAuthorName();
+
+    return {
+      app_id: 12,
+      user_id: null,
+      cluster_id: formData.group ? Number(formData.group) : null,
+      category_id: formData.category ? Number(formData.category) : null,
+      sub_category_id: formData.subcategory ? Number(formData.subcategory) : null,
+      blog_title: formData.title?.trim(),
+      author_name: authorName,
+      description: formData.content || "",
+      time_to_read: estimateReadTime(formData.content || formData.subtitle),
+      blog_status: statusOverride || formData.blogStatus || "created",
+      carousel_status: 1,
+      view_count: 0,
+      img_1: formData.cover || "",
+      img_2: "",
+      slug: toSlug(formData.title),
+      obj_1: formData.subtitle || "",
+      obj_2: getDropdownLabel("country", formData.country),
+      obj_3: getDropdownLabel("state", formData.state),
+      obj_4: getDropdownLabel("district", formData.district),
+      obj_5: getDropdownLabel("city", formData.city),
+      status: 1,
+      created_by: authorName,
+    };
+  };
 
   const submitBlog = async (statusOverride, navigateOnSuccess = true) => {
     if (!formData.title?.trim()) {

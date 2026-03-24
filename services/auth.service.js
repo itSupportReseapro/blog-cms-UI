@@ -2,6 +2,31 @@ import authClient from "@/lib/authAxios";
 
 const AUTH_APP_ID = process.env.NEXT_PUBLIC_AUTH_APP_ID || "20";
 
+function resolveUserDisplayName(user, fallbackEmail = "") {
+  const primaryNameParts = [user?.first_name, user?.last_name].filter(
+    (value) => typeof value === "string" && value.trim()
+  );
+  const secondaryNameParts = [user?.firstName, user?.lastName].filter(
+    (value) => typeof value === "string" && value.trim()
+  );
+  const fullName = (primaryNameParts.length ? primaryNameParts : secondaryNameParts)
+    .filter((value) => typeof value === "string" && value.trim())
+    .join(" ")
+    .trim();
+  const fallbackName = [user?.name, user?.full_name, user?.fullName, user?.username, user?.user_name]
+    .find((value) => typeof value === "string" && value.trim())
+    ?.replace(/\s+/g, " ")
+    .trim();
+
+  return (
+    fullName ||
+    fallbackName ||
+    (typeof fallbackEmail === "string" && fallbackEmail.includes("@")
+      ? fallbackEmail.split("@")[0]
+      : "")
+  );
+}
+
 async function postWithFallback(paths, payload) {
   let lastError = null;
 
@@ -61,11 +86,30 @@ export async function loginUser({ email, password }) {
     const token = data.accessToken ?? data.access_token ?? data.token ?? payload.accessToken ?? payload.token ?? "";
     const refreshToken = data.refreshToken ?? data.refresh_token ?? payload.refreshToken ?? payload.refresh_token ?? null;
     
-    const user = payload.user ?? data.user ?? {
+    const rawUser = payload.user ?? data.user ?? {
       id: payload.user_id ?? data.user_id ?? payload.id ?? data.id ?? "",
+      user_id: payload.user_id ?? data.user_id ?? payload.id ?? data.id ?? "",
+      first_name: payload.first_name ?? data.first_name ?? "",
+      last_name: payload.last_name ?? data.last_name ?? "",
+      firstName: payload.firstName ?? data.firstName ?? "",
+      lastName: payload.lastName ?? data.lastName ?? "",
       name: payload.name ?? data.name ?? "",
       email: payload.email ?? data.email ?? email,
       role: payload.role ?? data.role ?? payload.user_type ?? data.user_type ?? "user",
+    };
+
+    const user = {
+      ...rawUser,
+      id: rawUser?.id ?? rawUser?.user_id ?? payload.user_id ?? data.user_id ?? payload.id ?? data.id ?? "",
+      user_id:
+        rawUser?.user_id ?? rawUser?.id ?? payload.user_id ?? data.user_id ?? payload.id ?? data.id ?? "",
+      first_name: rawUser?.first_name ?? payload.first_name ?? data.first_name ?? "",
+      last_name: rawUser?.last_name ?? payload.last_name ?? data.last_name ?? "",
+      firstName: rawUser?.firstName ?? payload.firstName ?? data.firstName ?? "",
+      lastName: rawUser?.lastName ?? payload.lastName ?? data.lastName ?? "",
+      name: resolveUserDisplayName(rawUser, rawUser?.email ?? email),
+      email: rawUser?.email ?? payload.email ?? data.email ?? email,
+      role: rawUser?.role ?? payload.role ?? data.role ?? payload.user_type ?? data.user_type ?? "user",
     };
 
     if (!token) {
@@ -100,12 +144,12 @@ export async function registerUser(payload) {
       phone: payload?.phone ?? "",
       whatsapp_no: payload?.whatsapp_no ?? "",
       gender: payload?.gender ?? "",
-      designation: payload?.designation ?? "",
+      job_description: payload?.job_description ?? payload?.designation ?? "",
       company: payload?.company ?? "",
       country: payload?.country ?? "",
       gst: payload?.gst ?? "",
       hear_about_us: payload?.hear_about_us ?? "",
-      description: payload?.description ?? "",
+      about: payload?.about ?? payload?.description ?? "",
       user_photo: payload?.user_photo ?? "",
       address_1: payload?.address_1 ?? "",
       address_2: payload?.address_2 ?? "",

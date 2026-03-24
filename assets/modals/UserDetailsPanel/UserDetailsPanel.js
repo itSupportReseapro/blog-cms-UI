@@ -15,7 +15,28 @@ import crossIcon from "@/assets/Images/icon/cross-icon.svg";
 /* NEW avatar icon */
 import profileAvatar from "@/assets/Images/icon/Profile-avatar.svg";
 
-export default function UserDetailsPanel({ onClose, onEdit, onLogout }) {
+function getUserField(user, keys, fallback = "") {
+  for (const key of keys) {
+    const value = user?.[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return fallback;
+}
+
+export default function UserDetailsPanel({ user, onClose, onEdit, onLogout }) {
+  const firstName = getUserField(user, ["first_name", "firstName"]);
+  const lastName = getUserField(user, ["last_name", "lastName"]);
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+  const name =
+    fullName ||
+    getUserField(user, ["name", "full_name", "fullName", "username", "user_name"], "User");
+  const email = getUserField(user, ["email"], "Not available");
+  const phone = getUserField(user, ["phone", "phone_no", "mobile", "mobile_no"], "Not available");
+
   return (
     <div className="overlay" onClick={onClose}>
       <div className="user-panel" onClick={(e) => e.stopPropagation()}>
@@ -47,16 +68,16 @@ export default function UserDetailsPanel({ onClose, onEdit, onLogout }) {
 
           </div>
 
-          <h4 className="user-name">Epari Sadashiv Reddy</h4>
+          <h4 className="user-name">{name}</h4>
 
           <div className="info-row">
             <Image src={letterIcon} alt="Mail" width={18} height={18} />
-            <span>eparisadashiv.reddy@reseapro.com</span>
+            <span>{email}</span>
           </div>
 
           <div className="info-row">
             <Image src={phoneIcon} alt="Phone" width={18} height={18} />
-            <span>+91 - 9861513301</span>
+            <span>{phone}</span>
           </div>
 
           <div className="panel-buttons">
