@@ -1,0 +1,474 @@
+.re-wrap {
+	position: relative;
+}
+
+.re-toolbar {
+	display: flex;
+	gap: var(--spacing-sm);
+	flex-wrap: wrap;
+	margin-bottom: var(--spacing-sm);
+}
+
+.re-btn {
+	padding: 6px 10px;
+	border: 1px solid var(--Grey1);
+	background: var(--White);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	user-select: none;
+	font-size: var(--font-size-sm);
+	font-family: var(--font-family);
+	color: var(--Text1);
+}
+
+.re-btn:hover {
+	background: var(--Background);
+	border-color: var(--Grey3);
+}
+
+.re-btn--active,
+.re-btn--active:hover,
+.re-btn--active:focus-visible {
+	background: #d6dbe3;
+	border-color: #adb5c2;
+	color: #111827;
+}
+
+.re-btn:active {
+	background: #d6dbe3;
+	border-color: #adb5c2;
+	color: #111827;
+}
+
+.re-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.re-select {
+	padding: 6px 10px;
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-md);
+	background: var(--White);
+	font-size: var(--font-size-sm);
+	font-family: var(--font-family);
+	color: var(--Text1);
+	outline: none;
+	cursor: pointer;
+}
+
+.re-group {
+	display: inline-flex;
+	gap: var(--spacing-sm);
+	padding: 6px;
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-lg);
+	background: var(--TableHead);
+	align-items: center;
+}
+
+.re-editor {
+	min-height: 180px;
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-lg);
+	padding: 25px;
+	outline: none;
+	background: var(--White);
+	color: var(--Text1);
+	font-family: var(--font-family);
+	font-size: var(--font-size-base);
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.re-editor--disabled {
+	background: var(--Background);
+}
+
+.re-editor[contenteditable="true"]:empty::before {
+	content: attr(data-placeholder);
+	color: var(--Text2);
+}
+
+/* Link styling */
+.re-editor a {
+	color: #2563eb;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.re-editor a:hover {
+	color: #1d4ed8;
+	text-decoration: underline;
+	opacity: 1;
+}
+
+.re-editor a:visited {
+	color: #2563eb;
+}
+
+.re-modal-backdrop {
+	position: fixed;
+	top: var(--navbar-height);
+	right: 0;
+	bottom: 0;
+	left: var(--sidebar-width);
+	background: rgba(17, 24, 39, 0.28);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 200;
+	padding: 20px;
+}
+
+@media (max-width: 768px) {
+	.re-modal-backdrop {
+		left: 0;
+	}
+}
+
+.re-modal {
+	width: min(420px, 100%);
+	background: var(--White);
+	border: 1px solid var(--Grey1);
+	border-radius: 16px;
+	box-shadow: var(--shadow-lg);
+	overflow: hidden;
+}
+
+.re-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 18px;
+	border-bottom: 1px solid var(--Grey1);
+}
+
+.re-modal-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--Text1);
+}
+
+.re-modal-close {
+	border: none;
+	background: transparent;
+	font-size: 24px;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--Text2);
+}
+
+.re-modal-close:hover {
+	color: var(--Text1);
+}
+
+.re-modal-body {
+	padding: 18px;
+}
+
+.re-modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.re-modal-field__label {
+	font-size: var(--font-size-sm);
+	font-weight: 500;
+	color: var(--Text1);
+}
+
+.re-modal-field__input {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid var(--Grey1);
+	border-radius: 10px;
+	outline: none;
+	background: var(--White);
+	font-size: var(--font-size-sm);
+	font-family: var(--font-family);
+	color: var(--Text1);
+	box-sizing: border-box;
+}
+
+.re-modal-field__input:focus {
+	border-color: var(--Primary);
+}
+
+.re-modal-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	padding: 0 18px 18px;
+}
+
+.re-modal-btn {
+	padding: 8px 14px;
+	border-radius: 10px;
+	font-size: var(--font-size-sm);
+	font-family: var(--font-family);
+	cursor: pointer;
+	border: 1px solid var(--Grey1);
+	background: var(--White);
+	color: var(--Text1);
+}
+
+.re-modal-btn:hover {
+	background: var(--Background);
+	border-color: var(--Grey3);
+}
+
+.re-modal-btn--insert {
+	background: var(--Primary);
+	border-color: var(--Primary);
+	color: var(--TextLight);
+}
+
+.re-modal-btn--insert:hover {
+	background: var(--PrimaryPastel);
+	color: var(--Primary);
+}
+
+.re-link-pop {
+	z-index: 50;
+	background: var(--White);
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-lg);
+	padding: 10px;
+	box-shadow: var(--shadow-lg);
+	min-width: 280px;
+}
+
+.re-link-row {
+	display: flex;
+	gap: var(--spacing-sm);
+}
+
+.re-link-input {
+	flex: 1;
+	padding: 8px 10px;
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-md);
+	outline: none;
+	background: var(--White);
+	color: var(--Text1);
+	font-family: var(--font-family);
+	font-size: var(--font-size-sm);
+}
+
+.re-link-apply-btn {
+	padding: 8px 10px;
+	border-radius: var(--radius-md);
+	border: 1px solid var(--Primary);
+	background: var(--Primary);
+	color: var(--TextLight);
+	font-family: var(--font-family);
+	font-size: var(--font-size-sm);
+	cursor: pointer;
+}
+
+.re-link-apply-btn:hover {
+	background: var(--PrimaryPastel);
+	color: var(--Primary);
+}
+
+.re-link-actions {
+	display: flex;
+	gap: var(--spacing-sm);
+	margin-top: var(--spacing-sm);
+	justify-content: space-between;
+}
+
+.re-link-secondary-btn {
+	padding: 6px 10px;
+	border-radius: var(--radius-md);
+	border: 1px solid var(--Grey1);
+	background: var(--White);
+	font-family: var(--font-family);
+	font-size: var(--font-size-sm);
+	color: var(--Text1);
+	cursor: pointer;
+}
+
+.re-link-secondary-btn:hover {
+	background: var(--Background);
+	border-color: var(--Grey3);
+}
+
+/* Table Popup */
+.re-table-pop {
+	z-index: 50;
+	background: var(--White);
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-lg);
+	padding: 12px;
+	box-shadow: var(--shadow-lg);
+	min-width: 240px;
+}
+
+.re-table-inputs {
+	display: flex;
+	gap: var(--spacing-sm);
+	margin-bottom: var(--spacing-sm);
+}
+
+.re-table-input-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+}
+
+.re-table-label {
+	font-size: var(--font-size-sm);
+	color: var(--Text1);
+	font-weight: 500;
+}
+
+.re-table-input {
+	padding: 6px 8px;
+	border: 1px solid var(--Grey1);
+	border-radius: var(--radius-md);
+	outline: none;
+	background: var(--White);
+	color: var(--Text1);
+	font-family: var(--font-family);
+	font-size: var(--font-size-sm);
+}
+
+.re-table-input:focus {
+	border-color: var(--Primary);
+}
+
+.re-table-actions {
+	display: flex;
+	gap: var(--spacing-sm);
+	justify-content: space-between;
+}
+
+/* Footer and Word Counter */
+.re-footer {
+	display: flex;
+	justify-content: flex-end;
+	padding: 8px 12px;
+	border: 1px solid var(--Grey1);
+	border-top: none;
+	border-bottom-left-radius: var(--radius-lg);
+	border-bottom-right-radius: var(--radius-lg);
+	background: var(--Background);
+	font-size: var(--font-size-sm);
+	color: var(--Text2);
+}
+
+.re-word-count {
+	color: var(--Text2);
+	font-size: var(--font-size-sm);
+}
+
+/* Table styling */
+.re-editor table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 10px 0;
+	border: 1px solid #ccc;
+}
+
+.re-editor tbody tr {
+	border: 1px solid #ccc;
+}
+
+.re-editor tbody td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	min-width: 50px;
+	position: relative;
+}
+
+.re-editor tbody td:empty::before {
+	content: attr(data-placeholder);
+	color: var(--Text2);
+}
+
+.re-editor tbody td[contenteditable="true"]:focus {
+	outline: 2px solid var(--Primary);
+	outline-offset: -2px;
+}
+
+/* ================= cms-rich-editor skin ================= */
+/* Applied whenever className="cms-rich-editor" is set on <RichEditor>. */
+
+.cms-rich-editor {
+	border: 1px solid #d8d8d8;
+	border-radius: 10px;
+	overflow: hidden;
+	background: #fff;
+}
+
+.cms-rich-editor .re-toolbar {
+	margin: 0;
+	padding: 10px 12px;
+	border-bottom: 1px solid #e7e7e7;
+	background: #fdfdfd;
+	gap: 8px;
+}
+
+.cms-rich-editor .re-group {
+	border: 0;
+	padding: 0;
+	background: transparent;
+	gap: 4px;
+}
+
+.cms-rich-editor .re-btn {
+	border: 0;
+	background: transparent;
+	border-radius: 6px;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 4px;
+}
+
+.cms-rich-editor .re-btn:hover {
+	background: #e8edf3;
+	border: 0;
+}
+
+.cms-rich-editor .re-btn--active,
+.cms-rich-editor .re-btn--active:hover,
+.cms-rich-editor .re-btn--active:focus-visible {
+	background: #d6dbe3;
+	border: 0;
+	color: #111827;
+}
+
+.cms-rich-editor .re-btn:active {
+	background: #d6dbe3;
+	color: #111827;
+}
+
+.cms-rich-editor .re-select {
+	border: 0;
+	background: transparent;
+	padding: 0 4px;
+	height: 22px;
+	min-width: 36px;
+	font-size: 12px;
+}
+
+.cms-rich-editor .re-editor {
+	border: 0;
+	border-radius: 0;
+	min-height: 420px;
+	max-height: 520px;
+	overflow-y: auto;
+	padding: 14px 22px;
+}
+
+.cms-rich-editor .re-footer {
+	border: 0;
+	border-top: 1px solid #e7e7e7;
+	border-radius: 0;
+	background: #fdfdfd;
+	padding: 6px 12px;
+}

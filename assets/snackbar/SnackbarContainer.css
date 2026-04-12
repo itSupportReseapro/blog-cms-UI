@@ -1,0 +1,14 @@
+/* SnackbarContainer.css */
+.snackbar-container {
+  z-index: 1010;
+  background: none;
+  flex-direction: column;
+  gap: 6px;
+  width: 250px;
+  height: 120px;
+  display: flex;
+  position: fixed;
+  /* top: 90vh; */
+  bottom: 10vh;
+  left: 1%;
+}

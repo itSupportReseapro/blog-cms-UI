@@ -1,0 +1,43 @@
+.ut-root {
+  min-width: 0;
+}
+
+.ut-title {
+  margin-bottom: 12px;
+}
+
+.ut-toggleCell {
+  width: 64px;
+  text-align: center;
+}
+
+.ut-expandedRow .pdp-td {
+  background: var(--Background);
+}
+
+.ut-expandedTableWrap {
+  overflow: auto;
+}
+
+.ut-innerTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ut-innerTable th,
+.ut-innerTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--pdp-border);
+  text-align: left;
+  font-size: 13px;
+}
+
+.ut-emptyExpanded {
+  color: var(--pdp-text-muted);
+  font-size: 13px;
+}
+
+.ut-spanningTable .pdp-th,
+.ut-spanningTable .pdp-td {
+  white-space: normal;
+}

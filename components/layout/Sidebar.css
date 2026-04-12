@@ -1,0 +1,88 @@
+/* ================= Sidebar Container ================= */
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--surface-base);
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-strong);
+  height: calc(var(--cms-shell-height) - var(--navbar-height));
+  overflow: hidden;
+}
+
+/* ================= Nav ================= */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 12px 20px;
+  margin-top: 0;
+  overflow: auto;
+}
+
+/* ================= Default Item ================= */
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--Text1);
+  text-decoration: none;
+  font-weight: var(--font-weight-regular);
+  border: 1px solid transparent;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ================= Hover ================= */
+
+.sidebar-link:hover {
+  background: var(--PrimaryPastel);
+  color: var(--Primary);
+  border-color: rgba(4, 102, 200, 0.12);
+}
+
+/* ================= Active ================= */
+
+.sidebar-link.active {
+  background: var(--PrimaryPastel);
+  color: var(--Primary);
+  border-color: rgba(4, 102, 200, 0.18);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ================= Icon Styling ================= */
+
+.sidebar-link img,
+.sidebar-link svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: filter 0.2s ease;
+}
+
+/* 🔵 Hover Icon Color */
+.sidebar-link:hover img,
+.sidebar-link:hover svg {
+  filter: brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(1886%)
+    hue-rotate(195deg) brightness(94%) contrast(98%);
+}
+
+/* 🔵 Active Icon Color */
+.sidebar-link.active img,
+.sidebar-link.active svg {
+  filter: brightness(0) saturate(100%) invert(28%) sepia(94%) saturate(1886%)
+    hue-rotate(195deg) brightness(94%) contrast(98%);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}

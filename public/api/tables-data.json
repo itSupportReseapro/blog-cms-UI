@@ -1,0 +1,144 @@
+{
+  "blogPosts": {
+    "config": {
+      "tableId": "blog-posts",
+      "tableName": "Blog Posts",
+      "columns": [
+        { "id": "id", "label": "ID", "sortable": false },
+        { "id": "title", "label": "Blog Title", "sortable": true },
+        { "id": "author", "label": "Author", "sortable": true },
+        { "id": "lastUpdated", "label": "Last Updated", "sortable": true },
+        { "id": "status", "label": "Status", "sortable": false }
+      ],
+      "statusBadges": {
+        "Published": { "color": "#4CAF50", "bgColor": "#E8F5E9" },
+        "Draft": { "color": "#FF9800", "bgColor": "#FFF3E0" },
+        "Unpublished": { "color": "#2196F3", "bgColor": "#E3F2FD" },
+        "Created": { "color": "#9C27B0", "bgColor": "#F3E5F5" },
+        "Deleted": { "color": "#F44336", "bgColor": "#FFEBEE" }
+      },
+      "actions": [
+        {
+          "label": "Details",
+          "key": "details",
+          "condition": "always"
+        },
+        {
+          "label": "Edit",
+          "key": "edit",
+          "condition": "always"
+        },
+        {
+          "label": "Publish",
+          "key": "publish",
+          "condition": "status_not_published"
+        },
+        {
+          "label": "Unpublish",
+          "key": "unpublish",
+          "condition": "status_published"
+        },
+        {
+          "label": "Delete",
+          "key": "delete",
+          "condition": "always"
+        },
+        {
+          "label": "Rollback",
+          "key": "rollback",
+          "condition": "status_deleted"
+        }
+      ],
+      "pagination": {
+        "defaultPageSize": 10,
+        "pageOptions": [10, 25, 50]
+      }
+    },
+    "data": [
+      {
+        "id": 1,
+        "title": "How to scale editorial workflow",
+        "author": "Eleanor Whitmore",
+        "userId": "user-001",
+        "lastUpdated": "2026-02-20T10:00:00Z",
+        "status": "Published"
+      },
+      {
+        "id": 2,
+        "title": "Top CMS trends in 2026",
+        "author": "Eleanor Whitmore",
+        "userId": "user-001",
+        "lastUpdated": "2026-02-19T10:00:00Z",
+        "status": "Draft"
+      },
+      {
+        "id": 3,
+        "title": "SEO checklist for blog teams",
+        "author": "Eleanor Whitmore",
+        "userId": "user-001",
+        "lastUpdated": "2026-02-18T10:00:00Z",
+        "status": "Created"
+      },
+      {
+        "id": 4,
+        "title": "Content calendar planning guide",
+        "author": "Eleanor Whitmore",
+        "userId": "user-001",
+        "lastUpdated": "2026-02-16T10:00:00Z",
+        "status": "Published"
+      },
+      {
+        "id": 5,
+        "title": "User engagement strategies",
+        "author": "John Doe",
+        "userId": "user-002",
+        "lastUpdated": "2026-02-20T14:30:00Z",
+        "status": "Published"
+      },
+      {
+        "id": 6,
+        "title": "Marketing automation tips",
+        "author": "John Doe",
+        "userId": "user-002",
+        "lastUpdated": "2026-02-19T09:15:00Z",
+        "status": "Draft"
+      }
+    ]
+  },
+  "activityLog": {
+    "config": {
+      "tableId": "activity-log",
+      "tableName": "Activity Log",
+      "columns": [
+        { "id": "timestamp", "label": "Timestamp", "sortable": true },
+        { "id": "user", "label": "User", "sortable": true },
+        { "id": "action", "label": "Action", "sortable": true },
+        { "id": "resource", "label": "Resource", "sortable": true },
+        { "id": "resourceType", "label": "Type", "sortable": false },
+        { "id": "status", "label": "Status", "sortable": false }
+      ],
+      "statusBadges": {
+        "Success": { "color": "#4CAF50", "bgColor": "#E8F5E9" },
+        "Failed": { "color": "#F44336", "bgColor": "#FFEBEE" },
+        "Pending": { "color": "#FF9800", "bgColor": "#FFF3E0" }
+      },
+      "actions": [
+        {
+          "label": "Details",
+          "key": "details",
+          "condition": "always"
+        },
+        {
+          "label": "Undo",
+          "key": "undo",
+          "condition": "always"
+        }
+      ],
+      "pagination": {
+        "defaultPageSize": 10,
+        "pageOptions": [10, 25, 50, 100]
+      }
+    },
+    "data": []
+  }
+}

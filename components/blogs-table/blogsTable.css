@@ -1,0 +1,153 @@
+.blogs-table-wrapper {
+  padding: var(--cms-page-padding);
+  background: var(--Background);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-card {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
+  padding: var(--cms-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cms-section-gap);
+}
+
+.blogs-toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.blogs-createLink {
+  text-decoration: none;
+}
+
+.blogs-createBtn {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-weight: var(--font-weight-medium);
+}
+
+.blogs-statusFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--control-height-sm);
+  padding: 0 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface-base);
+}
+
+.blogs-statusFilterLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--Text2);
+}
+
+.blogs-statusFilter select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--Text1);
+  padding-right: 12px;
+  cursor: pointer;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrapper {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+tbody tr {
+  border-bottom: 1px dashed var(--Grey3);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+.sortable-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.sortable-head img {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.sortable-head:hover img {
+  opacity: 1;
+}
+
+/* ================= STATUS BADGES ================= */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+  text-transform: capitalize;
+}
+
+.status-pill.published {
+  background: var(--GreenPastel);
+  color: var(--Green);
+}
+
+.status-pill.unpublished {
+  background: var(--YellowPastel);
+  color: var(--Yellow);
+}
+
+.status-pill.deleted {
+  background: var(--RedPastel);
+  color: var(--Red);
+}
+
+.status-pill.draft {
+  background: var(--OrangePastel);
+  color: var(--Orange);
+}
+
+.status-pill.created {
+  background: var(--PrimaryPastel);
+  color: var(--Primary);
+}
+
+@media (max-width: 768px) {
+  .blogs-toolbarLeft {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .blogs-statusFilter {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

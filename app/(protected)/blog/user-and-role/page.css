@@ -1,0 +1,157 @@
+.cms-dashboard{
+  padding: var(--cms-page-padding);
+  background: var(--Background);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-card{
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
+  padding: var(--cms-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cms-section-gap);
+}
+
+.user-cell{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.user-avatar{
+  border-radius:50%;
+  object-fit:cover;
+}
+
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:72px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:var(--font-weight-semibold);
+  text-transform:capitalize;
+  background:var(--surface-soft);
+  color:var(--Text1);
+}
+
+.role-badge-admin{
+  background:var(--RedPastel);
+  color:var(--Red);
+}
+
+.role-badge-editor{
+  background:var(--PrimaryPastel);
+  color:var(--Primary);
+}
+
+.role-badge-user{
+  background:var(--GreenPastel);
+  color:var(--Green);
+}
+
+.sortable-head{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+}
+
+.top-controls{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  width:100%;
+}
+
+.right-controls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.search-wrapper{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:260px;
+  height:var(--control-height-sm);
+  background:var(--surface-base);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  padding:0 12px;
+}
+
+.search-input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:14px;
+  background:transparent;
+}
+
+.icon-btn{
+  width:40px;
+  height:var(--control-height-sm);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  background:var(--surface-base);
+  cursor:pointer;
+}
+
+.table-wrapper{
+  width:100%;
+  margin-top:0;
+  border-radius:16px;
+  overflow:hidden;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 992px){
+  .search-wrapper{
+    width:260px;
+  }
+}
+
+@media (max-width: 768px){
+  .main-card{
+    padding:16px;
+  }
+
+  .right-controls{
+    width:100%;
+  }
+
+  .search-wrapper{
+    width:100%;
+  }
+}
+
+@media (max-width: 640px){
+  .top-controls{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .icon-btn{
+    flex:0 0 40px;
+  }
+}

@@ -1,0 +1,245 @@
+.about-page {
+  padding: var(--cms-page-padding);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.about-card {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--surface-base);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.about-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.about-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.about-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.about-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 10px 20px 0;
+  background: linear-gradient(180deg, rgba(4, 102, 200, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.about-tab {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--Text1);
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  border-radius: 12px 12px 0 0;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.about-tab:hover {
+  background: var(--PrimaryPastel);
+}
+
+.about-tab.active {
+  border-bottom-color: var(--Primary);
+  color: var(--Primary);
+}
+
+.about-tab-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px;
+}
+
+.about-tab-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.about-tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.about-tab-content::-webkit-scrollbar-thumb {
+  background: var(--Grey2);
+  border-radius: 12px;
+}
+
+.about-content {
+  width: 100%;
+}
+
+.about-stack-gap {
+  display: grid;
+  gap: 22px;
+}
+
+.about-two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.about-three-col {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.about-input,
+.about-textarea {
+  width: 100%;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--surface-base);
+  color: var(--Text1);
+  font-size: var(--font-size-sm);
+  padding: 14px 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-input {
+  min-height: 56px;
+}
+
+.about-textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.about-textarea-short {
+  min-height: 136px;
+}
+
+.about-input:focus,
+.about-textarea:focus {
+  outline: none;
+  border-color: var(--Primary);
+  box-shadow: var(--focus-ring);
+}
+
+.about-upload-block {
+  display: grid;
+  gap: 8px;
+}
+
+.about-upload-input-wrap {
+  position: relative;
+}
+
+.about-upload-trigger {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--Text2);
+  cursor: pointer;
+}
+
+.about-upload-trigger:hover {
+  background: var(--Background);
+}
+
+.about-upload-trigger svg {
+  width: 18px;
+  height: 18px;
+}
+
+.about-hidden-file {
+  display: none;
+}
+
+.about-upload-note {
+  margin: 0;
+  color: var(--Text2);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.about-editor-wrap > div {
+  width: 100%;
+}
+
+.about-subsection-card {
+  display: grid;
+  gap: 18px;
+  border-bottom: 1px solid var(--Grey1);
+  padding-bottom: 22px;
+}
+
+.about-subsection-card h4,
+.about-value-item h4 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--Primary);
+  font-weight: 600;
+}
+
+.about-value-item {
+  display: grid;
+  gap: 14px;
+  border-top: 1px solid var(--Grey1);
+  padding-top: 18px;
+}
+
+@media (max-width: 1024px) {
+  .about-two-col,
+  .about-three-col {
+    grid-template-columns: 1fr;
+  }
+
+  .about-tab-content {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .about-actions {
+    width: 100%;
+  }
+
+  .about-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
