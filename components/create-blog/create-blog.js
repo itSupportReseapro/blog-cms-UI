@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import PdpButton from "@/assets/buttons/button";
 import CmsTimeline from "@/components/timeline/timeline";
 import "./create-blog.css";
-import { defaultDoc, htmlToDoc } from "@/components/pdp-rich-editor";
+import { defaultDoc, htmlToDoc } from "@/components/pdp-rich-editor-2";
 import {
   createBlogDropdownOption,
   fetchBlogDropdownOptions,
@@ -499,6 +499,8 @@ export default function CreateBlog({ blogId = null }) {
           )}
         </div>
 
+        <CmsTimeline currentStep={step} />
+
         <div className="right-section">
 
           {step === 2 && (
@@ -535,10 +537,6 @@ export default function CreateBlog({ blogId = null }) {
 
         </div>
       </div>
-
-
-      <CmsTimeline currentStep={step} />
-
 
       {/* STEP 1 */}
 

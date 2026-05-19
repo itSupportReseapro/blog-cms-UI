@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
+  scrollbar-gutter: stable;
 }
 
 /* TOP HEADER */
@@ -19,7 +20,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 
 .left-section {
@@ -53,7 +54,7 @@
 /* STEP */
 
 .step-one {
-  margin-top: 25px;
+  margin-top: 10px;
   min-height: 0;
   padding-bottom: 40px;
 }
@@ -87,7 +88,7 @@
 .create-blog-wrapper .pdp-textbox-label {
   left: 12px;
   top: 50%;
-  color: #7b7b7b;
+  color: var(--GreyDark);
   font-size: var(--font-size-sm);
   background: var(--White);
   padding: 0 6px;
@@ -103,8 +104,8 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #777 50%),
-    linear-gradient(135deg, #777 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, var(--GreyDark) 50%),
+    linear-gradient(135deg, var(--GreyDark) 50%, transparent 50%);
   background-position: calc(100% - 18px) calc(50% - 2px),
     calc(100% - 12px) calc(50% - 2px);
   background-size: 6px 6px, 6px 6px;
@@ -112,8 +113,8 @@
 }
 
 .create-blog-wrapper .pdp-textbox-dropdown:disabled {
-  background-color: #f7f8fa;
-  color: #9ca3af;
+  background-color: var(--Background);
+  color: var(--GreyMedium);
   cursor: not-allowed;
 }
 
@@ -141,7 +142,7 @@
 /* SECTION */
 
 .section {
-  margin-top: 35px;
+  margin-top: 10px;
 }
 
 .step-one .section:last-of-type {
@@ -189,10 +190,6 @@
 
 .rich-editor {
   border-radius: 12px;
-}
-
-.cms-rich-editor {
-  margin-bottom: 36px;
 }
 
 .ql-container {

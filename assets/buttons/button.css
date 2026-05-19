@@ -3,7 +3,8 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: var(--control-height-sm);
+  height: var(--control-height-sm);
+  min-width: 100px;
   border: 1px solid transparent;
   border-radius: 12px;
   cursor: pointer;
@@ -13,7 +14,8 @@
   padding: 0 18px;
   font-size: var(--font-size-sm);
   white-space: nowrap;
-  line-height: 1;
+  line-height: 1.2;
+  flex-shrink: 0;
 }
 
 /* ===== FULL WIDTH ===== */
@@ -34,23 +36,26 @@
   height: 36px;
   font-size: var(--font-size-sm);
   padding: 0 14px;
+  min-width: 80px;
 }
 
 .pdp-btn-md {
   height: var(--control-height-sm);
+  min-width: 100px;
 }
 
 .pdp-btn-lg {
   height: var(--control-height-md);
   font-size: var(--font-size-base);
   padding: 0 24px;
+  min-width: 120px;
 }
 
 /* ================= RADIUS ================= */
 
-.pdp-btn-radius-sm {
+/* .pdp-btn-radius-sm {
   border-radius: var(--radius-sm);
-}
+} */
 
 .pdp-btn-radius-md {
   border-radius: var(--radius-lg);
@@ -138,6 +143,7 @@
 .pdp-btn-icon {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .pdp-btn-icon img {
@@ -148,4 +154,7 @@
 .pdp-btn-text {
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

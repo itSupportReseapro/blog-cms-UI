@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RichEditor, defaultDoc } from "@/components/pdp-rich-editor";
+import { RichEditor, defaultDoc } from "@/components/pdp-rich-editor-2";
 import Button from "@/assets/buttons/button";
 import useTermAndCondition from "@/hooks/term-and-condition/use-term-and-condition";
 import "./term-and-condition.css";

@@ -3,7 +3,7 @@
 import "./BlogDetailsModal.css";
 import Image from "next/image";
 import CrossIcon from "@/assets/Images/icon/cross-icon.svg";
-import { docToPlainText, htmlToDoc } from "@/components/pdp-rich-editor";
+import { docToPlainText, htmlToDoc } from "@/components/pdp-rich-editor-2";
 
 function getPlainTextFromHtml(value) {
   if (!value) {

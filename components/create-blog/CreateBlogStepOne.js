@@ -105,6 +105,8 @@ export default function CreateBlogStepOne({
             placeholder="Select country"
             options={dropdownState.country.options}
             loading={dropdownState.country.loading}
+            direction="up"
+            showSearch={true}
             onOpen={() => loadDropdown(DROPDOWN_FIELDS.country)}
             onSelect={(option) => handleChange({ target: { name: "country", value: option.value } })}
           />
@@ -116,6 +118,8 @@ export default function CreateBlogStepOne({
             options={dropdownState.state.options}
             loading={dropdownState.state.loading}
             disabled={!formData.country}
+            direction="up"
+            showSearch={true}
             onOpen={() => loadDropdown(DROPDOWN_FIELDS.state)}
             onSelect={(option) => handleChange({ target: { name: "state", value: option.value } })}
             onAdd={(label) => addDropdownOption(DROPDOWN_FIELDS.state, label)}
@@ -128,6 +132,8 @@ export default function CreateBlogStepOne({
             options={dropdownState.district.options}
             loading={dropdownState.district.loading}
             disabled={!formData.state}
+            direction="up"
+            showSearch={true}
             onOpen={() => loadDropdown(DROPDOWN_FIELDS.district)}
             onSelect={(option) => handleChange({ target: { name: "district", value: option.value } })}
             onAdd={(label) => addDropdownOption(DROPDOWN_FIELDS.district, label)}
@@ -140,6 +146,8 @@ export default function CreateBlogStepOne({
             options={dropdownState.city.options}
             loading={dropdownState.city.loading}
             disabled={!formData.district}
+            direction="up"
+            showSearch={true}
             onOpen={() => loadDropdown(DROPDOWN_FIELDS.city)}
             onSelect={(option) => handleChange({ target: { name: "city", value: option.value } })}
             onAdd={(label) => addDropdownOption(DROPDOWN_FIELDS.city, label)}

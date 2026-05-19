@@ -23,13 +23,13 @@
 /* ───────────────────────── */
 
 .snackbar-success {
-  background: #dff2e3;
-  border-color: #a1e5b1;
+  background: var(--GreenPastel);
+  border-color: var(--Green);
 }
 
 .snackbar-error {
-  background: #fae1e3;
-  border-color: #e1b9bd;
+  background: var(--RedPastel);
+  border-color: var(--Red);
 }
 
 /* ───────────────────────── */
@@ -54,13 +54,13 @@
   height: 28px;
 }
 .snackbar-icon-box.success {
-  border-color: #28a745;
-  color: #28a745;
+  border-color: var(--Green);
+  color: var(--Green);
 }
 
 .snackbar-icon-box.error {
-  border-color: #dc3545;
-  color: #dc3545;
+  border-color: var(--Red);
+  color: var(--Red);
 }
 
 /* ───────────────────────── */
@@ -80,12 +80,12 @@
 /* CONTENT COLOR BY TYPE */
 .snackbar-success .snackbar-title,
 .snackbar-success .snackbar-message {
-  color: #28a745;
+  color: var(--Green);
 }
 
 .snackbar-error .snackbar-title,
 .snackbar-error .snackbar-message {
-  color: #dc3545;
+  color: var(--Red);
 }
 
 .snackbar-title {

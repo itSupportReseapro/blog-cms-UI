@@ -2,14 +2,23 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { logoutUser } from "@/services/auth.service";
 
 export default function BlogHeader() {
   const router = useRouter();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    router.replace("/login");
+  const handleLogout = async () => {
+    try {
+      // Call logout API
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      // Clear local session regardless of API response
+      logout();
+      router.replace("/login");
+    }
   };
 
   return (

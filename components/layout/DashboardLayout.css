@@ -18,7 +18,7 @@
   flex: 1;
   overflow: hidden;
   padding: var(--spacing-lg);
-  background: linear-gradient(180deg, rgba(4, 102, 200, 0.04) 0%, rgba(245, 247, 250, 0) 120px);
+  background: var(--gradient-primary-soft);
 }
 
 /* Responsive Design */

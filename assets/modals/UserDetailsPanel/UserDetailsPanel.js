@@ -3,6 +3,7 @@
 import "./UserDetailsPanel.css";
 import Image from "next/image";
 import PdpButton from "@/assets/buttons/button";
+import { resolveUploadUrl } from "@/services/cms.service";
 
 import letterIcon from "@/assets/Images/icon/Letter.svg";
 import phoneIcon from "@/assets/Images/icon/Phone Calling.svg";
@@ -27,7 +28,7 @@ function getUserField(user, keys, fallback = "") {
   return fallback;
 }
 
-export default function UserDetailsPanel({ user, onClose, onEdit, onLogout }) {
+export default function UserDetailsPanel({ user, onClose, onEdit, onLogout, onResetPassword }) {
   const firstName = getUserField(user, ["first_name", "firstName"]);
   const lastName = getUserField(user, ["last_name", "lastName"]);
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
@@ -36,6 +37,7 @@ export default function UserDetailsPanel({ user, onClose, onEdit, onLogout }) {
     getUserField(user, ["name", "full_name", "fullName", "username", "user_name"], "User");
   const email = getUserField(user, ["email"], "Not available");
   const phone = getUserField(user, ["phone", "phone_no", "mobile", "mobile_no"], "Not available");
+  const avatarUrl = resolveUploadUrl(user?.user_photo || user?.profilePicture || user?.avatar || user?.image || "");
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -53,12 +55,20 @@ export default function UserDetailsPanel({ user, onClose, onEdit, onLogout }) {
 
             {/* BIG avatar */}
             <div className="avatar-circle">
-              <Image
-                src={profileAvatar}
-                alt="Avatar"
-                width={70}
-                height={70}
-              />
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Avatar"
+                  className="avatar-uploaded-img"
+                />
+              ) : (
+                <Image
+                  src={profileAvatar}
+                  alt="Avatar"
+                  width={70}
+                  height={70}
+                />
+              )}
             </div>
 
             {/* SMALL edit icon */}
@@ -82,7 +92,13 @@ export default function UserDetailsPanel({ user, onClose, onEdit, onLogout }) {
 
           <div className="panel-buttons">
 
-            <PdpButton className="panel-button" variant="outline" icon={keyIcon} iconPosition="left">
+            <PdpButton
+              className="panel-button"
+              variant="outline"
+              icon={keyIcon}
+              iconPosition="left"
+              onClick={onResetPassword}
+            >
               Reset Password
             </PdpButton>
 

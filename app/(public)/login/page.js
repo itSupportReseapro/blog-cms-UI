@@ -16,6 +16,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Removed appId and appKey state
   const [remember, setRemember] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
@@ -134,6 +135,8 @@ export default function LoginPage() {
             autoComplete="new-password"
             onFocus={() => setPasswordFocused(true)}
           />
+
+          {/* Removed App ID and App Key fields */}
 
           <div className="CheckNforgetBox">
             <div className="check">

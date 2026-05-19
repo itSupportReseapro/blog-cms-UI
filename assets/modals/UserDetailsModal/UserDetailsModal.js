@@ -3,6 +3,7 @@
 import "./UserDetailsModal.css";
 import Image from "next/image";
 import CrossIcon from "@/assets/Images/icon/cross-icon.svg";
+import { resolveUploadUrl } from "@/services/cms.service";
 
 function formatValue(value) {
   if (value === null || value === undefined || value === "") {
@@ -32,12 +33,14 @@ function normalizeRole(role) {
 export default function UserDetailsModal({ user, onClose }) {
   if (!user) return null;
 
-  const profileUrl =
+  const profileUrl = resolveUploadUrl(
+    user.user_photo ||
     user.profilePicture ||
     user.profile ||
     user.avatar ||
     user.image ||
-    "";
+    ""
+  );
   const fileName = profileUrl ? profileUrl.split("/").pop() : "-";
   const roleTone = normalizeRole(user.role);
   const userFields = [

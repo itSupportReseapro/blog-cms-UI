@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { defaultDoc, docToHTML, htmlToDoc } from "@/components/pdp-rich-editor";
+import { defaultDoc, docToHTML, htmlToDoc } from "@/components/pdp-rich-editor-2";
 import {
   CMS_DEFAULTS,
   CMS_RESOURCE_IDS,

@@ -35,5 +35,5 @@ export {
   listCategories,
   listSubCategories,
 } from "./lookup";
-export { uploadCmsAsset } from "./upload";
+export { resolveUploadUrl, uploadCmsAsset } from "./upload";
 export { fetchBlogDropdownOptions, createBlogDropdownOption } from "./dropdown";

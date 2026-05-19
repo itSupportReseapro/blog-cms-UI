@@ -65,7 +65,7 @@
   width:180px;
   height:180px;
   border-radius:50%;
-  border:4px solid #E1E1E1;
+  border:4px solid var(--Grey1);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -79,7 +79,7 @@
   height:160px;
   border-radius:50%;
   overflow:hidden;
-  background:#BFD0E2;
+  background: var(--AvatarBg);
 }
 
 .profile-avatar{
@@ -97,6 +97,53 @@
   transform:translateX(-50%);
   cursor:pointer;
 }
+
+/* FORM GRID */
+
+.form-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+  padding: 24px 32px 32px 32px;
+}
+
+/* PASSWORD ROW */
+
+.password-row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.password-row > *:first-child{
+  flex: 1;
+  min-width: 0;
+}
+
+/* GENERATE PASSWORD BUTTON */
+
+.generate-pwd-btn{
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  background: var(--Primary, #1a6fdb);
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.generate-pwd-btn:hover{
+  background: var(--PrimaryHover, #1558b5);
+}
+
+.generate-pwd-btn img{
+  filter: brightness(0) invert(1);
+}
+
 
 .avatar-edit input{
   display:none;

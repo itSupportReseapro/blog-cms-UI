@@ -2,8 +2,8 @@
 
 .tooltip-container {
     position: absolute;
-    background-color: #555;
-    color: #fff;
+    background-color: var(--TooltipBg);
+    color: var(--White);
     padding: 6px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -23,7 +23,7 @@
     left: 50%;
     transform: translateX(-50%);
     border-width: 5px 5px 0 5px;
-    border-color: #555 transparent transparent transparent;
+    border-color: var(--TooltipBg) transparent transparent transparent;
 }
 
 .tooltip-arrow-bottom {
@@ -31,7 +31,7 @@
     left: 50%;
     transform: translateX(-50%);
     border-width: 0 5px 5px 5px;
-    border-color: transparent transparent #555 transparent;
+    border-color: transparent transparent var(--TooltipBg) transparent;
 }
 
 .tooltip-arrow-left {
@@ -39,7 +39,7 @@
     right: -5px;
     transform: translateY(-50%);
     border-width: 5px 0 5px 5px;
-    border-color: transparent transparent transparent #555;
+    border-color: transparent transparent transparent var(--TooltipBg);
 }
 
 .tooltip-arrow-right {
@@ -47,7 +47,7 @@
     left: -5px;
     transform: translateY(-50%);
     border-width: 5px 5px 5px 0;
-    border-color: transparent #555 transparent transparent;
+    border-color: transparent var(--TooltipBg) transparent transparent;
 }
 
 

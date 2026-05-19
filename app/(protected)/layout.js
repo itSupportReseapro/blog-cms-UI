@@ -11,8 +11,15 @@ export default function ProtectedLayout({ children }) {
 
   useEffect(() => {
     if (loading) return;
+    
     if (!isAuthenticated) {
-      router.replace("/login");
+      // Only redirect if we have no refresh token (completely logged out)
+      const refreshToken = typeof window !== "undefined" ? sessionStorage.getItem("refreshToken") : null;
+      
+      if (!refreshToken) {
+        router.replace("/login");
+      }
+      // If we have a refresh token, don't redirect - let the interceptor handle the refresh
     }
   }, [isAuthenticated, loading, router]);
 

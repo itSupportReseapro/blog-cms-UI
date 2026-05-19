@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import PdpButton from "@/assets/buttons/button";
-import { RichEditor } from "@/components/pdp-rich-editor";
+import { RichEditor } from "@/components/pdp-rich-editor-2";
 import useAboutUs, { createInitialAboutUsState } from "@/hooks/about-us/use-about-us";
 import { uploadCmsAsset } from "@/services/cms.service";
 import "./page.css";

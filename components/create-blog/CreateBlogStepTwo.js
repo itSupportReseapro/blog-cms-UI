@@ -1,4 +1,4 @@
-import { RichEditor } from "@/components/pdp-rich-editor";
+import { RichEditor } from "@/components/pdp-rich-editor-2";
 
 export default function CreateBlogStepTwo({ contentDoc, onDocChange, onHtmlChange }) {
   return (

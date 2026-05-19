@@ -19,10 +19,39 @@
   --TextLight: #FFFFFF;
   
   /* Neutral/Grey Scale */
+  --Grey0: #FAFAFA;
   --Grey1: #E1E1E1;
   --Grey2: #E6E6E6;
   --Grey3: #CDCDCD;
+  --Grey4: #D8D8D8;
+  --GreyDark: #7B7B7B;
+  --GreyMedium: #9CA3AF;
+  --GreyLight: #E7E7E7;
   --White: #FFFFFF;
+  --OffWhite: #FDFDFD;
+  
+  /* Text Colors - Extended */
+  --TextDark: #232323;
+  --TextVeryDark: #111827;
+  
+  /* Link Colors */
+  --LinkPrimary: #2563EB;
+  --LinkDark: #1D4ED8;
+  
+  /* UI Greys - Blue-tinted */
+  --GreyBlueSoft: #D6DBE3;
+  --GreyBlueMedium: #ADB5C2;
+  
+  /* Table-specific colors */
+  --TableBlueLightest: #F8FBFF;
+  --TableBlueLight: #F8FAFF;
+  --TableBlueMedium: #DBE5F2;
+  --TableBlueDark: #CDDDEA;
+  --TableBlueVeryLight: #EEFBFB;
+  --TableMarkBg: #FAFCFF;
+  --TableMarkBorder: #E5E4F8;
+  --AvatarBg: #BFD0E2;
+  --TooltipBg: #555555;
   
   /* UI Backgrounds */
   --Background: #F5F7FA;
@@ -70,6 +99,9 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.15);
+
+  /* Gradients */
+  --gradient-primary-soft: linear-gradient(180deg, rgba(4, 102, 200, 0.04) 0%, rgba(245, 247, 250, 0) 120px);
 
   /* Layout + Modal System */
   --navbar-height: 100px;

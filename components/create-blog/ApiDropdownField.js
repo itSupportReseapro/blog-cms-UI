@@ -11,6 +11,8 @@ export default function ApiDropdownField({
   loading = false,
   disabled = false,
   addFields = [],
+  direction = "down",
+  showSearch = false,
   onOpen,
   onSelect,
   onAdd,
@@ -92,7 +94,7 @@ export default function ApiDropdownField({
   };
 
   return (
-    <div className="api-dropdown-field" ref={rootRef}>
+    <div className={`api-dropdown-field ${direction === "up" ? "up" : ""}`} ref={rootRef}>
       <button
         type="button"
         className={`api-dropdown-trigger ${isOpen ? "open" : ""}`}
@@ -108,7 +110,7 @@ export default function ApiDropdownField({
 
       {isOpen && !disabled && (
         <div className="api-dropdown-panel">
-          {canShowAdd && (
+          {(canShowAdd || showSearch) && (
             <div className="api-dropdown-input-row">
               {addFields.length > 0 ? (
                 addFields.map((field) => (
@@ -129,18 +131,20 @@ export default function ApiDropdownField({
                 <input
                   type="text"
                   value={query}
-                  placeholder="Enter to add"
+                  placeholder={canShowAdd ? "Search or add..." : "Search..."}
                   onChange={(e) => setQuery(e.target.value)}
                 />
               )}
-              <button
-                type="button"
-                className="api-dropdown-add-btn"
-                onClick={handleAdd}
-                disabled={!canAdd}
-              >
-                Add
-              </button>
+              {canShowAdd && (
+                <button
+                  type="button"
+                  className="api-dropdown-add-btn"
+                  onClick={handleAdd}
+                  disabled={!canAdd}
+                >
+                  Add
+                </button>
+              )}
             </div>
           )}
 

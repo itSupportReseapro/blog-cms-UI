@@ -300,9 +300,16 @@ const PdpTextbox1 = ({
       {maskText && type !== "date" && (
         <span
           className="toggle-visibility"
-          onMouseDown={() => setShowText(true)}
-          onMouseUp={() => setShowText(false)}
-          onMouseLeave={() => setShowText(false)}
+          role="button"
+          tabIndex={0}
+          aria-label={showText ? "Hide password" : "Show password"}
+          onClick={toggleShowText}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              toggleShowText();
+            }
+          }}
         >
           {showText ? (
             <Image src={EyeOpenicon} alt="eyeopen" />

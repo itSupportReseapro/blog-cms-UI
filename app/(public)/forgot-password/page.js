@@ -10,6 +10,7 @@ export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,24 +27,45 @@ export default function ForgotPasswordPage() {
 
     try {
       setSubmitting(true);
+      // Centralized Auth System sends password reset link via email
       const result = await sendForgotPasswordEmail(email);
 
       if (result?.error) {
-        window.addSnackbar?.(result.message || "Failed to send OTP", "error");
+        window.addSnackbar?.(result.message || "Failed to send password reset link", "error");
         return;
       }
 
-      window.addSnackbar?.("OTP sent. Check your email.", "success");
-      router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+      window.addSnackbar?.("Password reset instructions sent to your email.", "success");
+      setSent(true);
+      
+      // Optional: Redirect back to login after a delay
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (sent) {
+    return (
+      <main style={{ maxWidth: 420, margin: "56px auto", padding: "24px" }}>
+        <h1>Check Your Email</h1>
+        <p>
+          We've sent a password reset link to <strong>{email}</strong>. 
+          Please check your email and click the link to reset your password.
+        </p>
+        <p style={{ marginTop: "16px", fontSize: "12px", color: "#666" }}>
+          You'll be redirected to login in a few seconds...
+        </p>
+      </main>
+    );
+  }
+
   return (
     <main style={{ maxWidth: 420, margin: "56px auto", padding: "24px" }}>
       <h1>Forgot Password</h1>
-      <p>Enter your email to receive a verification code.</p>
+      <p>Enter your email to receive a password reset link.</p>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: "12px", marginTop: "16px" }}>
         <PdpTextbox1
@@ -56,7 +78,7 @@ export default function ForgotPasswordPage() {
         />
 
         <PdpButton type="submit" variant="primary" fullWidth disabled={submitting}>
-          {submitting ? "Sending..." : "Send OTP"}
+          {submitting ? "Sending..." : "Send Reset Link"}
         </PdpButton>
       </form>
     </main>

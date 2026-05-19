@@ -120,6 +120,8 @@
   transition: transform 80ms ease, background 120ms ease, border-color 120ms ease;
   font-size: 13px;
   line-height: 1;
+  min-width: 120px;
+  white-space: nowrap;
 }
 
 .pdp-toolbarIconBtn {
@@ -384,7 +386,7 @@
   font-size: 11px;
   border: 1px solid var(--pdp-border);
   color: var(--pdp-text-muted);
-  background: #fff;
+  background: var(--White);
 }
 
 .pdp-hasSort {
@@ -461,6 +463,14 @@
   left: 0;
   right: auto;
   z-index: 3000;
+  min-width: 160px;
+  max-width: 200px;
+  background: var(--White);
+  border: 1px solid var(--Grey3);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  pointer-events: auto;
 }
 
 .pdp-actionsCell {
@@ -708,7 +718,7 @@
   max-height: 280px;
   overflow: auto;
   scrollbar-width: thin;
-  scrollbar-color: #dbe5f2 #f8fbff;
+  scrollbar-color: var(--TableBlueMedium) var(--TableBlueLightest);
 }
 
 .pdp-columnManagerList::-webkit-scrollbar {
@@ -717,18 +727,18 @@
 }
 
 .pdp-columnManagerList::-webkit-scrollbar-track {
-  background: #f8fbff;
+  background: var(--TableBlueLightest);
   border-radius: 999px;
 }
 
 .pdp-columnManagerList::-webkit-scrollbar-thumb {
-  background: #dbe5f2;
+  background: var(--TableBlueMedium);
   border-radius: 999px;
-  border: 2px solid #f8fbff;
+  border: 2px solid var(--TableBlueLightest);
 }
 
 .pdp-columnManagerList::-webkit-scrollbar-thumb:hover {
-  background: #cdd9ea;
+  background: var(--TableBlueDark);
 }
 
 .pdp-checkboxRow {
@@ -996,8 +1006,8 @@
   place-items: center;
   gap: 8px;
   text-align: center;
-  background: #fafcff;
-  border: 1px dashed #e5edf8;
+  background: var(--TableMarkBg);
+  border: 1px dashed var(--TableMarkBorder);
   border-radius: 12px;
 }
 
@@ -1030,7 +1040,7 @@
   display: inline-block;
   height: 12px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #f8faff 25%, #eef3fb 37%, #f8faff 63%);
+  background: linear-gradient(90deg, var(--TableBlueLight) 25%, var(--TableBlueVeryLight) 37%, var(--TableBlueLight) 63%);
   background-size: 400px 100%;
   animation: shimmer 1.2s ease-in-out infinite;
 }
@@ -1040,7 +1050,7 @@
   height: 14px;
   border-radius: 999px;
   display: inline-block;
-  background: linear-gradient(90deg, #f8faff 25%, #eef3fb 37%, #f8faff 63%);
+  background: linear-gradient(90deg, var(--TableBlueLight) 25%, var(--TableBlueVeryLight) 37%, var(--TableBlueLight) 63%);
   background-size: 400px 100%;
   animation: shimmer 1.2s ease-in-out infinite;
 }
@@ -1050,7 +1060,7 @@
   height: 34px;
   border-radius: 10px;
   display: inline-block;
-  background: linear-gradient(90deg, #f8faff 25%, #eef3fb 37%, #f8faff 63%);
+  background: linear-gradient(90deg, var(--TableBlueLight) 25%, var(--TableBlueVeryLight) 37%, var(--TableBlueLight) 63%);
   background-size: 400px 100%;
   animation: shimmer 1.2s ease-in-out infinite;
 }
@@ -1312,7 +1322,7 @@
   overflow: auto;
   color: var(--Text1);
   scrollbar-width: thin;
-  scrollbar-color: #dbe5f2 #f8fbff;
+  scrollbar-color: var(--TableBlueMedium) var(--TableBlueLightest);
 }
 
 .pdp-sidebarBody::-webkit-scrollbar {
@@ -1321,18 +1331,18 @@
 }
 
 .pdp-sidebarBody::-webkit-scrollbar-track {
-  background: #f8fbff;
+  background: var(--TableBlueLightest);
   border-radius: 999px;
 }
 
 .pdp-sidebarBody::-webkit-scrollbar-thumb {
-  background: #dbe5f2;
+  background: var(--TableBlueMedium);
   border-radius: 999px;
-  border: 2px solid #f8fbff;
+  border: 2px solid var(--TableBlueLightest);
 }
 
 .pdp-sidebarBody::-webkit-scrollbar-thumb:hover {
-  background: #cdd9ea;
+  background: var(--TableBlueDark);
 }
 
 .pdp-sidebarSection {

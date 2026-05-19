@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PdpTextbox1 from "@/assets/textbox/PdpTextbox1";
 import PdpButton from "@/assets/buttons/button";
-import { verifyOtp } from "@/services/auth.service";
+import { verifyOtp, sendForgotPasswordEmail } from "@/services/auth.service";
 
 function VerifyOtpForm() {
   const router = useRouter();
@@ -12,6 +12,7 @@ function VerifyOtpForm() {
   const email = searchParams.get("email") || "";
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,6 +44,29 @@ function VerifyOtpForm() {
     }
   };
 
+  const handleResendOtp = async () => {
+    if (!email) {
+      window.addSnackbar?.("Email is missing. Restart forgot password flow.", "error");
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      const result = await sendForgotPasswordEmail(email);
+
+      if (result?.error) {
+        window.addSnackbar?.(result.message || "Failed to send OTP", "error");
+        return;
+      }
+
+      window.addSnackbar?.("OTP sent. Check your email.", "success");
+    } catch (error) {
+      window.addSnackbar?.("Failed to resend OTP", "error");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   return (
     <main style={{ maxWidth: 420, margin: "56px auto", padding: "24px" }}>
       <h1>Verify OTP</h1>
@@ -58,9 +82,21 @@ function VerifyOtpForm() {
           onChange={(event) => setOtp(event.target.value)}
         />
 
-        <PdpButton type="submit" variant="primary" fullWidth disabled={submitting}>
-          {submitting ? "Verifying..." : "Verify OTP"}
-        </PdpButton>
+        <div style={{ display: "flex", gap: "12px", flexDirection: "column" }}>
+          <PdpButton type="submit" variant="primary" fullWidth disabled={submitting || isResending}>
+            {submitting ? "Verifying..." : "Verify OTP"}
+          </PdpButton>
+
+          <PdpButton 
+            type="button" 
+            variant="outline" 
+            fullWidth 
+            onClick={handleResendOtp} 
+            disabled={submitting || isResending}
+          >
+            {isResending ? "Resending..." : "Resend OTP"}
+          </PdpButton>
+        </div>
       </form>
     </main>
   );

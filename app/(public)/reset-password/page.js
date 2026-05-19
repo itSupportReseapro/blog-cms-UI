@@ -9,8 +9,8 @@ import { resetPassword } from "@/services/auth.service";
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") || "";
-  const otp = searchParams.get("otp") || "";
+  const token = searchParams.get("token") || "";
+  const email = searchParams.get("email") || ""; // For reference only
 
   const [form, setForm] = useState({
     newPassword: "",
@@ -26,8 +26,8 @@ function ResetPasswordForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!email || !otp) {
-      window.addSnackbar?.("Email or OTP is missing. Restart forgot password flow.", "error");
+    if (!token) {
+      window.addSnackbar?.("Reset token is missing. Restart forgot password flow.", "error");
       router.push("/forgot-password");
       return;
     }
@@ -44,7 +44,8 @@ function ResetPasswordForm() {
 
     try {
       setSubmitting(true);
-      const result = await resetPassword(email, otp, form.newPassword, form.confirmPassword);
+      // New Centralized Auth System uses token-based reset
+      const result = await resetPassword(token, form.newPassword);
 
       if (result?.error) {
         window.addSnackbar?.(result.message || "Failed to reset password", "error");
@@ -61,7 +62,7 @@ function ResetPasswordForm() {
   return (
     <main style={{ maxWidth: 420, margin: "56px auto", padding: "24px" }}>
       <h1>Reset Password</h1>
-      <p>Set a new password for {email || "your account"}.</p>
+      <p>Set a new password for {email ? `${email}` : "your account"}.</p>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: "12px", marginTop: "16px" }}>
         <PdpTextbox1

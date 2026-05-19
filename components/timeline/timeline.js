@@ -4,7 +4,7 @@ import "./timeline.css";
 export default function CmsTimeline({ currentStep }) {
   const steps = [
     { id: 1, label: "Blog Details" },
-    { id: 2, label: "Write your Blog" },
+    { id: 2, label: "Write Your Blog" },
   ];
 
   return (

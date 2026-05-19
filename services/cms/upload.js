@@ -8,6 +8,36 @@ export function getCurrentUploadDomain() {
   return UPLOAD_DOMAIN_MAP[ENV_KEY] || UPLOAD_DOMAIN_MAP.development;
 }
 
+export function resolveUploadUrl(url) {
+  const rawUrl = String(url || "").trim();
+
+  if (!rawUrl) return "";
+
+  if (rawUrl.startsWith("data:") || rawUrl.startsWith("blob:")) {
+    return rawUrl;
+  }
+
+  const uploadBase = String(getCurrentUploadBase() || "").replace(/\/$/, "");
+
+  if (/^https?:\/\//i.test(rawUrl)) {
+    try {
+      const parsedUrl = new URL(rawUrl);
+      const isLocalUrl = ["localhost", "127.0.0.1", "::1"].includes(parsedUrl.hostname);
+
+      if (!isLocalUrl) return rawUrl;
+
+      const localPath = `${parsedUrl.pathname}${parsedUrl.search || ""}`;
+      return uploadBase ? `${uploadBase}${localPath}` : localPath;
+    } catch {
+      return rawUrl;
+    }
+  }
+
+  const normalizedPath = rawUrl.startsWith("/") ? rawUrl : `/${rawUrl}`;
+
+  return uploadBase ? `${uploadBase}${normalizedPath}` : normalizedPath;
+}
+
 function resolveUploadUserId() {
   if (typeof window === "undefined") {
     return "UnknownUser";
@@ -59,14 +89,21 @@ export async function uploadCmsAsset(file, options = {}) {
     throw new Error(data?.message || "File upload failed");
   }
 
-  const url = data?.urls?.friendly || data?.urls?.canonical;
+  const url =
+    data?.urls?.canonical ||
+    data?.urls?.friendly ||
+    data?.url ||
+    data?.data?.url ||
+    data?.data?.urls?.canonical ||
+    data?.data?.urls?.friendly;
 
   if (!url) {
     throw new Error("Upload succeeded but URL is missing");
   }
 
   return {
-    url,
+    url: resolveUploadUrl(url),
+    rawUrl: url,
     response: data,
   };
 }

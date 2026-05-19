@@ -3,12 +3,15 @@
   justify-content: center;
   align-items: center;
   gap: 120px;
-  margin: 30px 0 40px;
+  margin: 0;
   position: relative;
 }
 
 .cms-step {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 }
 
@@ -22,6 +25,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .cms-circle.active,
@@ -34,13 +38,14 @@
   margin-top: 8px;
   font-size: 14px;
   color: var(--Text1);
+  min-width: 80px;
 }
 
 .cms-line {
   position: absolute;
-  top: 19px;
-  left: 58px;
-  width: 130px;
+  top: 18px;
+  left: 60px;
+  width: 168px;
   height: 2px;
   background: var(--Grey2);
 }

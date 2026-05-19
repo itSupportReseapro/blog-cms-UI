@@ -7,6 +7,8 @@ import Image from "next/image";
 import { normalizeCellValue } from "./utils";
 import ThreeDotsIcon from "@/assets/Images/icon/3-dots.svg";
 import BothArrowIcon from "@/assets/Images/icon/both-arrow.svg";
+import SortUpIcon from "@/assets/Images/icon/SortUP.svg";
+import SortDownIcon from "@/assets/Images/icon/SortDown.svg";
 import FilterIcon from "@/assets/Images/icon/filter-icon.svg";
 
 export default function TableDesktop({
@@ -59,10 +61,10 @@ export default function TableDesktop({
         return;
       }
 
-      const clickedInsideTable = tableRef.current?.contains(event.target);
+      // Close menu if click is outside the menu (regardless of whether it's in the table)
       const clickedInsideMenu = actionMenuRef.current?.contains(event.target);
 
-      if (!clickedInsideTable && !clickedInsideMenu) {
+      if (!clickedInsideMenu) {
         setOpenActionMenuKey(null);
       }
     };
@@ -202,7 +204,13 @@ export default function TableDesktop({
                         title="Sort"
                         aria-label={`Sort ${col.label}`}
                       >
-                        <Image src={BothArrowIcon} alt="Sort" width={13} height={13} />
+                        {sortConfig?.key === col.field && sortConfig?.direction === "asc" ? (
+                          <Image src={SortUpIcon} alt="Sort Ascending" width={13} height={13} />
+                        ) : sortConfig?.key === col.field && sortConfig?.direction === "desc" ? (
+                          <Image src={SortDownIcon} alt="Sort Descending" width={13} height={13} />
+                        ) : (
+                          <Image src={BothArrowIcon} alt="Sort" width={13} height={13} />
+                        )}
                       </button>
                     )}
 
@@ -333,17 +341,35 @@ export default function TableDesktop({
                           type="button"
                           className="pdp-actionKebabBtn"
                           onClick={(event) => {
+                            event.stopPropagation();
                             const buttonRect = event.currentTarget.getBoundingClientRect();
+                            const viewportWidth = window.innerWidth;
+                            const viewportHeight = window.innerHeight;
+                            
                             const estimatedWidth = 170;
-                            const estimatedHeight = Math.max(56, rowActions.length * 44 + 8);
-                            const nextLeft = Math.max(
-                              12,
-                              Math.min(buttonRect.right - estimatedWidth, window.innerWidth - estimatedWidth - 12)
-                            );
-                            const fitsBelow = buttonRect.bottom + 6 + estimatedHeight <= window.innerHeight - 12;
-                            const nextTop = fitsBelow
-                              ? buttonRect.bottom + 6
-                              : Math.max(12, buttonRect.top - estimatedHeight - 6);
+                            const estimatedHeight = Math.max(56, rowActions.length * 44 + 16);
+                            
+                            // Calculate horizontal position (prioritize right alignment, fallback to left)
+                            let nextLeft = buttonRect.right - estimatedWidth;
+                            
+                            // Ensure menu doesn't overflow right edge
+                            if (nextLeft + estimatedWidth + 12 > viewportWidth) {
+                              nextLeft = viewportWidth - estimatedWidth - 12;
+                            }
+                            
+                            // Ensure menu doesn't overflow left edge
+                            if (nextLeft < 12) {
+                              nextLeft = 12;
+                            }
+                            
+                            // Calculate vertical position (prefer below, fallback to above)
+                            let nextTop = buttonRect.bottom + 8;
+                            
+                            // Check if fits below
+                            const fitsBelow = nextTop + estimatedHeight + 12 <= viewportHeight;
+                            if (!fitsBelow) {
+                              nextTop = Math.max(12, buttonRect.top - estimatedHeight - 8);
+                            }
 
                             setActionMenuPos({
                               top: nextTop,
