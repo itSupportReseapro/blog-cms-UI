@@ -1,8 +1,23 @@
 # blog-cms
 
+Next.js App Router CMS for blog content management.
+
+## Project structure
+
+- `app/` - routes, route groups, layouts, and route-local styles
+- `components/` - reusable UI and feature components
+- `assets/` - shared UI assets, SVGs, buttons, modals, inputs, and notifications
+- `context/` - React context providers
+- `hooks/` - reusable hooks and page-domain hooks
+- `lib/` - shared client utilities
+- `services/` - API clients and service modules
+- `docs/` - project documentation
+
+See `docs/PROJECT_STRUCTURE.md` for the full structure notes.
+
 ## Environment variables
 
-Create a `.env.local` file in the project root and set:
+Copy `.env.example` to `.env.local` in the project root and set:
 
 - `NEXT_PUBLIC_ENV=development`
 - `NEXT_PUBLIC_DEV_AUTH_API=https://dev.pdp.auth.reseapro.com` (Centralized Auth System)
@@ -30,4 +45,13 @@ Create a `.env.local` file in the project root and set:
 
 - Development (port 4000): `npm run dev`
 - Production (port 3000): `npm run build` then `npm run start`
-- Test (port 5000): `npm run build:test` then `npm run test`
+- Test build: `npm run build:test`
+- Test server (port 5000): `npm run build:test` then `npm run start:test`
+
+## Pipeline
+
+- Install clean dependencies: `npm ci`
+- Lint: `npm run lint`
+- Case-sensitive path check: `npm run check:case`
+- CI validation: `npm run ci`
+- Test alias for CI validation: `npm test`

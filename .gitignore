@@ -20,6 +20,17 @@
 # production
 /build
 
+# generated archives and local backups
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# local editor/system files
+.idea/
+.vscode/
+Thumbs.db
+
 # misc
 .DS_Store
 *.pem
@@ -32,6 +43,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel

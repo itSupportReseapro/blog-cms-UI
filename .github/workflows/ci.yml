@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  validate:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_ENV: test
+      NEXT_PUBLIC_DEV_AUTH_API: https://dev.pdp.auth.reseapro.com
+      NEXT_PUBLIC_TEST_AUTH_API: https://tst.pdp.auth.reseapro.com
+      NEXT_PUBLIC_PROD_AUTH_API: https://pdp.auth.reseapro.com
+      NEXT_PUBLIC_AUTH_BASE_URL: https://pdp.auth.reseapro.com
+      NEXT_PUBLIC_AUTH_APP_ID: "20"
+      NEXT_PUBLIC_DEV_API_BASE_URL: https://dev.api.reseapro.com
+      NEXT_PUBLIC_TEST_API_BASE_URL: https://test.api.reseapro.com
+      NEXT_PUBLIC_PROD_API_BASE_URL: https://api.reseapro.com
+      NEXT_PUBLIC_DEV_CMS_API_BASE_URL: https://dev.api.services.blog.reseapro.com
+      NEXT_PUBLIC_TEST_CMS_API_BASE_URL: https://test.api.services.blog.reseapro.com
+      NEXT_PUBLIC_PROD_CMS_API_BASE_URL: https://api.services.blog.reseapro.com
+      NEXT_PUBLIC_DEV_LOCATION_API_BASE_URL: https://dev.services.location.reseapro.com/api/location
+      NEXT_PUBLIC_TEST_LOCATION_API_BASE_URL: https://test.services.location.reseapro.com/api/location
+      NEXT_PUBLIC_PROD_LOCATION_API_BASE_URL: https://services.location.reseapro.com/api/location
+      NEXT_PUBLIC_DEV_UPLOAD_API: https://dev.upload.reseapro.com
+      NEXT_PUBLIC_TEST_UPLOAD_API: https://tst.upload.reseapro.com
+      NEXT_PUBLIC_PROD_UPLOAD_API: https://upload.reseapro.com
+      NEXT_PUBLIC_DEV_UPLOAD_DOMAIN: dev.pubmanu.com
+      NEXT_PUBLIC_TEST_UPLOAD_DOMAIN: tst.pubmanu.com
+      NEXT_PUBLIC_PROD_UPLOAD_DOMAIN: pubmanu.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate
+        run: npm run ci

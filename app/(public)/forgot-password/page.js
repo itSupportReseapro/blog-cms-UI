@@ -52,11 +52,11 @@ export default function ForgotPasswordPage() {
       <main style={{ maxWidth: 420, margin: "56px auto", padding: "24px" }}>
         <h1>Check Your Email</h1>
         <p>
-          We've sent a password reset link to <strong>{email}</strong>. 
+          We&apos;ve sent a password reset link to <strong>{email}</strong>. 
           Please check your email and click the link to reset your password.
         </p>
         <p style={{ marginTop: "16px", fontSize: "12px", color: "#666" }}>
-          You'll be redirected to login in a few seconds...
+          You&apos;ll be redirected to login in a few seconds...
         </p>
       </main>
     );
