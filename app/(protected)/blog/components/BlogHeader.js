@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { logoutUser } from "@/services/auth.service";
+import { clearBlogAppSelection } from "@/lib/blogAppContext";
 
 export default function BlogHeader() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function BlogHeader() {
       console.error("Logout API error:", error);
     } finally {
       // Clear local session regardless of API response
+      clearBlogAppSelection();
       logout();
       router.replace("/login");
     }

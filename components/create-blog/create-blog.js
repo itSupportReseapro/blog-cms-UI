@@ -15,6 +15,7 @@ import {
   uploadCmsAsset,
 } from "@/services/cms.service";
 import { createBlog, getBlogById, updateBlog } from "@/services/blog.service";
+import { useBlogApp } from "@/hooks/useBlogApp";
 import { DEPENDENT_DROPDOWNS, DROPDOWN_FIELDS } from "./createBlog.constants";
 import {
   estimateReadTime,
@@ -29,6 +30,7 @@ import CreateBlogStepTwo from "./CreateBlogStepTwo";
 export default function CreateBlog({ blogId = null }) {
 
   const router = useRouter();
+  const { appId } = useBlogApp();
   const normalizedBlogId = blogId ? String(blogId) : null;
   const isEdit = normalizedBlogId !== null;
   
@@ -104,7 +106,10 @@ export default function CreateBlog({ blogId = null }) {
     setDropdownLoading(field, true);
 
     try {
-      const options = await fetchBlogDropdownOptions(field, customParams || parentParams);
+      const options = await fetchBlogDropdownOptions(field, {
+        ...(customParams || parentParams),
+        app_id: appId,
+      });
       setDropdownOptions(field, options);
     } catch (error) {
       window.addSnackbar?.(error.message || "Failed to load options", "error");
@@ -119,7 +124,10 @@ export default function CreateBlog({ blogId = null }) {
     }
 
     try {
-      const createdOption = await createBlogDropdownOption(field, value, parentParams);
+      const createdOption = await createBlogDropdownOption(field, value, {
+        ...parentParams,
+        app_id: appId,
+      });
 
       setDropdownState((prev) => ({
         ...prev,
@@ -229,7 +237,7 @@ export default function CreateBlog({ blogId = null }) {
 
     try {
       window.addSnackbar?.("Uploading cover image...", "info");
-      const { url } = await uploadCmsAsset(file);
+      const { url } = await uploadCmsAsset(file, { appId });
 
       setFormData((prev) => ({
         ...prev,
@@ -253,7 +261,7 @@ export default function CreateBlog({ blogId = null }) {
     const authorName = resolveAuthorName();
 
     return {
-      app_id: 12,
+      app_id: appId,
       user_id: null,
       cluster_id: formData.group ? Number(formData.group) : null,
       category_id: formData.category ? Number(formData.category) : null,
@@ -368,12 +376,15 @@ export default function CreateBlog({ blogId = null }) {
           return String(savedValue);
         };
 
-        const countryOptions = await fetchBlogDropdownOptions(DROPDOWN_FIELDS.country);
+        const countryOptions = await fetchBlogDropdownOptions(DROPDOWN_FIELDS.country, {
+          app_id: appId,
+        });
         const resolvedCountryValue = resolveSelectedValue(savedLocation.country, countryOptions);
 
         const stateOptions = resolvedCountryValue
           ? await fetchBlogDropdownOptions(DROPDOWN_FIELDS.state, {
               country: resolvedCountryValue,
+              app_id: appId,
             })
           : [];
         const resolvedStateValue = resolveSelectedValue(savedLocation.state, stateOptions);
@@ -382,6 +393,7 @@ export default function CreateBlog({ blogId = null }) {
           ? await fetchBlogDropdownOptions(DROPDOWN_FIELDS.district, {
               country: resolvedCountryValue,
               state: resolvedStateValue,
+              app_id: appId,
             })
           : [];
         const resolvedDistrictValue = resolveSelectedValue(savedLocation.district, districtOptions);
@@ -391,6 +403,7 @@ export default function CreateBlog({ blogId = null }) {
               country: resolvedCountryValue,
               state: resolvedStateValue,
               district: resolvedDistrictValue,
+              app_id: appId,
             })
           : [];
         const resolvedCityValue = resolveSelectedValue(savedLocation.city, cityOptions);
@@ -471,7 +484,7 @@ export default function CreateBlog({ blogId = null }) {
     return () => {
       mounted = false;
     };
-  }, [isEdit, normalizedBlogId]);
+  }, [appId, isEdit, normalizedBlogId]);
 
   return (
     <div className="create-blog-wrapper">

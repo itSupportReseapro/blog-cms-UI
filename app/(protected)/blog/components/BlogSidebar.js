@@ -6,7 +6,6 @@ const links = [
   { href: "/blog/blogs", label: "Blogs" },
   { href: "/blog/privacy-policy", label: "Privacy Policy" },
   { href: "/blog/term-and-condition", label: "Term & Condition" },
-  { href: "/blog/user-and-role", label: "User & Role" },
 ];
 
 export default function BlogSidebar() {

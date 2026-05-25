@@ -1,14 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import { hasSelectedBlogApp } from "@/lib/blogAppContext";
 import "./DashboardLayout.css";
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState("dashboard");
+
+  useEffect(() => {
+    if (!hasSelectedBlogApp()) {
+      router.replace("/choose-cms");
+    }
+  }, [router]);
 
   // Map pathname to active section
   useEffect(() => {

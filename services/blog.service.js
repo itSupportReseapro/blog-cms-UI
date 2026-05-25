@@ -1,4 +1,5 @@
 import apiClient from "@/lib/axios";
+import { getCurrentBlogAppId } from "@/lib/blogAppContext";
 
 const ENV = process.env.NEXT_PUBLIC_ENV || "development";
 
@@ -16,10 +17,6 @@ const BLOG_BASE_MAP = {
 };
 
 const BLOG_BASE_URL = BLOG_BASE_MAP[ENV] || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
-
-const BLOG_APP_ID = Number(
-  process.env.NEXT_PUBLIC_BLOG_APP_ID || process.env.NEXT_PUBLIC_APP_ID || 12
-);
 
 function buildUrl(path) {
   return `${BLOG_BASE_URL}${path}`;
@@ -39,14 +36,15 @@ function unwrapSingle(payload) {
   return data;
 }
 
-export async function fetchBlogs({ status = "all", page = 1, limit = 100 } = {}) {
+export async function fetchBlogs({ status = "all", page = 1, limit = 100, appId } = {}) {
   try {
     const normalizedStatus = String(status || "all").toLowerCase();
+    const resolvedAppId = Number(appId || getCurrentBlogAppId());
 
     const path =
       normalizedStatus === "all"
-        ? `/getBlog/${BLOG_APP_ID}`
-        : `/getBlogByStatus/${BLOG_APP_ID}/${encodeURIComponent(normalizedStatus)}`;
+        ? `/getBlog/${resolvedAppId}`
+        : `/getBlogByStatus/${resolvedAppId}/${encodeURIComponent(normalizedStatus)}`;
 
     const response = await apiClient.get(buildUrl(path), {
       params: { page, limit },

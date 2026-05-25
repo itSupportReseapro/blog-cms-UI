@@ -11,7 +11,7 @@ export default function AppSelectorPage() {
   useEffect(() => {
     if (loading) return;
     if (isAuthenticated) {
-      router.replace("/blog/dashboard");
+      router.replace("/choose-cms");
       return;
     }
     router.replace("/login");

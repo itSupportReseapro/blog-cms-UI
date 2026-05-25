@@ -59,9 +59,28 @@
 }
 
 .navbar-bell:focus-visible,
+.navbar-switchCms:focus-visible,
 .navbar-avatar:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+.navbar-switchCms {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--surface-base);
+  color: var(--Text1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.navbar-switchCms:hover {
+  border-color: var(--Primary);
+  background: var(--PrimaryPastel);
 }
 
 .navbar-avatar {
@@ -102,6 +121,10 @@
 
   .navbar-right {
     gap: 12px;
+  }
+
+  .navbar-switchCms {
+    display: none;
   }
 
   .navbar-avatar {

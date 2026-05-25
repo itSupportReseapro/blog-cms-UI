@@ -1,0 +1,134 @@
+.chooseCms {
+  min-height: 100vh;
+  padding: 40px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, rgba(4, 102, 200, 0.06), rgba(245, 247, 250, 0)),
+    var(--Background);
+}
+
+.chooseCms-panel {
+  width: min(960px, 100%);
+  display: grid;
+  gap: 28px;
+}
+
+.chooseCms-header {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.chooseCms-eyebrow {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--Primary);
+}
+
+.chooseCms-header h1 {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.15;
+  color: var(--Text1);
+}
+
+.chooseCms-header p {
+  margin: 0;
+  color: var(--Text2);
+}
+
+.chooseCms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.chooseCms-card {
+  min-height: 260px;
+  padding: 28px;
+  display: grid;
+  align-content: space-between;
+  gap: 22px;
+  text-align: left;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--card-radius);
+  background: var(--surface-base);
+  box-shadow: var(--shadow-md);
+  color: var(--Text1);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.chooseCms-card:hover,
+.chooseCms-card:focus-visible {
+  border-color: var(--Primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.chooseCms-logoWrap {
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+}
+
+.chooseCms-logo {
+  width: auto;
+  max-width: 230px;
+  height: auto;
+  max-height: 72px;
+}
+
+.chooseCms-cardBody {
+  display: grid;
+  gap: 8px;
+}
+
+.chooseCms-cardTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.chooseCms-cardText {
+  max-width: 34ch;
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+  color: var(--Text2);
+}
+
+.chooseCms-action {
+  justify-self: start;
+  min-height: 40px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--Primary);
+  color: var(--surface-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (max-width: 760px) {
+  .chooseCms {
+    padding: 24px;
+  }
+
+  .chooseCms-header h1 {
+    font-size: 30px;
+  }
+
+  .chooseCms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chooseCms-card {
+    min-height: 230px;
+  }
+}

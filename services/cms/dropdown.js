@@ -1,13 +1,18 @@
 import apiClient from "@/lib/axios";
-import { CMS_DEFAULTS, BLOG_DROPDOWN_LIST_PATH, BLOG_DROPDOWN_CREATE_PATH } from "./config";
+import {
+  CMS_DEFAULTS,
+  BLOG_DROPDOWN_LIST_PATH,
+  BLOG_DROPDOWN_CREATE_PATH,
+  getCurrentCmsAppId,
+} from "./config";
 import { buildUrl, getErrorMessage } from "./http";
 import {
-  LOOKUP_LIST_CACHE,
   DROPDOWN_OPTIONS_CACHE,
   REMOTE_DROPDOWN_UNSUPPORTED_FIELDS,
   upsertLookupEntity,
   createDropdownCacheKey,
   clearDropdownCache,
+  clearLookupListCache,
 } from "./cache";
 import {
   getClusterById,
@@ -74,7 +79,7 @@ async function fetchRemoteDropdownOptions(field, params = {}) {
   }
 
   const requestParams = {
-    app_id: CMS_DEFAULTS.appId,
+    app_id: params?.app_id || getCurrentCmsAppId() || CMS_DEFAULTS.appId,
     ...params,
   };
 
@@ -115,6 +120,7 @@ async function fetchRemoteDropdownOptions(field, params = {}) {
 }
 
 export async function fetchBlogDropdownOptions(field, params = {}) {
+  const appId = params?.app_id || getCurrentCmsAppId() || CMS_DEFAULTS.appId;
   const selectedClusterId = params?.group || params?.cluster_id || null;
   const selectedCountryId = params?.country || params?.country_id || null;
   const selectedStateId = params?.state || params?.state_id || null;
@@ -177,7 +183,7 @@ export async function fetchBlogDropdownOptions(field, params = {}) {
       // Fallback to ID scan when dropdown endpoint is unavailable for this field.
     }
 
-    const clusters = await listClusters();
+    const clusters = await listClusters(appId);
     return clusters.map((item) => ({
       value: String(item.id),
       label: item.name,
@@ -194,7 +200,7 @@ export async function fetchBlogDropdownOptions(field, params = {}) {
       // Fallback to ID scan when dropdown endpoint is unavailable for this field.
     }
 
-    const categories = await listCategories(selectedClusterId);
+    const categories = await listCategories(selectedClusterId, appId);
     return categories.map((item) => ({
       value: String(item.id),
       label: item.name,
@@ -211,7 +217,7 @@ export async function fetchBlogDropdownOptions(field, params = {}) {
       // Fallback to ID scan when dropdown endpoint is unavailable for this field.
     }
 
-    const subCategories = await listSubCategories(selectedClusterId);
+    const subCategories = await listSubCategories(selectedClusterId, appId);
     return subCategories.map((item) => ({
       value: String(item.id),
       label: item.name,
@@ -226,13 +232,14 @@ export async function fetchBlogDropdownOptions(field, params = {}) {
 }
 
 export async function createBlogDropdownOption(field, value, params = {}) {
+  const appId = params?.app_id || getCurrentCmsAppId() || CMS_DEFAULTS.appId;
   const label = typeof value === "string" ? value : value?.name || "";
   const selectedCountryId = params?.country || params?.country_id || null;
   const selectedStateId = params?.state || params?.state_id || null;
   const selectedDistrictId = params?.district || params?.district_id || null;
 
   const basePayload = {
-    app_id: CMS_DEFAULTS.appId,
+    app_id: appId,
     name: label,
     obj_1: "",
     obj_2: "",
@@ -247,7 +254,7 @@ export async function createBlogDropdownOption(field, value, params = {}) {
     const response = await createCluster(basePayload);
     const created = response?.data;
     upsertLookupEntity("cluster", created);
-    LOOKUP_LIST_CACHE.cluster = null;
+    clearLookupListCache("cluster");
     clearDropdownCache("group");
     clearDropdownCache("category");
     clearDropdownCache("subcategory");
@@ -271,7 +278,7 @@ export async function createBlogDropdownOption(field, value, params = {}) {
     });
     const created = response?.data;
     upsertLookupEntity("category", created);
-    LOOKUP_LIST_CACHE.category = null;
+    clearLookupListCache("category");
     clearDropdownCache("category");
     clearDropdownCache("subcategory");
 
@@ -294,7 +301,7 @@ export async function createBlogDropdownOption(field, value, params = {}) {
     });
     const created = response?.data;
     upsertLookupEntity("subcategory", created);
-    LOOKUP_LIST_CACHE.subcategory = null;
+    clearLookupListCache("subcategory");
     clearDropdownCache("subcategory");
 
     return {

@@ -1,4 +1,9 @@
-import { CMS_DEFAULTS, LOOKUP_SCAN_MAX, LOOKUP_SCAN_MISS_LIMIT } from "./config";
+import {
+  CMS_DEFAULTS,
+  LOOKUP_SCAN_MAX,
+  LOOKUP_SCAN_MISS_LIMIT,
+  getCurrentCmsAppId,
+} from "./config";
 import { getSingle, postResource, putResource, getCollection } from "./http";
 import {
   LOOKUP_CACHE,
@@ -68,15 +73,18 @@ export async function scanById(
   return items;
 }
 
-export async function listClusters() {
-  if (Array.isArray(LOOKUP_LIST_CACHE.cluster)) {
-    return LOOKUP_LIST_CACHE.cluster;
+export async function listClusters(appIdOverride) {
+  const appId = appIdOverride || getCurrentCmsAppId();
+  const cacheKey = `cluster:${appId}`;
+
+  if (Array.isArray(LOOKUP_LIST_CACHE[cacheKey])) {
+    return LOOKUP_LIST_CACHE[cacheKey];
   }
 
   let items = await getCollection([
-    `/getCluster/${CMS_DEFAULTS.appId}`,
+    `/getCluster/${appId || CMS_DEFAULTS.appId}`,
     "/getCluster",
-    `/getClusters/${CMS_DEFAULTS.appId}`,
+    `/getClusters/${appId || CMS_DEFAULTS.appId}`,
     "/getClusters",
   ]);
 
@@ -87,17 +95,20 @@ export async function listClusters() {
   items.forEach((item) => upsertLookupEntity("cluster", item));
 
   const result = mergeWithCache("cluster", items).filter((item) => item.status !== 0);
-  LOOKUP_LIST_CACHE.cluster = result;
+  LOOKUP_LIST_CACHE[cacheKey] = result;
   return result;
 }
 
-export async function listCategories(clusterId) {
-  if (!LOOKUP_LIST_CACHE.category) {
+export async function listCategories(clusterId, appIdOverride) {
+  const appId = appIdOverride || getCurrentCmsAppId();
+  const cacheKey = `category:${appId}`;
+
+  if (!LOOKUP_LIST_CACHE[cacheKey]) {
     let items = await getCollection(
       [
-        `/getCategory/${CMS_DEFAULTS.appId}`,
+        `/getCategory/${appId || CMS_DEFAULTS.appId}`,
         "/getCategory",
-        `/getCategories/${CMS_DEFAULTS.appId}`,
+        `/getCategories/${appId || CMS_DEFAULTS.appId}`,
         "/getCategories",
       ].filter(Boolean)
     );
@@ -107,12 +118,12 @@ export async function listCategories(clusterId) {
     }
 
     items.forEach((item) => upsertLookupEntity("category", item));
-    LOOKUP_LIST_CACHE.category = mergeWithCache("category", items).filter(
+    LOOKUP_LIST_CACHE[cacheKey] = mergeWithCache("category", items).filter(
       (item) => item.status !== 0
     );
   }
 
-  const source = LOOKUP_LIST_CACHE.category || [];
+  const source = LOOKUP_LIST_CACHE[cacheKey] || [];
 
   return source.filter((item) => {
     if (!clusterId) {
@@ -123,13 +134,16 @@ export async function listCategories(clusterId) {
   });
 }
 
-export async function listSubCategories(clusterId) {
-  if (!LOOKUP_LIST_CACHE.subcategory) {
+export async function listSubCategories(clusterId, appIdOverride) {
+  const appId = appIdOverride || getCurrentCmsAppId();
+  const cacheKey = `subcategory:${appId}`;
+
+  if (!LOOKUP_LIST_CACHE[cacheKey]) {
     let items = await getCollection(
       [
-        `/getSubCategory/${CMS_DEFAULTS.appId}`,
+        `/getSubCategory/${appId || CMS_DEFAULTS.appId}`,
         "/getSubCategory",
-        `/getSubCategories/${CMS_DEFAULTS.appId}`,
+        `/getSubCategories/${appId || CMS_DEFAULTS.appId}`,
         "/getSubCategories",
       ].filter(Boolean)
     );
@@ -139,12 +153,12 @@ export async function listSubCategories(clusterId) {
     }
 
     items.forEach((item) => upsertLookupEntity("subcategory", item));
-    LOOKUP_LIST_CACHE.subcategory = mergeWithCache("subcategory", items).filter(
+    LOOKUP_LIST_CACHE[cacheKey] = mergeWithCache("subcategory", items).filter(
       (item) => item.status !== 0
     );
   }
 
-  const source = LOOKUP_LIST_CACHE.subcategory || [];
+  const source = LOOKUP_LIST_CACHE[cacheKey] || [];
 
   return source.filter((item) => {
     if (!clusterId) {

@@ -48,7 +48,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.replace("/blog/dashboard");
+      router.replace("/choose-cms");
     }
   }, [isAuthenticated, loading, router]);
 
@@ -92,7 +92,7 @@ export default function LoginPage() {
       }
 
       window.addSnackbar?.("Login successful", "success");
-      router.replace("/blog/dashboard");
+      router.replace("/choose-cms");
     } catch (submissionError) {
       const message = submissionError.message || "Login failed";
       setError(message);

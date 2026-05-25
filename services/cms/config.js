@@ -1,3 +1,5 @@
+import { DEFAULT_BLOG_APP_ID, getCurrentBlogAppId } from "@/lib/blogAppContext";
+
 const rawEnv = String(process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV || "development")
   .trim()
   .toLowerCase();
@@ -87,11 +89,15 @@ export const UPLOAD_DOMAIN_MAP = {
 export const ENV_KEY = ENV;
 
 export const CMS_DEFAULTS = {
-  appId: 12,
+  appId: DEFAULT_BLOG_APP_ID,
   userId: 1,
   status: 1,
   createdBy: "admin",
 };
+
+export function getCurrentCmsAppId() {
+  return getCurrentBlogAppId();
+}
 
 export const CMS_RESOURCE_IDS = {
   contactUs: 19,

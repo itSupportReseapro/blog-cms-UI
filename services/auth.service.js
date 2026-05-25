@@ -11,15 +11,14 @@ import { resolveUploadUrl } from "@/services/cms.service";
 function resolveAuthBaseUrl() {
   const appEnv = process.env.NEXT_PUBLIC_ENV || "development";
   const baseMap = {
-    development: process.env.NEXT_PUBLIC_DEV_AUTH_API,
-    test: process.env.NEXT_PUBLIC_TEST_AUTH_API,
-    production: process.env.NEXT_PUBLIC_PROD_AUTH_API,
+    development: process.env.NEXT_PUBLIC_DEV_PDP_AUTH_API || process.env.NEXT_PUBLIC_DEV_AUTH_API,
+    test: process.env.NEXT_PUBLIC_TEST_PDP_AUTH_API || process.env.NEXT_PUBLIC_TEST_AUTH_API,
+    production: process.env.NEXT_PUBLIC_PROD_PDP_AUTH_API || process.env.NEXT_PUBLIC_PROD_AUTH_API,
   };
 
   return (
     baseMap[appEnv] ||
     process.env.NEXT_PUBLIC_AUTH_BASE_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
     ""
   );
 }
@@ -43,6 +42,20 @@ async function postWithFallback(paths, payload) {
   }
 
   throw lastError || new Error("Auth endpoint not found");
+}
+
+async function registerWithFallback(payload) {
+  try {
+    return await authClient.post("/auth/register", payload);
+  } catch (error) {
+    const message = String(error?.response?.data?.message || "");
+
+    if (message.includes("insertUserDocuments is not a function")) {
+      return await authClient.post("/register", payload);
+    }
+
+    throw error;
+  }
 }
 
 async function putWithFallback(paths, payload) {
@@ -130,6 +143,14 @@ function toMysqlDate(value) {
   return rawValue;
 }
 
+function addIfFilled(target, key, value) {
+  const rawValue = value === null || value === undefined ? "" : String(value).trim();
+
+  if (rawValue) {
+    target[key] = rawValue;
+  }
+}
+
 export async function loginUser({ email, password }) {
   if (!email || !password) {
     throw new Error("Email and password are required");
@@ -205,44 +226,47 @@ export async function registerUser(payload) {
       first_name: payload?.first_name ?? "",
       middle_name: payload?.middle_name ?? "",
       last_name: payload?.last_name ?? "",
-      date_of_birth: toMysqlDate(payload?.date_of_birth),
-      gender: payload?.gender ?? "",
+      ...(toMysqlDate(payload?.date_of_birth) ? { date_of_birth: toMysqlDate(payload?.date_of_birth) } : {}),
+      ...(payload?.gender ? { gender: payload.gender } : {}),
       company_name: payload?.company_name ?? payload?.company ?? "",
-      gst_number: payload?.gst_number ?? payload?.gst ?? "",
+      ...(payload?.gst_number || payload?.gst ? { gst_number: payload?.gst_number ?? payload?.gst } : {}),
       mobile_number_primary: payload?.mobile_number_primary ?? payload?.phone ?? "",
-      mobile_number_secondary: payload?.mobile_number_secondary ?? payload?.whatsapp_no ?? "",
+      ...(payload?.mobile_number_secondary || payload?.whatsapp_no
+        ? { mobile_number_secondary: payload?.mobile_number_secondary ?? payload?.whatsapp_no }
+        : {}),
       email_address_personal: email_personal,
       // Only include email_address_official if it's provided and not empty
       ...(email_official ? { email_address_official: email_official } : {}),
-      pan: payload?.pan ?? "",
-      aadhaar: payload?.aadhaar ?? payload?.aadhar_no ?? "",
-      driving_licence: payload?.driving_licence ?? "",
-      voter_id: payload?.voter_id ?? "",
-      address_comm_at: payload?.address_comm_at ?? "",
-      address_comm_1: payload?.address_comm_1 ?? payload?.address_1 ?? "",
-      address_comm_2: payload?.address_comm_2 ?? payload?.address_2 ?? "",
-      address_comm_post: payload?.address_comm_post ?? "",
-      address_comm_ps: payload?.address_comm_ps ?? "",
-      address_comm_landmark: payload?.address_comm_landmark ?? "",
-      address_comm_city: payload?.address_comm_city ?? "",
-      address_comm_district: payload?.address_comm_district ?? "",
-      address_comm_pin: payload?.address_comm_pin ?? "",
-      address_comm_country: payload?.address_comm_country ?? "",
-      address_ship_at: payload?.address_ship_at ?? "",
-      address_ship_1: payload?.address_ship_1 ?? "",
-      address_ship_2: payload?.address_ship_2 ?? "",
-      address_ship_post: payload?.address_ship_post ?? "",
-      address_ship_ps: payload?.address_ship_ps ?? "",
-      address_ship_landmark: payload?.address_ship_landmark ?? "",
-      address_ship_city: payload?.address_ship_city ?? "",
-      address_ship_district: payload?.address_ship_district ?? "",
-      address_ship_pin: payload?.address_ship_pin ?? "",
-      address_ship_country: payload?.address_ship_country ?? "",
       password: payload?.password ?? "",
       created_by: payload?.created_by ?? "self",
     };
+
+    addIfFilled(registerPayload, "pan", payload?.pan);
+    addIfFilled(registerPayload, "aadhaar", payload?.aadhaar ?? payload?.aadhar_no);
+    addIfFilled(registerPayload, "driving_licence", payload?.driving_licence);
+    addIfFilled(registerPayload, "voter_id", payload?.voter_id);
+    addIfFilled(registerPayload, "address_comm_at", payload?.address_comm_at);
+    addIfFilled(registerPayload, "address_comm_1", payload?.address_comm_1 ?? payload?.address_1);
+    addIfFilled(registerPayload, "address_comm_2", payload?.address_comm_2 ?? payload?.address_2);
+    addIfFilled(registerPayload, "address_comm_post", payload?.address_comm_post);
+    addIfFilled(registerPayload, "address_comm_ps", payload?.address_comm_ps);
+    addIfFilled(registerPayload, "address_comm_landmark", payload?.address_comm_landmark);
+    addIfFilled(registerPayload, "address_comm_city", payload?.address_comm_city);
+    addIfFilled(registerPayload, "address_comm_district", payload?.address_comm_district);
+    addIfFilled(registerPayload, "address_comm_pin", payload?.address_comm_pin);
+    addIfFilled(registerPayload, "address_comm_country", payload?.address_comm_country);
+    addIfFilled(registerPayload, "address_ship_at", payload?.address_ship_at);
+    addIfFilled(registerPayload, "address_ship_1", payload?.address_ship_1);
+    addIfFilled(registerPayload, "address_ship_2", payload?.address_ship_2);
+    addIfFilled(registerPayload, "address_ship_post", payload?.address_ship_post);
+    addIfFilled(registerPayload, "address_ship_ps", payload?.address_ship_ps);
+    addIfFilled(registerPayload, "address_ship_landmark", payload?.address_ship_landmark);
+    addIfFilled(registerPayload, "address_ship_city", payload?.address_ship_city);
+    addIfFilled(registerPayload, "address_ship_district", payload?.address_ship_district);
+    addIfFilled(registerPayload, "address_ship_pin", payload?.address_ship_pin);
+    addIfFilled(registerPayload, "address_ship_country", payload?.address_ship_country);
     
-    const response = await postWithFallback(["/auth/register", "/register"], registerPayload);
+    const response = await registerWithFallback(registerPayload);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -505,14 +529,13 @@ export async function logoutUser() {
     // Determine the base URL
     const APP_ENV = process.env.NEXT_PUBLIC_ENV || "development";
     const AUTH_BASE_MAP = {
-      development: process.env.NEXT_PUBLIC_DEV_AUTH_API,
-      test: process.env.NEXT_PUBLIC_TEST_AUTH_API,
-      production: process.env.NEXT_PUBLIC_PROD_AUTH_API,
+      development: process.env.NEXT_PUBLIC_DEV_PDP_AUTH_API || process.env.NEXT_PUBLIC_DEV_AUTH_API,
+      test: process.env.NEXT_PUBLIC_TEST_PDP_AUTH_API || process.env.NEXT_PUBLIC_TEST_AUTH_API,
+      production: process.env.NEXT_PUBLIC_PROD_PDP_AUTH_API || process.env.NEXT_PUBLIC_PROD_AUTH_API,
     };
     const baseURL = 
       AUTH_BASE_MAP[APP_ENV] ||
       process.env.NEXT_PUBLIC_AUTH_BASE_URL ||
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
       "";
 
     if (!baseURL) {

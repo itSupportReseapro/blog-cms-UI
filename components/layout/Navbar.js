@@ -8,6 +8,7 @@ import bellIcon from "@/assets/Images/icon/bell-icon.svg";
 import profileIcon from "@/assets/Images/icon/Profile-avatar.svg";
 import { viewProfile, logoutUser } from "@/services/auth.service";
 import { resolveUploadUrl } from "@/services/cms.service";
+import { clearBlogAppSelection } from "@/lib/blogAppContext";
 
 import UserDetailsPanel from "@/assets/modals/UserDetailsPanel/UserDetailsPanel";
 import EditUserPanel from "@/assets/modals/EditUserPanel/EditUserPanel";
@@ -72,6 +73,7 @@ export default function Navbar() {
       console.error("Logout API error:", error);
     } finally {
       // Clear local session regardless of API response
+      clearBlogAppSelection();
       logout();
       router.replace("/login");
     }
@@ -98,6 +100,14 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-right">
+          <button
+            className="navbar-switchCms"
+            type="button"
+            onClick={() => router.push("/choose-cms")}
+          >
+            Switch CMS
+          </button>
+
           {/* <button className="navbar-bell">
             <Image src={bellIcon} alt="Notifications" width={28} height={28} />
           </button> */}

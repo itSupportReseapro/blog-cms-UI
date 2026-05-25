@@ -1,4 +1,4 @@
-import { ENV_KEY, UPLOAD_BASE_MAP, UPLOAD_DOMAIN_MAP } from "./config";
+import { ENV_KEY, UPLOAD_BASE_MAP, UPLOAD_DOMAIN_MAP, getCurrentCmsAppId } from "./config";
 
 export function getCurrentUploadBase() {
   return UPLOAD_BASE_MAP[ENV_KEY] || UPLOAD_BASE_MAP.development;
@@ -56,7 +56,7 @@ export async function uploadCmsAsset(file, options = {}) {
     throw new Error("No file selected for upload");
   }
 
-  const { appId = 26, userId } = options;
+  const { appId = getCurrentCmsAppId(), userId } = options;
   const resolvedUserId = userId || resolveUploadUserId();
 
   const formData = new FormData();

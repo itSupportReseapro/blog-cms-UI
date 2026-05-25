@@ -59,3 +59,18 @@ export function clearDropdownCache(field) {
     }
   }
 }
+
+export function clearLookupListCache(type) {
+  if (!type) {
+    Object.keys(LOOKUP_LIST_CACHE).forEach((key) => {
+      LOOKUP_LIST_CACHE[key] = null;
+    });
+    return;
+  }
+
+  Object.keys(LOOKUP_LIST_CACHE).forEach((key) => {
+    if (key === type || key.startsWith(`${type}:`)) {
+      LOOKUP_LIST_CACHE[key] = null;
+    }
+  });
+}

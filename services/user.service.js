@@ -49,16 +49,22 @@ function toMysqlDate(value) {
   return rawValue;
 }
 
+const APP_ENV = process.env.NEXT_PUBLIC_ENV || "development";
+const PDP_AUTH_MAP = {
+  development: process.env.NEXT_PUBLIC_DEV_PDP_AUTH_API,
+  test: process.env.NEXT_PUBLIC_TEST_PDP_AUTH_API,
+  production: process.env.NEXT_PUBLIC_PROD_PDP_AUTH_API,
+};
+const pdpAuthBaseUrl = PDP_AUTH_MAP[APP_ENV] || "https://pdp.auth.reseapro.com";
+
 /**
  * Get all users assigned to this app.
- * GET /apps/{app_key}/users?company_id={company_id}
+ * GET /users/profiles
  */
 export async function getAllUsers() {
   try {
-    const { appKey } = getRuntimeAppContext();
-    const response = await authClient.get(`/apps/${appKey}/users`, {
-      params: { company_id: COMPANY_ID },
-    });
+    const url = `${pdpAuthBaseUrl}/users/profiles`;
+    const response = await authClient.get(url);
     const payload = unwrap(response);
     return { data: extractList(payload) };
   } catch (error) {

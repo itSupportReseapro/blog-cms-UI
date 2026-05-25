@@ -13,7 +13,6 @@ import AboutIcon from "@/assets/Images/icon/Info-Circle.svg";
 import ContactIcon from "@/assets/Images/icon/Letter-Unread.svg";
 import PrivacyIcon from "@/assets/Images/icon/ShieldCheck-icon.svg";
 import TermIcon from "@/assets/Images/icon/Shield-User.svg";
-import UserRoleIcon from "@/assets/Images/icon/user-role.svg";
 
 const menuItems = [
   { href: "/blog/dashboard", label: "Dashboard", icon: DashboardIcon },
@@ -23,7 +22,6 @@ const menuItems = [
   { href: "/blog/contact-us", label: "Contact Us", icon: ContactIcon },
   { href: "/blog/privacy-policy", label: "Privacy Policy", icon: PrivacyIcon },
   { href: "/blog/term-and-condition", label: "Term & Condition", icon: TermIcon },
-  { href: "/blog/user-and-role", label: "User & Role", icon: UserRoleIcon },
 ];
 
 export default function Sidebar() {

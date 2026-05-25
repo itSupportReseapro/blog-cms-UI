@@ -8,6 +8,7 @@ import { useState, useMemo } from "react";
 import PdpButton from "@/assets/buttons/button";
 import { UniversalTable } from "@/components/universal-table";
 import { useBlog } from "@/hooks/useBlog";
+import { useBlogApp } from "@/hooks/useBlogApp";
 import { getBlogById, updateBlog } from "@/services/blog.service";
 import {
   getClusterById,
@@ -141,11 +142,13 @@ function normalizeBlogRow(item, index = 0) {
 export default function BlogsTable() {
 
   const router = useRouter();
+  const { appId } = useBlogApp();
   const [activeStatus, setActiveStatus] = useState("all");
   const { posts, loading, refetch } = useBlog({
     status: activeStatus,
     page: 1,
     limit: 200,
+    appId,
   });
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -221,7 +224,7 @@ export default function BlogsTable() {
           groupId   ? getClusterById(groupId).catch(() => null)                   : null,
           catId     ? getCategoryById(catId).catch(() => null)                    : null,
           subCatId  ? getSubCategoryById(subCatId).catch(() => null)              : null,
-          countryId ? fetchBlogDropdownOptions("country").catch(() => [])         : Promise.resolve([]),
+          countryId ? fetchBlogDropdownOptions("country", { app_id: appId }).catch(() => []) : Promise.resolve([]),
         ]);
 
         const countryLabel = countryId
@@ -233,15 +236,15 @@ export default function BlogsTable() {
         let cityLabel     = cityId     || null;
 
         if (countryId && stateId) {
-          const stateOptions = await fetchBlogDropdownOptions("state", { country: countryId }).catch(() => []);
+          const stateOptions = await fetchBlogDropdownOptions("state", { country: countryId, app_id: appId }).catch(() => []);
           stateLabel = stateOptions.find((o) => String(o.value) === stateId)?.label || stateId;
 
           if (districtId) {
-            const districtOptions = await fetchBlogDropdownOptions("district", { country: countryId, state: stateId }).catch(() => []);
+            const districtOptions = await fetchBlogDropdownOptions("district", { country: countryId, state: stateId, app_id: appId }).catch(() => []);
             districtLabel = districtOptions.find((o) => String(o.value) === districtId)?.label || districtId;
 
             if (cityId) {
-              const cityOptions = await fetchBlogDropdownOptions("city", { country: countryId, state: stateId, district: districtId }).catch(() => []);
+              const cityOptions = await fetchBlogDropdownOptions("city", { country: countryId, state: stateId, district: districtId, app_id: appId }).catch(() => []);
               cityLabel = cityOptions.find((o) => String(o.value) === cityId)?.label || cityId;
             }
           }
