@@ -37,6 +37,7 @@ export default function CreateBlog({ blogId = null }) {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBlog, setIsLoadingBlog] = useState(false);
+  const [originalBlogMeta, setOriginalBlogMeta] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -258,16 +259,19 @@ export default function CreateBlog({ blogId = null }) {
 
 
   const buildBlogPayload = (statusOverride) => {
-    const authorName = resolveAuthorName();
+    const currentUserName = resolveAuthorName();
+    const originalAuthorName =
+      originalBlogMeta?.authorName ||
+      originalBlogMeta?.createdBy ||
+      currentUserName;
 
-    return {
+    const payload = {
       app_id: appId,
       user_id: null,
       cluster_id: formData.group ? Number(formData.group) : null,
       category_id: formData.category ? Number(formData.category) : null,
       sub_category_id: formData.subcategory ? Number(formData.subcategory) : null,
       blog_title: formData.title?.trim(),
-      author_name: authorName,
       description: formData.content || "",
       time_to_read: estimateReadTime(formData.content || formData.subtitle),
       blog_status: statusOverride || formData.blogStatus || "created",
@@ -282,8 +286,18 @@ export default function CreateBlog({ blogId = null }) {
       obj_4: getDropdownLabel("district", formData.district),
       obj_5: getDropdownLabel("city", formData.city),
       status: 1,
-      created_by: authorName,
     };
+
+    if (isEdit) {
+      payload.author_name = originalAuthorName;
+      payload.created_by = originalBlogMeta?.createdBy || originalAuthorName;
+      payload.updated_by = currentUserName;
+    } else {
+      payload.author_name = currentUserName;
+      payload.created_by = currentUserName;
+    }
+
+    return payload;
   };
 
   const submitBlog = async (statusOverride, navigateOnSuccess = true) => {
@@ -344,6 +358,20 @@ export default function CreateBlog({ blogId = null }) {
         const groupId = blog.cluster_id ? String(blog.cluster_id) : "";
         const categoryId = blog.category_id ? String(blog.category_id) : "";
         const subCategoryId = blog.sub_category_id ? String(blog.sub_category_id) : "";
+        const originalAuthorName =
+          blog.author_name ||
+          blog.authorName ||
+          blog.created_by_name ||
+          blog.createdByName ||
+          blog.created_by ||
+          blog.createdBy ||
+          blog.author ||
+          "";
+
+        setOriginalBlogMeta({
+          authorName: originalAuthorName,
+          createdBy: blog.created_by || blog.createdBy || originalAuthorName,
+        });
 
         const savedLocation = {
           country: blog.obj_2 ? String(blog.obj_2) : "",

@@ -3,24 +3,6 @@
 import "./BlogDetailsModal.css";
 import Image from "next/image";
 import CrossIcon from "@/assets/Images/icon/cross-icon.svg";
-import { docToPlainText, htmlToDoc } from "@/components/pdp-rich-editor-2";
-
-function getPlainTextFromHtml(value) {
-  if (!value) {
-    return "";
-  }
-
-  try {
-    return docToPlainText(htmlToDoc(String(value))).trim();
-  } catch {
-    return String(value).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  }
-}
-
-function extractFileName(url) {
-  if (!url) return null;
-  return String(url).split("?")[0].split("/").pop() || null;
-}
 
 function formatValue(value) {
   if (value === null || value === undefined || value === "") {
@@ -28,6 +10,27 @@ function formatValue(value) {
   }
 
   return String(value);
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return "-";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).format(date);
 }
 
 function formatStatus(status) {
@@ -43,25 +46,11 @@ function formatStatus(status) {
 export default function BlogDetailsModal({ blog, isOpen, onClose }) {
   if (!isOpen || !blog) return null;
 
-  const descriptionText = getPlainTextFromHtml(blog.description);
-  const coverFileName = extractFileName(blog.coverImage);
   const summaryItems = [
     { label: "Author", value: formatValue(blog.author) },
-    { label: "Last Updated", value: formatValue(blog.lastUpdated) },
+    { label: "Last Updated", value: formatDateTime(blog.lastUpdated) },
     { label: "Status", value: formatStatus(blog.status), tone: blog.status },
   ];
-  const contentItems = [
-    { label: "Group", value: formatValue(blog.group) },
-    { label: "Category", value: formatValue(blog.category) },
-    { label: "Subcategory", value: formatValue(blog.subcategory) },
-  ];
-  const locationItems = [
-    { label: "Country", value: formatValue(blog.country) },
-    { label: "State", value: formatValue(blog.state) },
-    { label: "District", value: formatValue(blog.district) },
-    { label: "City", value: formatValue(blog.city) },
-  ];
-
   return (
     <div className="blog-modal-overlay" onClick={onClose}>
       <div
@@ -104,54 +93,6 @@ export default function BlogDetailsModal({ blog, isOpen, onClose }) {
             </div>
           </section>
 
-          <div className="blog-detail-card">
-            <span className="blog-detail-label">Blog Cover Image</span>
-            {blog.coverImage ? (
-              <a
-                href={blog.coverImage}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="blog-value-link"
-              >
-                {coverFileName}
-              </a>
-            ) : (
-              <p className="blog-detail-value">-</p>
-            )}
-          </div>
-
-          <div className="blog-detail-card">
-            <span className="blog-detail-label">Blog Description</span>
-            <p className="blog-description-text">{descriptionText || "-"}</p>
-          </div>
-
-          <section className="blog-detail-section blog-grid-full">
-            <div className="blog-section-header">
-              <span>Content Classification</span>
-            </div>
-            <div className="blog-section-grid">
-              {contentItems.map((item) => (
-                <div className="blog-detail-card" key={item.label}>
-                  <span className="blog-detail-label">{item.label}</span>
-                  <p className="blog-detail-value">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="blog-detail-section blog-grid-full">
-            <div className="blog-section-header">
-              <span>Location Classification</span>
-            </div>
-            <div className="blog-section-grid">
-              {locationItems.map((item) => (
-                <div className="blog-detail-card" key={item.label}>
-                  <span className="blog-detail-label">{item.label}</span>
-                  <p className="blog-detail-value">{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       </div>
     </div>

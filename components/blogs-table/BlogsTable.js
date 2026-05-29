@@ -109,25 +109,66 @@ const actionStatusMap = {
   },
 };
 
+function pickFirstValue(...values) {
+  return values.find((value) => value !== undefined && value !== null && value !== "") || "";
+}
+
 function normalizeBlogRow(item, index = 0) {
   const rawStatus = String(
     item?.blog_status || item?.status || item?.post_status || "created"
   ).toLowerCase();
+
+  const createdDate = pickFirstValue(
+    item?.created_at,
+    item?.createdAt,
+    item?.created_date,
+    item?.createdDate,
+    item?.create_date,
+    item?.createDate,
+    item?.created_on,
+    item?.createdOn,
+    item?.blog_created_date,
+    item?.blogCreatedDate
+  );
+
+  const updatedDate = pickFirstValue(
+    item?.lastUpdated,
+    item?.updated_at,
+    item?.updatedAt,
+    item?.updated_date,
+    item?.updatedDate,
+    item?.last_updated,
+    item?.last_updated_at,
+    item?.modified_at,
+    item?.modifiedAt
+  );
 
   return {
     id: item?.id || item?.blog_id || index + 1,
     title: item?.title || item?.blog_title || item?.name || "Untitled Blog",
     subtitle: item?.subtitle || item?.obj_1 || "",
     description: item?.description || "",
-    author: item?.author || item?.author_name || item?.created_by || "Unknown author",
-    lastUpdated:
-      item?.lastUpdated ||
-      item?.updated_at ||
-      item?.updatedAt ||
-      item?.created_at ||
-      item?.createdAt ||
-      new Date().toISOString().split("T")[0],
-    createdAt: item?.created_at || item?.createdAt || "",
+    author:
+      item?.author_name ||
+      item?.authorName ||
+      item?.created_by_name ||
+      item?.createdByName ||
+      item?.created_by ||
+      item?.createdBy ||
+      item?.author ||
+      "Unknown author",
+    createdAt: createdDate,
+    lastUpdated: updatedDate || createdDate,
+    updatedName:
+      item?.updated_name ||
+      item?.updatedName ||
+      item?.updated_by_name ||
+      item?.updatedByName ||
+      item?.updated_by ||
+      item?.updatedBy ||
+      item?.modified_by ||
+      item?.modifiedBy ||
+      "-",
     deletedAt: item?.deleted_at || item?.deletedAt || "",
     slug: item?.slug || "",
     timeToRead: item?.time_to_read ?? item?.timeToRead ?? null,
@@ -254,6 +295,27 @@ export default function BlogsTable() {
           title:       b.blog_title || b.title || row.title,
           coverImage:  b.img_1 || null,
           subtitle:    b.obj_1 || "",
+          author:
+            b.author_name ||
+            b.authorName ||
+            b.created_by_name ||
+            b.createdByName ||
+            b.created_by ||
+            b.createdBy ||
+            b.author ||
+            row.author,
+          lastUpdated:
+            b.lastUpdated ||
+            b.updated_at ||
+            b.updatedAt ||
+            b.updated_date ||
+            b.updatedDate ||
+            b.last_updated ||
+            b.last_updated_at ||
+            b.modified_at ||
+            b.modifiedAt ||
+            row.lastUpdated,
+          status: b.blog_status || b.status || b.post_status || row.status,
           group:       cluster?.name      || null,
           category:    category?.name     || null,
           subcategory: subCategory?.name  || null,
@@ -302,12 +364,25 @@ export default function BlogsTable() {
     {
       field: "title",
       label: "Blog Title",
+      width: 185,
+      minWidth: 120,
       sortable: true
     },
 
     {
       field: "author",
       label: "Author",
+      width: 125,
+      minWidth: 90,
+      sortable: true
+    },
+
+    {
+      field: "createdAt",
+      label: "Created Date",
+      type: "date",
+      width: 115,
+      minWidth: 95,
       sortable: true
     },
 
@@ -315,12 +390,24 @@ export default function BlogsTable() {
       field: "lastUpdated",
       label: "Last Updated",
       type: "date",
+      width: 115,
+      minWidth: 95,
+      sortable: true
+    },
+
+    {
+      field: "updatedName",
+      label: "Updated Name",
+      width: 120,
+      minWidth: 95,
       sortable: true
     },
 
     {
       field: "status",
       label: "Status",
+      width: 105,
+      minWidth: 90,
       sortable: true,
       render: (value, row) => (
         <span className={`status-pill ${row.status}`}>
@@ -393,6 +480,7 @@ export default function BlogsTable() {
             exportFileBaseName="blogs"
             bodyHeight={520}
             loading={loading || isActionLoading}
+            autoFitColumns={false}
           />
 
         </div>
