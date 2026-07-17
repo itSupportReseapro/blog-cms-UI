@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
-import { hasSelectedBlogApp } from "@/lib/blogAppContext";
+import { hasSelectedBlogApp, getCurrentBlogAppKey } from "@/lib/blogAppContext";
 import "./DashboardLayout.css";
 
 export default function DashboardLayout({ children }) {
@@ -17,6 +17,25 @@ export default function DashboardLayout({ children }) {
       router.replace("/choose-cms");
     }
   }, [router]);
+
+  // Dynamically set browser favicon based on selected app key
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const currentKey = getCurrentBlogAppKey();
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.getElementsByTagName("head")[0].appendChild(link);
+    }
+
+    if (currentKey === "swastyarekha") {
+      link.href = "/Swastyarekha_favicon.svg";
+    } else {
+      link.href = "/icon.svg";
+    }
+  }, [pathname]);
 
   // Map pathname to active section
   useEffect(() => {

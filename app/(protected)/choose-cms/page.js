@@ -2,27 +2,31 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { BLOG_APP_OPTIONS, setCurrentBlogAppId } from "@/lib/blogAppContext";
+import { BLOG_APP_OPTIONS, setCurrentBlogAppKey } from "@/lib/blogAppContext";
 import PubmanuLogo from "@/assets/Images/pubmanu-logo.svg";
 import ScholarHangoutLogo from "@/assets/Images/scholar-hangout-logo.svg";
+import SwastyarekhaLogo from "@/assets/Images/swastyarekha-logo.svg";
 import "./choose-cms.css";
 
 const logoByKey = {
   pubmanu: PubmanuLogo,
   "scholar-hangout": ScholarHangoutLogo,
+  swastyarekha: SwastyarekhaLogo,
 };
 
 const descriptionByKey = {
   pubmanu: "Manage Pubmanu blog content, categories, pages, and publishing flow.",
   "scholar-hangout":
     "Manage Scholar Hangout blog content, categories, pages, and publishing flow.",
+  swastyarekha:
+    "Manage Swastyarekha blog content, categories, pages, and publishing flow.",
 };
 
 export default function ChooseCmsPage() {
   const router = useRouter();
 
-  const handleChoose = (appId) => {
-    setCurrentBlogAppId(appId);
+  const handleChoose = (key) => {
+    setCurrentBlogAppKey(key);
     router.replace("/blog/dashboard");
   };
 
@@ -38,10 +42,10 @@ export default function ChooseCmsPage() {
         <div className="chooseCms-grid">
           {BLOG_APP_OPTIONS.map((app) => (
             <button
-              key={app.id}
+              key={app.key}
               type="button"
               className="chooseCms-card"
-              onClick={() => handleChoose(app.id)}
+              onClick={() => handleChoose(app.key)}
             >
               <span className="chooseCms-logoWrap">
                 <Image
