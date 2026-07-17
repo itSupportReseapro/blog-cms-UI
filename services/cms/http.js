@@ -1,8 +1,8 @@
 import apiClient from "@/lib/axios";
-import { CMS_BASE_URL } from "./config";
+import { getCmsBaseUrl } from "./config";
 
-export function buildUrl(path) {
-  return `${CMS_BASE_URL}${path}`;
+export function buildUrl(path, appKeyOrId) {
+  return `${getCmsBaseUrl(appKeyOrId)}${path}`;
 }
 
 export function unwrapSingle(payload) {

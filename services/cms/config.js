@@ -1,4 +1,9 @@
-import { DEFAULT_BLOG_APP_ID, getCurrentBlogAppId } from "@/lib/blogAppContext";
+import {
+  DEFAULT_BLOG_APP_ID,
+  getBlogAppById,
+  getCurrentBlogAppId,
+  getCurrentBlogAppKey,
+} from "@/lib/blogAppContext";
 
 const rawEnv = String(process.env.NEXT_PUBLIC_ENV || process.env.NODE_ENV || "development")
   .trim()
@@ -18,19 +23,104 @@ const ENV_ALIASES = {
 const ENV = ENV_ALIASES[rawEnv] || "development";
 
 const CMS_BASE_MAP = {
-  development:
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL || "https://dev.api.services.blog.reseapro.com",
-  test:
-    process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
-    "https://dev.api.services.blog.reseapro.com",
-  production:
-    process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
-    "https://dev.api.services.blog.reseapro.com",
+  development: {
+    default:
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL || "https://dev.api.services.blog.reseapro.com",
+    pubmanu:
+      process.env.NEXT_PUBLIC_DEV_PUBMANU_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    "scholar-hangout":
+      process.env.NEXT_PUBLIC_DEV_SCHOLARHANGOUT_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    swastyarekha:
+      process.env.NEXT_PUBLIC_DEV_SWASTYAREKHA_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+  },
+  test: {
+    default:
+      process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    pubmanu:
+      process.env.NEXT_PUBLIC_TEST_PUBMANU_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    "scholar-hangout":
+      process.env.NEXT_PUBLIC_TEST_SCHOLARHANGOUT_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    swastyarekha:
+      process.env.NEXT_PUBLIC_TEST_SWASTYAREKHA_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+  },
+  production: {
+    default:
+      process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    pubmanu:
+      process.env.NEXT_PUBLIC_PROD_PUBMANU_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    "scholar-hangout":
+      process.env.NEXT_PUBLIC_PROD_SCHOLARHANGOUT_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+    swastyarekha:
+      process.env.NEXT_PUBLIC_PROD_SWASTYAREKHA_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
+      "https://dev.api.services.blog.reseapro.com",
+  },
 };
 
-export const CMS_BASE_URL = CMS_BASE_MAP[ENV] || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
+function normalizeAppKey(appKeyOrId) {
+  if (!appKeyOrId) {
+    return getCurrentBlogAppKey();
+  }
+
+  if (typeof appKeyOrId === "number" || /^\d+$/.test(String(appKeyOrId))) {
+    const app = getBlogAppById(Number(appKeyOrId));
+    return app?.key || null;
+  }
+
+  const normalized = String(appKeyOrId).trim().toLowerCase();
+  if (normalized === "scholarhangout") {
+    return "scholar-hangout";
+  }
+
+  return normalized;
+}
+
+export function getCmsBaseUrl(appKeyOrId = getCurrentBlogAppKey()) {
+  const baseMap = CMS_BASE_MAP[ENV] || CMS_BASE_MAP.development;
+  const appKey = normalizeAppKey(appKeyOrId);
+
+  if (appKey === "swastyarekha") {
+    return baseMap.swastyarekha || baseMap.default || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
+  }
+
+  if (appKey === "scholar-hangout" || appKey === "scholarhangout") {
+    return baseMap["scholar-hangout"] || baseMap.default || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
+  }
+
+  if (appKey === "pubmanu") {
+    return baseMap.pubmanu || baseMap.default || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
+  }
+
+  return baseMap.default || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
+}
+
+export const CMS_BASE_URL = getCmsBaseUrl();
 
 export const BLOG_DROPDOWN_LIST_PATH =
   process.env.NEXT_PUBLIC_BLOG_DROPDOWN_LIST_PATH || "/getBlogDropdownOptions";

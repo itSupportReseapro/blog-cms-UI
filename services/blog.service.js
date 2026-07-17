@@ -1,25 +1,9 @@
 import apiClient from "@/lib/axios";
 import { getCurrentBlogAppId } from "@/lib/blogAppContext";
+import { getCmsBaseUrl } from "@/services/cms/config";
 
-const ENV = process.env.NEXT_PUBLIC_ENV || "development";
-
-const BLOG_BASE_MAP = {
-  development:
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL || "https://dev.api.services.blog.reseapro.com",
-  test:
-    process.env.NEXT_PUBLIC_TEST_CMS_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
-    "https://dev.api.services.blog.reseapro.com",
-  production:
-    process.env.NEXT_PUBLIC_PROD_CMS_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_DEV_CMS_API_BASE_URL ||
-    "https://dev.api.services.blog.reseapro.com",
-};
-
-const BLOG_BASE_URL = BLOG_BASE_MAP[ENV] || process.env.NEXT_PUBLIC_CMS_API_BASE_URL || "";
-
-function buildUrl(path) {
-  return `${BLOG_BASE_URL}${path}`;
+function buildUrl(path, appKeyOrId) {
+  return `${getCmsBaseUrl(appKeyOrId)}${path}`;
 }
 
 function getErrorMessage(error, fallbackMessage) {
@@ -46,7 +30,7 @@ export async function fetchBlogs({ status = "all", page = 1, limit = 100, appId 
         ? `/getBlog/${resolvedAppId}`
         : `/getBlogByStatus/${resolvedAppId}/${encodeURIComponent(normalizedStatus)}`;
 
-    const response = await apiClient.get(buildUrl(path), {
+    const response = await apiClient.get(buildUrl(path, resolvedAppId), {
       params: { page, limit },
     });
 
