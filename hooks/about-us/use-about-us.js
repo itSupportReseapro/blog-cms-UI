@@ -4,7 +4,6 @@ import { useState } from "react";
 import { defaultDoc, docToHTML, htmlToDoc } from "@/components/pdp-rich-editor-2";
 import {
   CMS_DEFAULTS,
-  CMS_RESOURCE_IDS,
   createAboutUs,
   createAboutUsMissionAndVision,
   createAboutUsOurValues,
@@ -66,11 +65,6 @@ function getHtmlDoc(value) {
 function persistResourceId(key, id) {
   if (typeof window === "undefined" || !id) return;
   window.localStorage.setItem(key, String(id));
-}
-
-function resolveResourceId(key, fallbackId) {
-  if (typeof window === "undefined") return fallbackId;
-  return window.localStorage.getItem(key) || fallbackId;
 }
 
 function mapAboutResponseToState(entity) {
@@ -143,20 +137,10 @@ export default function useAboutUs() {
     setError(null);
 
     try {
-      const aboutId = resolveResourceId(ABOUT_STORAGE_KEYS.about, CMS_RESOURCE_IDS.aboutUs);
-      const missionVisionId = resolveResourceId(
-        ABOUT_STORAGE_KEYS.missionVision,
-        CMS_RESOURCE_IDS.aboutUsMissionVision
-      );
-      const valuesId = resolveResourceId(
-        ABOUT_STORAGE_KEYS.values,
-        CMS_RESOURCE_IDS.aboutUsOurValues
-      );
-
       const [about, missionVision, values] = await Promise.all([
-        getAboutUsById(aboutId),
-        getAboutUsMissionAndVisionById(missionVisionId),
-        getAboutUsOurValuesById(valuesId),
+        getAboutUsById(CMS_DEFAULTS.appId),
+        getAboutUsMissionAndVisionById(CMS_DEFAULTS.appId),
+        getAboutUsOurValuesById(CMS_DEFAULTS.appId),
       ]);
 
       if (about?.id) persistResourceId(ABOUT_STORAGE_KEYS.about, about.id);

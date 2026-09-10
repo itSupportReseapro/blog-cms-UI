@@ -1,9 +1,9 @@
-// components/pdp-rich-editor-2/RichEditor.js
+// components/pdp-rich-editor/RichEditor.js
 "use client";
 import "./RichEditor.css";
 import React, { useEffect, useRef, useState } from "react";
-import { defaultDoc, docToPlainText } from "./core";
-import { setSelectionOffsets, getRangeRectSafe } from "./selection-dom";
+import { defaultDoc, docToPlainText, docToIndexedText, inlineNodeIndexLength } from "./core/core";
+import { getSelectionOffsets, setSelectionOffsets, getRangeRectSafe } from "./utils/selection-dom";
 
 import {
   indentBlock,
@@ -17,20 +17,40 @@ import {
   setHighlight,
   setFontSize,
   insertTable,
-} from "./commands";
+  insertImage,
+  insertEquation,
+  insertText,
+  updateAtomicBlock,
+  removeAtomicBlock,
+} from "./core/commands";
 
-import { docToEditableHTML, htmlToDoc, getTableHeaderPresentation } from "./conversion";
-import { findContainingBlock, getLinkHrefInRange, getLinkRangeAtPos } from "./helpers";
+import { docToEditableHTML, htmlToDoc, getTableHeaderPresentation } from "./core/conversion";
+import {
+  insertTableRow as txInsertTableRow,
+  deleteTableRow as txDeleteTableRow,
+  insertTableColumn as txInsertTableColumn,
+  deleteTableColumn as txDeleteTableColumn,
+  deleteTable as txDeleteTable,
+  setTableTheme as txSetTableTheme,
+  setTableHeaderColor as txSetTableHeaderColor,
+  mergeTableCells as txMergeTableCells,
+  splitTableCell as txSplitTableCell,
+} from "./table/tableCommands";
 
-import useRichEditorState from "./useRichEditorState";
-import useRichEditorHistory from "./useRichEditorHistory";
-import useRichEditorUI from "./useRichEditorUI";
+import useRichEditorState from "./hooks/useRichEditorState";
+import useRichEditorHistory from "./hooks/useRichEditorHistory";
+import useRichEditorUI from "./hooks/useRichEditorUI";
 
-import Toolbar from "./Toolbar";
-import LinkModal from "./LinkModal";
-import TablePopup from "./TablePopup";
-import Editor from "./Editor";
-import EditorFooter from "./EditorFooter";
+import Toolbar from "./components/toolbar/Toolbar";
+import LinkModal from "./components/modals/LinkModal";
+import TablePopup from "./components/modals/TablePopup";
+import ImageModal, { validateImage } from "./components/modals/ImageModal";
+import ImageToolbar from "./components/modals/ImageToolbar";
+import EquationModal from "./components/modals/EquationModal";
+import SymbolPopup from "./components/modals/SymbolPopup";
+import ColorPickerPopup from "./components/modals/ColorPickerPopup";
+import Editor from "./components/Editor";
+import EditorFooter from "./components/EditorFooter";
 
 function countWords(doc) {
   const plainText = docToPlainText(doc);
@@ -71,7 +91,8 @@ export default function RichEditor({
   value,
   onChange,
   onHTMLChange,
-  placeholder = "Write...",
+  onUploadImage,
+  placeholder = "Write…",
   disabled = false,
   showFooter = true,
   className,
@@ -95,8 +116,12 @@ export default function RichEditor({
   const { rootRef, wrapRef, docRef, selectionRef, selectionSnapshotRef } = editorState;
   const { lastHistoryAtRef, pushHistory } = history;
   const { linkInputRef, tableRowsInputRef, tableColsInputRef } = ui;
-  const { setLinkUI, setTableUI } = ui;
+  const { setLinkUI, setTableUI, setImageUI, setEquationUI, setSymbolUI } = ui;
 
+  const [selectedBlockId, setSelectedBlockId] = useState(null);
+  const [selectedBlockType, setSelectedBlockType] = useState(null);
+
+  const equationInsertSelectionRef = useRef(null);
   const hoveredTableRef = useRef(null);
   const tableHoverCloseTimerRef = useRef(null);
   const [tableHoverUI, setTableHoverUI] = useState({
@@ -115,7 +140,6 @@ export default function RichEditor({
     const el = rootRef.current;
     if (!el) return;
     el.innerHTML = docToEditableHTML(docRef.current);
-    Array.from(el.querySelectorAll("table")).forEach((table) => applyTableHeaderPresentation(table));
   }, []);
 
   useEffect(() => {
@@ -140,6 +164,7 @@ export default function RichEditor({
       if (!wrap?.contains(event.target)) {
         setLinkUI((prev) => ({ ...prev, open: false }));
         setTableUI((prev) => ({ ...prev, open: false }));
+        setSymbolUI((prev) => ({ ...prev, open: false }));
         setTableMenuOpen({ top: false, left: false });
       } else if (!event.target?.closest?.(".re-table-plus-wrap") && !event.target?.closest?.(".re-table-action-menu")) {
         setTableMenuOpen({ top: false, left: false });
@@ -147,34 +172,13 @@ export default function RichEditor({
     };
 
     document.addEventListener("mousedown", onDocMouseDown);
-    return () => document.removeEventListener("mousedown", onDocMouseDown);
-  }, [setLinkUI, setTableUI, wrapRef]);
+    return () => {
+      document.removeEventListener("mousedown", onDocMouseDown);
+      clearTimeout(tableHoverCloseTimerRef.current);
+    };
+  }, [setLinkUI, setTableUI, setSymbolUI, wrapRef]);
 
   const emitDoc = (nextDoc) => editorState.emitDoc(nextDoc, onChange, onHTMLChange);
-
-  const applyTableHeaderPresentation = (table) => {
-    if (!table) return;
-    const theme = table.getAttribute("data-theme") === "plain" ? "plain" : "blue";
-    const headerColor = rgbToHex(table.getAttribute("data-header-color") || table.style.getPropertyValue("--re-table-header-bg") || "#dbeafe", "#dbeafe");
-    const header = getTableHeaderPresentation(headerColor, theme);
-    table.setAttribute("data-header-color", header.headerColor);
-    table.style.setProperty("--re-table-header-bg", header.headerColor);
-
-    const rows = Array.from(table.rows || []);
-    rows.forEach((row, rowIndex) => {
-      Array.from(row.cells || []).forEach((cell) => {
-        if (rowIndex === 0) {
-          cell.style.backgroundColor = header.background;
-          cell.style.color = header.textColor;
-          cell.style.fontWeight = "600";
-        } else {
-          cell.style.removeProperty("background-color");
-          cell.style.removeProperty("color");
-          cell.style.removeProperty("font-weight");
-        }
-      });
-    });
-  };
 
   const insertPlainTextAtSelection = (text) => {
     const selection = window.getSelection();
@@ -190,6 +194,58 @@ export default function RichEditor({
     return true;
   };
 
+  const uploadAndInsertImage = async (file, metadata = {}) => {
+    if (!file) return;
+
+    setImageUI((previous) => ({
+      ...previous,
+      uploading: true,
+      error: "",
+    }));
+
+    try {
+      validateImage(file);
+
+      let uploaded = null;
+      if (typeof onUploadImage === "function") {
+        uploaded = await onUploadImage(file);
+      } else {
+        const objectUrl = URL.createObjectURL(file);
+        uploaded = { src: objectUrl, width: 600 };
+      }
+
+      applyTx((doc, selection) =>
+        insertImage(doc, selection, {
+          ...uploaded,
+          alt: metadata.alt || "",
+          caption: metadata.caption || "",
+          width: metadata.width || uploaded.width || 600,
+          align: metadata.align || "center",
+          wrap: metadata.wrap || "break-text",
+        })
+      );
+
+      setImageUI({
+        open: false,
+        file: null,
+        src: "",
+        alt: "",
+        caption: "",
+        width: 600,
+        align: "center",
+        wrap: "break-text",
+        uploading: false,
+        error: "",
+      });
+    } catch (error) {
+      setImageUI((previous) => ({
+        ...previous,
+        uploading: false,
+        error: error.message || "Image upload failed",
+      }));
+    }
+  };
+
   const getActiveCodeElement = () => {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return null;
@@ -197,6 +253,165 @@ export default function RichEditor({
       ? selection.anchorNode
       : selection.anchorNode?.parentElement;
     return node?.closest?.("pre, code") || null;
+  };
+
+  const openEquationModal = () => {
+    editorState.captureSelectionSnapshot();
+
+    const savedSelection =
+      selectionSnapshotRef.current ||
+      selectionRef.current ||
+      {
+        from: 0,
+        to: 0,
+      };
+
+    equationInsertSelectionRef.current = {
+      from: Number.isFinite(
+        savedSelection.from
+      )
+        ? savedSelection.from
+        : 0,
+
+      to: Number.isFinite(
+        savedSelection.to
+      )
+        ? savedSelection.to
+        : Number.isFinite(
+            savedSelection.from
+          )
+          ? savedSelection.from
+          : 0,
+    };
+
+    ui.setEquationUI((previous) => ({
+      ...previous,
+      open: true,
+      editingId: null,
+    }));
+  };
+
+  const selectEntireEditor = () => {
+    const editorElement = rootRef.current;
+
+    if (!editorElement) {
+      return false;
+    }
+
+    const liveDocument = htmlToDoc(
+      editorElement.innerHTML
+    );
+
+    const totalLength =
+      docToIndexedText(
+        liveDocument
+      ).length;
+
+    setSelectionOffsets(
+      editorElement,
+      0,
+      totalLength
+    );
+
+    const selectedOffsets = {
+      from: 0,
+      to: totalLength,
+    };
+
+    const rect =
+      getRangeRectSafe(
+        editorElement
+      );
+
+    selectionRef.current =
+      selectedOffsets;
+
+    selectionSnapshotRef.current = {
+      ...selectedOffsets,
+      rect,
+    };
+
+    /*
+     * Clear individually selected image/equation state.
+     * Otherwise Backspace may delete only that one object.
+     */
+    editorElement
+      .querySelectorAll(".is-selected")
+      .forEach((element) =>
+        element.classList.remove(
+          "is-selected"
+        )
+      );
+
+    setSelectedBlockId(null);
+    setSelectedBlockType(null);
+
+    return true;
+  };
+
+  const isEntireEditorSelected = () => {
+    const editorElement = rootRef.current;
+    const selection = window.getSelection();
+
+    if (
+      !editorElement ||
+      !selection ||
+      selection.rangeCount === 0 ||
+      selection.isCollapsed
+    ) {
+      return false;
+    }
+
+    const liveDocument = htmlToDoc(editorElement.innerHTML);
+    const totalLength = docToIndexedText(liveDocument).length;
+    const selectedOffsets = getSelectionOffsets(editorElement);
+
+    const isFullByOffsets =
+      selectedOffsets.from === 0 &&
+      selectedOffsets.to >= Math.max(0, totalLength - 5);
+
+    const range = selection.getRangeAt(0);
+    const firstChild = editorElement.firstChild;
+    const lastChild = editorElement.lastChild;
+
+    const isFullByDOM =
+      Boolean(range) &&
+      (range.startContainer === editorElement ||
+        (firstChild && (firstChild.contains(range.startContainer) || range.startContainer === firstChild))) &&
+      (range.endContainer === editorElement ||
+        (lastChild && (lastChild.contains(range.endContainer) || range.endContainer === lastChild)));
+
+    const containsAllNodes =
+      Boolean(firstChild) &&
+      Boolean(lastChild) &&
+      selection.containsNode(firstChild, true) &&
+      selection.containsNode(lastChild, true);
+
+    return isFullByOffsets || isFullByDOM || containsAllNodes;
+  };
+
+  const clearEntireEditor = () => {
+    applyTx(() => ({
+      doc: defaultDoc(),
+      selection: {
+        from: 0,
+        to: 0,
+      },
+    }));
+
+    hoveredTableRef.current = null;
+    setSelectedBlockId(null);
+    setSelectedBlockType(null);
+
+    setTableHoverUI((previousState) => ({
+      ...previousState,
+      open: false,
+    }));
+
+    setTableMenuOpen({
+      top: false,
+      left: false,
+    });
   };
 
   const syncTableUIFromCell = (cell, table) => {
@@ -256,7 +471,7 @@ export default function RichEditor({
     const next = result?.doc ? result.doc : prev;
     const nextSel = result?.selection || sel;
 
-    if (!opts.skipHistory) pushHistory(prev);
+    if (!opts.skipHistory) pushHistory(prev, sel);
 
     el.innerHTML = docToEditableHTML(next);
     setSelectionOffsets(el, nextSel.from, nextSel.to);
@@ -267,12 +482,12 @@ export default function RichEditor({
   };
 
   const undo = () => {
-    history.undo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
+    history.undo(rootRef, docRef, selectionRef, emitDoc, onChange, onHTMLChange);
     refreshUIFromDOMSelection();
   };
 
   const redo = () => {
-    history.redo(rootRef, docRef, emitDoc, onChange, onHTMLChange);
+    history.redo(rootRef, docRef, selectionRef, emitDoc, onChange, onHTMLChange);
     refreshUIFromDOMSelection();
   };
 
@@ -285,306 +500,326 @@ export default function RichEditor({
     const probeEnd = Math.max(from, to);
 
     const checkRuns = (runs = []) => {
+      let runAbs = abs;
+      let matchedMarks = null;
+
       for (const run of runs) {
-        const text = String(run?.text || "");
-        const start = abs;
-        const end = start + text.length;
-        abs = end;
-        const overlapsRange = probeEnd > probeStart && end > probeStart && start < probeEnd;
-        const containsCaret = probeEnd === probeStart && probeStart >= start && probeStart <= end;
-        if (overlapsRange || containsCaret) {
-          return Array.isArray(run?.marks) ? run.marks : [];
+        const len = inlineNodeIndexLength(run);
+        const runStart = runAbs;
+        const runEnd = runAbs + len;
+        runAbs = runEnd;
+
+        const overlaps = probeStart === probeEnd
+          ? (probeStart >= runStart && probeStart <= runEnd)
+          : (probeStart < runEnd && probeEnd > runStart);
+
+        if (overlaps) {
+          const marks = Array.isArray(run?.marks) ? run.marks : [];
+          if (matchedMarks === null) {
+            matchedMarks = marks;
+          } else {
+            matchedMarks = matchedMarks.filter((m) =>
+              marks.some((rm) => (m.type === "a" ? rm.type === "a" && rm.href === m.href : rm.type === m.type))
+            );
+          }
         }
       }
-      return null;
+
+      abs = runAbs;
+      return matchedMarks;
     };
 
-    for (let bi = 0; bi < blocks.length; bi++) {
-      const block = blocks[bi];
-      if (block?.type === "table") {
-        const rows = Array.isArray(block.rows) ? block.rows : [];
-        for (let ri = 0; ri < rows.length; ri++) {
-          const cells = Array.isArray(rows[ri]?.cells) ? rows[ri].cells : [];
-          for (let ci = 0; ci < cells.length; ci++) {
-            const found = checkRuns(Array.isArray(cells[ci]?.content) ? cells[ci].content : []);
-            if (found) return found;
-            if (ci !== cells.length - 1) abs += 1;
+    for (const b of blocks) {
+      if (b.type === "table") {
+        for (const r of b.rows || []) {
+          for (const c of r.cells || []) {
+            const cellMarks = checkRuns(c.content || []);
+            if (cellMarks !== null) return cellMarks;
+            abs += 1;
           }
-          if (ri !== rows.length - 1) abs += 1;
+          abs += 1;
         }
       } else {
-        const found = checkRuns(Array.isArray(block?.content) ? block.content : []);
-        if (found) return found;
+        const blockMarks = checkRuns(b.content || []);
+        if (blockMarks !== null) return blockMarks;
       }
-
-      if (bi !== blocks.length - 1) abs += 1;
+      abs += 1;
     }
 
     return [];
   }
 
   function refreshUIFromDOMSelection() {
-    const el = rootRef.current;
-    if (!el) return;
+    const root = rootRef.current;
+    if (!root) return;
 
-    const liveDoc = htmlToDoc(el.innerHTML);
-    const selOff = editorState.getBestSelection();
-    const rect = getRangeRectSafe(el);
+    const sel = editorState.getBestSelection();
+    selectionRef.current = sel;
 
-    selectionRef.current = selOff;
+    const curDoc = htmlToDoc(root.innerHTML);
+    docRef.current = curDoc;
 
-    if (selOff.from !== selOff.to) {
-      selectionSnapshotRef.current = { ...selOff, rect };
+    const domSel = window.getSelection();
+    let currentBlock = null;
+    let anchorNode = domSel?.anchorNode;
+
+    if (anchorNode) {
+      const el = anchorNode.nodeType === Node.ELEMENT_NODE ? anchorNode : anchorNode.parentElement;
+      const bEl = el?.closest("p, h1, h2, h3, pre, li, td, th, figure, [data-re-node]");
+      if (bEl) {
+        const tag = bEl.tagName.toLowerCase();
+        if (tag === "h1") currentBlock = { type: "h1" };
+        else if (tag === "h2") currentBlock = { type: "h2" };
+        else if (tag === "h3") currentBlock = { type: "h3" };
+        else if (tag === "pre") currentBlock = { type: "code" };
+        else if (tag === "li") {
+          const listTag = bEl.parentElement?.tagName?.toLowerCase();
+          currentBlock = { type: listTag === "ol" ? "ol" : "ul" };
+        } else {
+          currentBlock = { type: "p" };
+        }
+
+        const alignVal = bEl.style?.textAlign || "left";
+        ui.setAlignState(alignVal);
+      }
     }
 
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) {
-      ui.setActiveMarks(emptyActiveMarks);
-      ui.setColorState(NONE_VALUE);
-      ui.setHighlightState(NONE_VALUE);
-      ui.setFontSizeState("16px");
-      return;
+    ui.setFormat(currentBlock?.type || "p");
+
+    let computedColor = "#111827";
+    let computedHighlight = NONE_VALUE;
+    let computedFontSize = "16px";
+
+    if (anchorNode) {
+      const el = anchorNode.nodeType === Node.ELEMENT_NODE ? anchorNode : anchorNode.parentElement;
+      if (el && root.contains(el)) {
+        const cs = window.getComputedStyle(el);
+        computedColor = rgbToHex(cs.color, "#111827");
+        const bg = cs.backgroundColor;
+        if (bg && bg !== "transparent" && !/^rgba?\(\s*0\s*,\s*0\s*,\s*0\s*,\s*0\s*\)$/i.test(bg)) {
+          computedHighlight = rgbToHex(bg, NONE_VALUE);
+        }
+        computedFontSize = normalizePx(cs.fontSize, "16px");
+      }
     }
 
-    const r = sel.getRangeAt(0);
-    const blockEl = findContainingBlock(el, r.startContainer);
-    if (!blockEl) {
-      ui.setActiveMarks(emptyActiveMarks);
-      return;
-    }
+    ui.setColorState(computedColor);
+    ui.setHighlightState(computedHighlight);
+    ui.setFontSizeState(computedFontSize);
 
-    const tag = blockEl.tagName.toLowerCase();
-
-    if (tag === "h1") ui.setFormat("h1");
-    else if (tag === "h2") ui.setFormat("h2");
-    else if (tag === "h3") ui.setFormat("h3");
-    else if (tag === "pre") ui.setFormat("code");
-    else if (tag === "li") {
-      const p = blockEl.parentElement?.tagName?.toLowerCase();
-      ui.setFormat(p === "ol" ? "ol" : "ul");
-    } else ui.setFormat("p");
-
-    const a = (
-      blockEl.style?.textAlign || blockEl.closest?.("p, h1, h2, h3, li")?.style?.textAlign || "left"
-    ).toLowerCase();
-    ui.setAlignState(["left", "center", "right", "justify"].includes(a) ? a : "left");
-
-    const startEl = r.startContainer.nodeType === Node.ELEMENT_NODE
-      ? r.startContainer
-      : r.startContainer.parentElement;
-
-    const hasAncestor = (selector) => {
-      const match = startEl?.closest?.(selector);
-      return !!(match && el.contains(match));
-    };
-
-    const currentMarks = getSelectionInlineMarks(liveDoc, selOff);
-    const colorMark = currentMarks.find((mark) => mark.type === "color" && mark.value)?.value || NONE_VALUE;
-    const backgroundMark = currentMarks.find((mark) => mark.type === "background" && mark.value)?.value || NONE_VALUE;
-    const fontSizeMark = currentMarks.find((mark) => mark.type === "fontSize" && mark.value)?.value || null;
-
+    const activeMarks = getSelectionInlineMarks(curDoc, sel);
     ui.setActiveMarks({
-      b: hasAncestor("strong,b") || currentMarks.some((mark) => mark.type === "b"),
-      i: hasAncestor("em,i") || currentMarks.some((mark) => mark.type === "i"),
-      u: hasAncestor("u") || currentMarks.some((mark) => mark.type === "u"),
-      s: hasAncestor("s,strike") || currentMarks.some((mark) => mark.type === "s"),
-      sub: hasAncestor("sub") || currentMarks.some((mark) => mark.type === "sub"),
-      sup: hasAncestor("sup") || currentMarks.some((mark) => mark.type === "sup"),
-      a: hasAncestor("a") || currentMarks.some((mark) => mark.type === "a"),
+      b: activeMarks.some((m) => m.type === "b"),
+      i: activeMarks.some((m) => m.type === "i"),
+      u: activeMarks.some((m) => m.type === "u"),
+      s: activeMarks.some((m) => m.type === "s"),
+      sub: activeMarks.some((m) => m.type === "sub"),
+      sup: activeMarks.some((m) => m.type === "sup"),
+      a: activeMarks.some((m) => m.type === "a"),
     });
 
-    const styledElement = startEl?.nodeType === Node.ELEMENT_NODE ? startEl : blockEl;
-    const computed = styledElement ? window.getComputedStyle(styledElement) : null;
-    ui.setColorState(colorMark);
-    ui.setHighlightState(backgroundMark);
-    ui.setFontSizeState(fontSizeMark || normalizePx(computed?.fontSize || "16px"));
+    const activeLinkMark = activeMarks.find((m) => m.type === "a");
+    if (activeLinkMark?.href) {
+      const rect = getRangeRectSafe(root);
+      const pos = getPopupPositionFromRect(rect, "bottom");
+      ui.setLinkUI({
+        open: true,
+        href: activeLinkMark.href,
+        x: pos.x,
+        y: pos.y,
+        selection: sel,
+      });
+    } else {
+      ui.setLinkUI((prev) => (prev.open ? { ...prev, open: false } : prev));
+    }
   }
 
   const openLinkModal = () => {
-    const el = rootRef.current;
-    if (!el) return;
-
-    const liveDoc = htmlToDoc(el.innerHTML);
-    docRef.current = liveDoc;
-
-    const liveSel = editorState.isSelectionInside()
-      ? editorState.getLiveSelection()
-      : editorState.getBestSelection();
-
-    let selOff = liveSel;
-    let href = "";
-
-    if (selOff.from === selOff.to) {
-      const linkAtCaret = getLinkRangeAtPos(liveDoc, selOff.from);
-      if (!linkAtCaret) return;
-      selOff = { from: linkAtCaret.from, to: linkAtCaret.to };
-      href = linkAtCaret.href;
-    } else {
-      href = getLinkHrefInRange(liveDoc, selOff);
-    }
-
-    selectionRef.current = selOff;
-    setSelectionOffsets(el, selOff.from, selOff.to);
-
-    const rect = getRangeRectSafe(el) || selectionSnapshotRef.current?.rect;
+    const sel = editorState.getBestSelection();
+    selectionRef.current = sel;
+    const rect = getRangeRectSafe(rootRef.current);
     const pos = getPopupPositionFromRect(rect, "bottom");
 
-    ui.setLinkUI({ open: true, href: String(href || ""), x: pos.x, y: pos.y });
+    const curDoc = htmlToDoc(rootRef.current.innerHTML);
+    const activeMarks = getSelectionInlineMarks(curDoc, sel);
+    const linkMark = activeMarks.find((m) => m.type === "a");
 
-    setTimeout(() => {
-      const el2 = rootRef.current;
-      if (el2) setSelectionOffsets(el2, selOff.from, selOff.to);
-    }, 0);
+    ui.setLinkUI({
+      open: true,
+      href: linkMark?.href || "",
+      x: pos.x,
+      y: pos.y,
+      selection: sel,
+    });
   };
 
-  const applyLinkFromModal = () => {
-    const href = String(ui.linkUI.href || "").trim();
-    if (!href) return;
-
-    const savedSel = selectionRef.current;
-    applyTx((d) => setLink(d, savedSel, href));
-    ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
+  const applyLinkFromModal = (url) => {
+    const targetSel = ui.linkUI.selection || editorState.getBestSelection();
+    if (url) {
+      applyTx((d) => setLink(d, targetSel, url));
+    } else {
+      applyTx((d) => unsetLink(d, targetSel));
+    }
+    ui.setLinkUI({ open: false, href: "", x: 0, y: 0, selection: null });
   };
 
   const removeLinkFromModal = () => {
-    const savedSel = selectionRef.current;
-    applyTx((d) => unsetLink(d, savedSel));
-    ui.setLinkUI({ open: false, href: "", x: 0, y: 0 });
+    const targetSel = ui.linkUI.selection || editorState.getBestSelection();
+    applyTx((d) => unsetLink(d, targetSel));
+    ui.setLinkUI({ open: false, href: "", x: 0, y: 0, selection: null });
   };
 
   const openTablePopup = () => {
-    const el = rootRef.current;
-    const wrap = wrapRef.current;
-    if (!el || !wrap) return;
+    const sel = editorState.getBestSelection();
+    selectionRef.current = sel;
+    const rect = getRangeRectSafe(rootRef.current);
+    const pos = getPopupPositionFromRect(rect, "bottom");
 
-    let rect = getRangeRectSafe(el);
-    if (!rect) rect = selectionSnapshotRef.current?.rect;
-    if (!rect) return;
-
-    const wrapRect = wrap.getBoundingClientRect();
-    const x = rect.left - wrapRect.left;
-    const y = rect.bottom - wrapRect.top + 8;
-
-    ui.setTableUI({ open: true, rows: 2, cols: 2, x, y });
-    el.focus();
+    ui.setTableUI({
+      open: true,
+      rows: 2,
+      cols: 2,
+      x: pos.x,
+      y: pos.y,
+    });
   };
 
-  const insertTableWithDimensions = () => {
-    const rows = Math.max(1, Math.min(20, ui.tableUI.rows || 2));
-    const cols = Math.max(1, Math.min(20, ui.tableUI.cols || 2));
+  const insertTableWithDimensions = (r, c) => {
+    const rows = typeof r === "number" && Number.isFinite(r) ? Math.max(1, r) : (ui.tableUI.rows || 2);
+    const cols = typeof c === "number" && Number.isFinite(c) ? Math.max(1, c) : (ui.tableUI.cols || 2);
     applyTx((d, s) => insertTable(d, s, rows, cols));
     ui.setTableUI({ open: false, rows: 2, cols: 2, x: 0, y: 0 });
   };
 
-  const scheduleTableHoverClose = () => {
-    clearTimeout(tableHoverCloseTimerRef.current);
-    tableHoverCloseTimerRef.current = setTimeout(() => {
-      hoveredTableRef.current = null;
-      setTableHoverUI((prev) => ({ ...prev, open: false }));
-      setTableMenuOpen({ top: false, left: false });
-      }, 120);
-  };
-
   const updateTableHoverUIFromTarget = (target) => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root || !target) return;
 
-    if (target?.closest?.(".re-table-plus-wrap") || target?.closest?.(".re-table-action-menu")) return;
-
-    const cell = target?.closest?.("td,th");
+    const cell = target.closest?.("td, th");
     const table = cell?.closest?.("table");
-    if (!cell || !table || !root.contains(table)) {
-      scheduleTableHoverClose();
-      return;
+
+    if (cell && table && root.contains(table)) {
+      clearTimeout(tableHoverCloseTimerRef.current);
+      syncTableUIFromCell(cell, table);
     }
-
-    clearTimeout(tableHoverCloseTimerRef.current);
-    syncTableUIFromCell(cell, table);
   };
 
-  const refreshTableHoverAfterMutation = () => {
-    const table = hoveredTableRef.current;
-    if (!table) return;
-
-    const rows = Array.from(table.rows || []);
-    const rowEl = rows[tableHoverUI.rowIndex] || rows[0];
-    const cell = rowEl?.cells?.[tableHoverUI.colIndex] || rowEl?.cells?.[0];
-    if (!rowEl || !cell) return;
-    syncTableUIFromCell(cell, table);
-  };
-
-  const applyTableDomMutation = (mutator) => {
-    const root = rootRef.current;
-    const table = hoveredTableRef.current;
-    if (!root || !table || !root.contains(table)) return;
-
-    mutator(table, tableHoverUI.rowIndex, tableHoverUI.colIndex);
-    applyTableHeaderPresentation(table);
-    root.focus();
-    setTableMenuOpen({ top: false, left: false });
-    handleScheduleSyncFromDOM();
-    setTimeout(refreshTableHoverAfterMutation, 0);
+  const scheduleTableHoverClose = () => {
+    tableHoverCloseTimerRef.current = setTimeout(() => {
+      if (!tableMenuOpen.top && !tableMenuOpen.left) {
+        setTableHoverUI((prev) => ({ ...prev, open: false }));
+        hoveredTableRef.current = null;
+      }
+    }, 150);
   };
 
   const addTableRow = (position = "below") => {
-    applyTableDomMutation((table, rowIndex) => {
-      const rows = Array.from(table.rows || []);
-      const safeIndex = Math.max(0, Math.min(rowIndex, rows.length - 1));
-      const referenceRow = rows[safeIndex] || rows[rows.length - 1];
-      const cellCount = Math.max(1, referenceRow?.cells?.length || 1);
-      const insertIndex = position === "above" ? safeIndex : Math.min(safeIndex + 1, rows.length);
-      const newRow = table.insertRow(insertIndex);
-      for (let i = 0; i < cellCount; i++) {
-        const cell = newRow.insertCell(i);
-        cell.textContent = "\u200B";
-      }
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txInsertTableRow(doc, { tableId, rowIndex: tableHoverUI.rowIndex, position }));
+    setTableMenuOpen({ top: false, left: false });
   };
 
   const removeTableRow = () => {
-    applyTableDomMutation((table, rowIndex) => {
-      if ((table.rows || []).length <= 1) return;
-      table.deleteRow(Math.max(0, Math.min(rowIndex, table.rows.length - 1)));
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txDeleteTableRow(doc, { tableId, rowIndex: tableHoverUI.rowIndex }));
+    setTableMenuOpen({ top: false, left: false });
   };
 
   const addTableColumn = (position = "right") => {
-    applyTableDomMutation((table, _rowIndex, colIndex) => {
-      Array.from(table.rows || []).forEach((row, rowIndex) => {
-        const insertAt = position === "left" ? Math.max(0, colIndex) : Math.min(colIndex + 1, row.cells.length);
-        const cell = row.insertCell(insertAt);
-        if (rowIndex === 0) {
-          const th = document.createElement("th");
-          th.contentEditable = "true";
-          th.textContent = "\u200B";
-          row.replaceChild(th, cell);
-        } else {
-          cell.textContent = "\u200B";
-        }
-      });
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txInsertTableColumn(doc, { tableId, colIndex: tableHoverUI.colIndex, position }));
+    setTableMenuOpen({ top: false, left: false });
   };
 
   const removeTableColumn = () => {
-    applyTableDomMutation((table, _rowIndex, colIndex) => {
-      const rows = Array.from(table.rows || []);
-      if (!rows.length || rows[0].cells.length <= 1) return;
-      rows.forEach((row) => row.deleteCell(Math.max(0, Math.min(colIndex, row.cells.length - 1))));
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txDeleteTableColumn(doc, { tableId, colIndex: tableHoverUI.colIndex }));
+    setTableMenuOpen({ top: false, left: false });
+  };
+
+  const removeEntireTable = () => {
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txDeleteTable(doc, { tableId }));
+    hoveredTableRef.current = null;
+    setTableHoverUI((prev) => ({ ...prev, open: false }));
+    setTableMenuOpen({ top: false, left: false });
   };
 
   const setHoveredTableTheme = (theme) => {
-    applyTableDomMutation((table) => {
-      table.setAttribute("data-theme", theme === "plain" ? "plain" : "blue");
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txSetTableTheme(doc, { tableId, theme }));
+    setTableMenuOpen({ top: false, left: false });
   };
 
   const setHoveredTableHeaderColor = (color) => {
-    applyTableDomMutation((table) => {
-      const safeColor = rgbToHex(color, "#dbeafe");
-      table.setAttribute("data-header-color", safeColor);
-      table.style.setProperty("--re-table-header-bg", safeColor);
-    });
+    const tableId = hoveredTableRef.current?.getAttribute("data-table-id") || null;
+    applyTx((doc) => txSetTableHeaderColor(doc, { tableId, color }));
+    setTableMenuOpen({ top: false, left: false });
+  };
+
+  const handleDoubleClick = (event) => {
+    const eqEl = event.target?.closest?.('[data-re-node="equation"]');
+    if (eqEl) {
+      const id = eqEl.getAttribute("data-id");
+      const rawAst = eqEl.getAttribute("data-equation");
+      const source = eqEl.getAttribute("data-source") || "";
+      let ast = { type: "row", children: [] };
+      if (rawAst) {
+        try {
+          ast = JSON.parse(decodeURIComponent(rawAst));
+        } catch {}
+      }
+      ui.setEquationUI({
+        open: true,
+        editingId: id,
+        source,
+        ast,
+      });
+      return;
+    }
+
+    const imgEl = event.target?.closest?.('[data-re-node="image"]');
+    if (imgEl) {
+      const id = imgEl.getAttribute("data-id");
+      const src = imgEl.getAttribute("data-src") || "";
+      const alt = imgEl.getAttribute("data-alt") || "";
+      const caption = imgEl.getAttribute("data-caption") || "";
+      const width = Number(imgEl.getAttribute("data-width")) || 600;
+      const align = imgEl.getAttribute("data-align") || "center";
+      const wrap = imgEl.getAttribute("data-wrap") || "break-text";
+
+      ui.setImageUI({
+        open: true,
+        file: null,
+        src,
+        alt,
+        caption,
+        width,
+        align,
+        wrap,
+        uploading: false,
+        error: "",
+      });
+    }
+  };
+
+  const handleClick = (event) => {
+    const nodeEl = event.target?.closest?.('[data-re-node="image"], [data-re-node="equation"]');
+    const root = rootRef.current;
+    if (!root) return;
+
+    root.querySelectorAll(".is-selected").forEach((el) => el.classList.remove("is-selected"));
+
+    if (nodeEl) {
+      nodeEl.classList.add("is-selected");
+      const id = nodeEl.getAttribute("data-id");
+      const nodeType = nodeEl.getAttribute("data-re-node");
+      setSelectedBlockId(id);
+      setSelectedBlockType(nodeType);
+    } else {
+      setSelectedBlockId(null);
+      setSelectedBlockType(null);
+    }
   };
 
   const onKeyDown = (e) => {
@@ -592,6 +827,13 @@ export default function RichEditor({
 
     const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
     const mod = isMac ? e.metaKey : e.ctrlKey;
+
+    if (mod && e.key.toLowerCase() === "a") {
+      e.preventDefault();
+      selectEntireEditor();
+      refreshUIFromDOMSelection();
+      return;
+    }
 
     if (mod && e.key.toLowerCase() === "z" && !e.shiftKey) {
       e.preventDefault();
@@ -604,11 +846,87 @@ export default function RichEditor({
       return;
     }
 
+    if (
+      e.key === "Backspace" ||
+      e.key === "Delete"
+    ) {
+      if (isEntireEditorSelected()) {
+        e.preventDefault();
+        clearEntireEditor();
+        return;
+      }
+
+      if (selectedBlockId) {
+        e.preventDefault();
+
+        applyTx((doc) =>
+          removeAtomicBlock(
+            doc,
+            selectedBlockId
+          )
+        );
+
+        setSelectedBlockId(null);
+        setSelectedBlockType(null);
+
+        return;
+      }
+    }
+
     if (e.key === "Tab") {
+      const selection = window.getSelection();
+      const currentCell = selection?.anchorNode?.nodeType === Node.ELEMENT_NODE
+        ? selection.anchorNode.closest("td,th")
+        : selection?.anchorNode?.parentElement?.closest("td,th");
+      const currentTable = currentCell?.closest("table");
+
+      if (currentCell && currentTable && rootRef.current?.contains(currentTable)) {
+        e.preventDefault();
+        const allCells = Array.from(currentTable.querySelectorAll("td, th"));
+        const currentIndex = allCells.indexOf(currentCell);
+
+        if (e.shiftKey) {
+          if (currentIndex > 0) {
+            const prevCell = allCells[currentIndex - 1];
+            prevCell.focus();
+            const range = document.createRange();
+            range.selectNodeContents(prevCell);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            refreshUIFromDOMSelection();
+          }
+        } else {
+          if (currentIndex < allCells.length - 1) {
+            const nextCell = allCells[currentIndex + 1];
+            nextCell.focus();
+            const range = document.createRange();
+            range.selectNodeContents(nextCell);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            refreshUIFromDOMSelection();
+          } else {
+            addTableRow("below");
+            setTimeout(() => {
+              const updatedCells = Array.from(currentTable.querySelectorAll("td, th"));
+              const newCell = updatedCells[allCells.length];
+              if (newCell) {
+                newCell.focus();
+                const range = document.createRange();
+                range.selectNodeContents(newCell);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                refreshUIFromDOMSelection();
+              }
+            }, 10);
+          }
+        }
+        return;
+      }
+
       const codeEl = getActiveCodeElement();
       if (codeEl) {
         e.preventDefault();
-        insertPlainTextAtSelection("	");
+        insertPlainTextAtSelection("\t");
         setTimeout(handleScheduleSyncFromDOM, 0);
         return;
       }
@@ -653,8 +971,15 @@ export default function RichEditor({
     const el = rootRef.current;
     if (!el) return;
 
+    const textContent = (el.textContent || "").replace(/[\u200B\u00A0]/g, "").trim();
+    const hasMediaOrTable = !!el.querySelector("table, img, iframe, pre, h1, h2, h3, ul, ol, figure, [data-re-node]");
+
+    let next = htmlToDoc(el.innerHTML);
+    if (!textContent && !hasMediaOrTable) {
+      next = defaultDoc();
+    }
+
     const prev = docRef.current || defaultDoc();
-    const next = htmlToDoc(el.innerHTML);
     const prevJson = JSON.stringify(prev);
     const nextJson = JSON.stringify(next);
 
@@ -665,7 +990,7 @@ export default function RichEditor({
 
     const now = Date.now();
     if (now - lastHistoryAtRef.current > 1000) {
-      pushHistory(prev);
+      pushHistory(prev, selectionRef.current);
       lastHistoryAtRef.current = now;
     }
 
@@ -679,6 +1004,8 @@ export default function RichEditor({
     ui.setWordCount(editorState.calculateWordCount());
   };
 
+  const selectedBlock = docRef.current?.content?.find((b) => b.id === selectedBlockId);
+
   return (
     <div
       ref={wrapRef}
@@ -687,6 +1014,8 @@ export default function RichEditor({
       onMouseMove={(event) => updateTableHoverUIFromTarget(event.target)}
       onMouseLeave={scheduleTableHoverClose}
       onClick={(e) => {
+        handleClick(e);
+
         const a = e.target?.closest?.("a");
         if (!a) return;
 
@@ -697,6 +1026,7 @@ export default function RichEditor({
         const href = a.getAttribute("href") || "";
         if (href) window.open(href, "_blank", "noopener,noreferrer");
       }}
+      onDoubleClick={handleDoubleClick}
     >
       <Toolbar
         disabled={disabled}
@@ -710,8 +1040,17 @@ export default function RichEditor({
         onUndo={undo}
         onRedo={redo}
         onToggleMark={(mark) => applyTx((d, s) => toggleInlineMark(d, s, mark))}
+        onSetBlockType={(type, level) => applyTx((d, s) => setBlockType(d, s, type, level))}
+        onToggleList={(type) => applyTx((d, s) => toggleList(d, s, type))}
+        onSetAlign={(alignment) => applyTx((d, s) => setAlign(d, s, alignment))}
         onIndent={(amount) => applyTx((d, s) => indentBlock(d, s, amount))}
         onInsertTable={openTablePopup}
+        onInsertImage={() => ui.setImageUI((prev) => ({ ...prev, open: true }))}
+        onInsertEquation={openEquationModal}
+        onInsertSymbol={() => ui.setSymbolUI((prev) => ({ ...prev, open: true }))}
+        onSetColor={(col) => applyTx((d, s) => setColor(d, s, col))}
+        onSetHighlight={(col) => applyTx((d, s) => setHighlight(d, s, col))}
+        onSetFontSize={(size) => applyTx((d, s) => setFontSize(d, s, size))}
         onOpenLink={openLinkModal}
         onFormatChange={handleFormatChange}
         onAlignChange={handleAlignChange}
@@ -719,6 +1058,19 @@ export default function RichEditor({
         onHighlightChange={handleHighlightChange}
         onFontSizeChange={handleFontSizeChange}
       />
+
+      {selectedBlockType === "image" && selectedBlock ? (
+        <ImageToolbar
+          block={selectedBlock}
+          onUpdate={(updates) => applyTx((d) => updateAtomicBlock(d, selectedBlockId, updates))}
+          onDelete={() => {
+            applyTx((d) => removeAtomicBlock(d, selectedBlockId));
+            setSelectedBlockId(null);
+            setSelectedBlockType(null);
+          }}
+          onClose={() => setSelectedBlockId(null)}
+        />
+      ) : null}
 
       <Editor
         rootRef={rootRef}
@@ -739,6 +1091,16 @@ export default function RichEditor({
         }}
         onPaste={(event) => {
           if (disabled) return;
+
+          const imageFile = Array.from(event.clipboardData?.files || []).find((file) =>
+            file.type.startsWith("image/")
+          );
+          if (imageFile) {
+            event.preventDefault();
+            uploadAndInsertImage(imageFile);
+            return;
+          }
+
           const codeEl = event.target?.closest?.("pre,code") || getActiveCodeElement();
           if (codeEl) {
             event.preventDefault();
@@ -746,6 +1108,20 @@ export default function RichEditor({
             insertPlainTextAtSelection(text.replace(/\r\n?/g, "\n"));
           }
           setTimeout(handleScheduleSyncFromDOM, 0);
+        }}
+        onDragOver={(e) => {
+          if (e.dataTransfer?.types?.includes("Files")) {
+            e.preventDefault();
+          }
+        }}
+        onDrop={(e) => {
+          const imageFile = Array.from(e.dataTransfer?.files || []).find((file) =>
+            file.type.startsWith("image/")
+          );
+          if (imageFile) {
+            e.preventDefault();
+            uploadAndInsertImage(imageFile);
+          }
         }}
       />
 
@@ -774,24 +1150,31 @@ export default function RichEditor({
                 <button type="button" className="re-table-action-menu__item" onClick={() => addTableColumn("left")}><span className="re-table-action-menu__icon">↤</span><span>Add column left</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={() => addTableColumn("right")}><span className="re-table-action-menu__icon">↦</span><span>Add column right</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={removeTableColumn}><span className="re-table-action-menu__icon">🗑</span><span>Remove column</span></button>
+                <button type="button" className="re-table-action-menu__item re-table-action-menu__item--danger" onClick={removeEntireTable}><span className="re-table-action-menu__icon">❌</span><span>Delete table</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={() => setHoveredTableTheme("blue")}><span className="re-table-action-menu__icon">🔷</span><span>Blue table theme</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={() => setHoveredTableTheme("plain")}><span className="re-table-action-menu__icon">⬜</span><span>Plain table theme</span></button>
-                <div className="re-table-action-menu__section">
-                  <div className="re-table-action-menu__section-title"><span className="re-table-action-menu__icon">🎨</span><span>Header colors</span></div>
-                  {[
-                    { value: "#dbeafe", label: "Blue" },
-                    { value: "#dcfce7", label: "Green" },
-                    { value: "#fef3c7", label: "Gold" },
-                    { value: "#fee2e2", label: "Rose" },
-                    { value: "#ede9fe", label: "Lavender" },
-                    { value: "#e0f2fe", label: "Sky" },
-                  ].map((option) => (
-                    <button key={option.value} type="button" className="re-table-action-menu__item re-table-action-menu__item--color" onClick={() => setHoveredTableHeaderColor(option.value)}>
-                      <span className="re-table-action-menu__icon">🎨</span>
-                      <span>{option.label}</span>
-                      <span className="re-color-dot" style={{ backgroundColor: option.value }} aria-hidden="true" />
-                    </button>
-                  ))}
+                <div className="re-table-action-menu__section" style={{ position: "relative" }}>
+                  <div className="re-table-action-menu__section-title"><span className="re-table-action-menu__icon">🎨</span><span>Header & Border 256 RGB Colors</span></div>
+                  <button
+                    type="button"
+                    className="re-table-action-menu__item"
+                    onClick={() => {
+                      setTableMenuOpen((prev) => ({ ...prev, headerColorPicker: !prev.headerColorPicker }));
+                    }}
+                  >
+                    <span className="re-table-action-menu__icon">🎨</span>
+                    <span>Header Color (256 RGB)</span>
+                  </button>
+                  {tableMenuOpen.headerColorPicker && (
+                    <ColorPickerPopup
+                      value="#dbeafe"
+                      allowNone={true}
+                      title="Header Color (256 / RGB)"
+                      onChange={(color) => setHoveredTableHeaderColor(color)}
+                      onClose={() => setTableMenuOpen((prev) => ({ ...prev, headerColorPicker: false }))}
+                      position={{ top: "100%", left: 0 }}
+                    />
+                  )}
                 </div>
               </div>
             ) : null}
@@ -820,6 +1203,7 @@ export default function RichEditor({
                 <button type="button" className="re-table-action-menu__item" onClick={() => addTableRow("above")}><span className="re-table-action-menu__icon">↑</span><span>Add row above</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={() => addTableRow("below")}><span className="re-table-action-menu__icon">↓</span><span>Add row below</span></button>
                 <button type="button" className="re-table-action-menu__item" onClick={removeTableRow}><span className="re-table-action-menu__icon">🗑</span><span>Remove row</span></button>
+                <button type="button" className="re-table-action-menu__item re-table-action-menu__item--danger" onClick={removeEntireTable}><span className="re-table-action-menu__icon">❌</span><span>Delete table</span></button>
               </div>
             ) : null}
           </div>
@@ -828,13 +1212,74 @@ export default function RichEditor({
 
       {showFooter ? <EditorFooter wordCount={ui.wordCount} /> : null}
 
+      <SymbolPopup
+        open={ui.symbolUI.open}
+        onClose={() => ui.setSymbolUI((prev) => ({ ...prev, open: false }))}
+        onSelectSymbol={(sym) => applyTx((d, s) => insertText(d, s, sym))}
+      />
+
+      <ImageModal
+        open={ui.imageUI.open}
+        onClose={() => ui.setImageUI((prev) => ({ ...prev, open: false }))}
+        onSubmit={(imgData) => applyTx((d, s) => insertImage(d, s, imgData))}
+        onUploadImage={onUploadImage}
+      />
+
+      <EquationModal
+        open={ui.equationUI.open}
+        initialEquation={
+          ui.equationUI.editingId
+            ? {
+                id: ui.equationUI.editingId,
+                source: ui.equationUI.source,
+                ast: ui.equationUI.ast,
+                display: "inline",
+              }
+            : null
+        }
+        onClose={() => {
+          equationInsertSelectionRef.current = null;
+
+          ui.setEquationUI((previous) => ({
+            ...previous,
+            open: false,
+          }));
+        }}
+        onSubmit={(eqData) => {
+          if (ui.equationUI.editingId) {
+            applyTx((doc) =>
+              updateAtomicBlock(
+                doc,
+                ui.equationUI.editingId,
+                eqData
+              )
+            );
+          } else {
+            const savedSelection =
+              equationInsertSelectionRef.current;
+
+            applyTx((doc, currentSelection) =>
+              insertEquation(
+                doc,
+                savedSelection ||
+                  currentSelection,
+                eqData
+              )
+            );
+          }
+
+          equationInsertSelectionRef.current =
+            null;
+        }}
+      />
+
       <LinkModal
         linkUI={ui.linkUI}
         linkInputRef={linkInputRef}
         onHrefChange={(href) => ui.setLinkUI((x) => ({ ...x, href }))}
         onApply={applyLinkFromModal}
         onRemove={removeLinkFromModal}
-        onClose={() => ui.setLinkUI({ open: false, href: "", x: 0, y: 0 })}
+        onClose={() => ui.setLinkUI({ open: false, href: "", x: 0, y: 0, selection: null })}
       />
 
       <TablePopup

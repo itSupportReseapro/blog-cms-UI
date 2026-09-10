@@ -15,7 +15,8 @@ export function updateContactUs(id, payload) {
 }
 
 export function getAboutUsById(id) {
-  return getSingle(`/getAboutUsById/${id}`, "Failed to fetch about us");
+  const appId = id || CMS_DEFAULTS.appId;
+  return getSingle(`/getAboutUs/${appId}`, "Failed to fetch about us");
 }
 
 export function createAboutUs(payload) {
@@ -27,8 +28,9 @@ export function updateAboutUs(id, payload) {
 }
 
 export function getAboutUsMissionAndVisionById(id) {
+  const appId = id || CMS_DEFAULTS.appId;
   return getSingle(
-    `/getAboutUsMissionAndVisionById/${id}`,
+    `/getAboutUsMissionAndVision/${appId}`,
     "Failed to fetch about us mission and vision"
   );
 }
@@ -50,7 +52,8 @@ export function updateAboutUsMissionAndVision(id, payload) {
 }
 
 export function getAboutUsOurValuesById(id) {
-  return getSingle(`/getAboutUsOurValuesById/${id}`, "Failed to fetch about us values");
+  const appId = id || CMS_DEFAULTS.appId;
+  return getSingle(`/getAboutUsOurValues/${appId}`, "Failed to fetch about us values");
 }
 
 export function createAboutUsOurValues(payload) {
